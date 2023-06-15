@@ -54,30 +54,29 @@ stages:
       - script: python -m poetry run python -m pytest
         displayName: 'Test with pytest'
 
-- stage: build
-  displayName: Build package and post to PyPI
-  dependsOn: unitTests
-  # Run only if previous stage succeeded. Don't run for tagging events
-  condition: and(succeeded(), eq(variables.isMaster, true))
-
-  jobs:
-    - job: buildAndUpload
-      displayName: Build and Upload to PyPI
-
-      steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.10'
-        displayName: 'Use Python 3.10'
-
-      - script: |
-          python -m ensurepip
-          python -m pip install --upgrade pip
-          python -m pip install poetry==1.4.1
-        displayName: 'Install poetry 1.4.1'
-      
-      - script: python -m poetry install
-        displayName: 'Install dependencies'
-      
-      - script: python -m poetry publish --build --username $(PYPI_USER) --password $(PYPI_TOKEN)
-        
+#- stage: build
+#  displayName: Build package and post to PyPI
+#  dependsOn: unitTests
+#  # Run only if previous stage succeeded. Don't run for tagging events
+#  condition: and(succeeded(), eq(variables.isMaster, true))
+#
+#  jobs:
+#    - job: buildAndUpload
+#      displayName: Build and Upload to PyPI
+#
+#      steps:
+#      - task: UsePythonVersion@0
+#        inputs:
+#          versionSpec: '3.10'
+#        displayName: 'Use Python 3.10'
+#
+#      - script: |
+#          python -m ensurepip
+#          python -m pip install --upgrade pip
+#          python -m pip install poetry==1.4.1
+#        displayName: 'Install poetry 1.4.1'
+#
+#      - script: python -m poetry install
+#        displayName: 'Install dependencies'
+#
+#      - script: python -m poetry publish --build --username $(PYPI_USER) --password $(PYPI_TOKEN)
