@@ -11,6 +11,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
 from microdata_tools.exceptions import ValidationException
+from microdata_tools._utils import check_exists
 
 logger = logging.getLogger()
 
@@ -20,25 +21,17 @@ def _encrypt_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) ->
     Encrypts a dataset as follows:
         1. Generates the symmetric key for this dataset.
         2. Encrypts the dataset using the symmetric key.
-        3. Encrypts the symmetric key using the public rsa key.
+        3. Encrypts the symmetric key using the RSA public key.
     """
 
-    if not rsa_keys_dir.exists():
-        raise ValidationException(f"The RSA keys directory {rsa_keys_dir} has to exist")
-
-    if not dataset_dir.exists():
-        raise ValidationException(
-            f"The directory containing the dataset files to encrypt {dataset_dir} "
-            "has to exist."
-        )
+    check_exists(rsa_keys_dir)
+    check_exists(dataset_dir)
 
     if not output_dir.exists():
         os.makedirs(output_dir)
 
     public_key_location = rsa_keys_dir / "microdata_public_key.pem"
-
-    if not public_key_location.is_file():
-        raise ValidationException(f"Public key {public_key_location} not found")
+    check_exists(public_key_location)
 
     # Read public key from file
     with open(public_key_location, "rb") as key_file:
@@ -108,8 +101,7 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
     :param dataset_name: the name of the dataset
     """
 
-    if not input_dir.exists():
-        raise ValidationException(f"Input directory {input_dir} does not exist")
+    check_exists(input_dir)
 
     if len(list((input_dir / dataset_name).iterdir())) == 0:
         raise ValidationException(f"No files found in {input_dir / dataset_name}")

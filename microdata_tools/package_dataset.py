@@ -14,13 +14,17 @@ def package_dataset(
     output_dir: Path,
 ) -> None:
     """
-    Encrypt a dataset and tar the resulting files.
-    Only the CSV file will be encrypted.
+    Packages a dataset. It will encrypt and tar the dataset using
+    the provided RSA public key. Only the CSV file will be encrypted.
 
-    :param rsa_keys_dir: directory containing public key file microdata_public_key.pem
-    :param dataset_dir: directory containing the dataset files (CSV and JSON)
-    :param output_dir: directory to encrypt to
-    :return: None
+    :param rsa_keys_dir:
+        directory containing public key file microdata_public_key.pem
+    :param dataset_dir:
+        directory containing the dataset files (CSV and JSON)
+    :param output_dir:
+        output directory
+    :return:
+        None
     """
 
     dataset_name = dataset_dir.stem
