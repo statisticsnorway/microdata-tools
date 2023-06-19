@@ -1,2 +1,10 @@
 class ValidationException(Exception):
-    pass
+    ...
+
+
+class InvalidTarFileContents(Exception):
+    ...
+
+
+class InvalidKeyError(Exception):
+    ...
