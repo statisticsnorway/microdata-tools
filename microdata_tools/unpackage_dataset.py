@@ -4,7 +4,7 @@ from pathlib import Path
 import shutil
 from typing import Union
 from microdata_tools._utils import check_exists
-from microdata_tools._decrypt import _decrypt, _untar_encrypted_dataset
+from microdata_tools._decrypt import decrypt, untar_encrypted_dataset
 
 logger = logging.getLogger()
 
@@ -44,8 +44,8 @@ def unpackage_dataset(
     logger.info(f"Unpackaging {packaged_file_path}")
 
     try:
-        _untar_encrypted_dataset(packaged_file_path, dataset_name, dataset_dir)
-        _decrypt(rsa_keys_dir, dataset_dir, output_dir)
+        untar_encrypted_dataset(packaged_file_path, dataset_name, dataset_dir)
+        decrypt(rsa_keys_dir, dataset_dir, output_dir)
         if archive_dir is not None:
             _archive(dataset_name, dataset_dir.parent, archive_dir, "unpackaged")
         logger.info(f"Unpackaged {packaged_file_path}")

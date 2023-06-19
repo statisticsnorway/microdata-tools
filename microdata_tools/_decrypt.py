@@ -16,7 +16,7 @@ from microdata_tools._utils import check_exists
 logger = logging.getLogger()
 
 
-def _decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
+def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     dataset_name = dataset_dir.stem
     encrypted_csv_file = Path(dataset_dir / f"{dataset_name}.csv.encr")
     output_dataset_dir = output_dir / dataset_name
@@ -86,7 +86,7 @@ def _copy_metadata_file(dataset_dir, dataset_name, output_dataset_dir):
     os.remove(metadata_file_path)
 
 
-def _untar_encrypted_dataset(input_file: Path, dataset_name: str, untar_dir: Path):
+def untar_encrypted_dataset(input_file: Path, dataset_name: str, untar_dir: Path):
     with tarfile.open(input_file) as tar:
         _validate_tar_contents(tar.getnames(), dataset_name)
         tar.extractall(path=untar_dir)
