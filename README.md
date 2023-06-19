@@ -18,7 +18,7 @@ my-input-directory/
 The CSV file is optional in some cases.
 
 ### Package dataset
-The `package_dataset()` function will encrypt and package your datset as a tar archive. The process is as follows:
+The `package_dataset()` function will encrypt and package your dataset as a tar archive. The process is as follows:
 
 1. Generate the symmetric key for a dataset.
 2. Encrypt the dataset data (CSV) using the symmetric key and store the encrypted file as `<DATASET_NAME>.csv.encr`
@@ -27,7 +27,7 @@ The `package_dataset()` function will encrypt and package your datset as a tar a
 4. Gather the encrypted CSV, encrypted symmetric key and metadata (JSON) file in one tar file.
 
 ### Unpackage dataset
-The `unpackage_dataset()` function will untar and decrypt your datset using the `microdata_private_key.pem`
+The `unpackage_dataset()` function will untar and decrypt your dataset using the `microdata_private_key.pem`
 RSA private key.
 
 The packaged file has to have the `<DATASET_NAME>.tar` extension. Its contents should be as follows:
