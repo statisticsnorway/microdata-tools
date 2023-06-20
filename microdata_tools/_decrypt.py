@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import shutil
 import tarfile
+import re
 from typing import List
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -18,9 +19,18 @@ logger = logging.getLogger()
 
 def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     dataset_name = dataset_dir.stem
-    encrypted_csv_file = Path(dataset_dir / f"{dataset_name}.csv.encr")
+    encrypted_csv_file = Path(dataset_dir / f"{dataset_name}_chunk_1.csv.encr")
     output_dataset_dir = output_dir / dataset_name
 
+    if not output_dataset_dir.exists():
+        os.makedirs(output_dataset_dir)
+
+        # if chunk_dir.exists():
+        #     logger.info(f"Encrypted file found in {dataset_dir}")
+
+        # Create temp directory for decrypted chunks
+        decrypted_dir = output_dir / "decrypted"
+        os.makedirs(decrypted_dir, exist_ok=True)
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
 
@@ -46,24 +56,37 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
                 label=None,
             ),
         )
+        # Decrypt all the encrypted csv files in the directory
+        for encrypted_file in dataset_dir.glob(f"{dataset_name}_chunk_*.csv.encr"):
+            csv_file = encrypted_file.stem
 
-        with open(encrypted_csv_file, "rb") as f:
-            data = f.read()
+            # Decrypt csv file
+            with open(encrypted_file, "rb") as file:
+                data = file.read()
 
-        fernet = Fernet(decrypted_symkey)
-        try:
-            decrypted = fernet.decrypt(data)
-            with open(Path(dataset_dir / f"{dataset_name}.csv"), "wb") as f:
-                f.write(decrypted)
-        except InvalidToken as exc:
-            raise InvalidKeyError(
-                f"Not able to decrypt {encrypted_csv_file}, is symkey correct?"
-            ) from exc
+            fernet = Fernet(decrypted_symkey)
+            try:
+                decrypted_data = fernet.decrypt(data)
+
+                with open(decrypted_dir / f"{csv_file}", "wb") as file:
+                    file.write(decrypted_data)
+
+            except InvalidToken as exc:
+                raise InvalidKeyError(
+                    f"Not able to decrypt {encrypted_csv_file}, is symkey correct?"
+                ) from exc
 
         logger.debug(f"Decrypted {encrypted_csv_file}")
+
+        # Merges the decrypted csv files into a single file
+        _combine_csv_files(decrypted_dir, dataset_dir / f"{dataset_name}.csv")
+
         _copy_decrypted_data_to_output_dir(
             dataset_dir, dataset_name, output_dataset_dir
         )
+
+        # Remove decrypted chunks
+        shutil.rmtree(decrypted_dir)
 
     _copy_metadata_file(dataset_dir, dataset_name, output_dataset_dir)
 
@@ -93,26 +116,52 @@ def untar_encrypted_dataset(input_file: Path, dataset_name: str, untar_dir: Path
 
 
 def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
-    if len(files) == 1:
-        if f"{dataset_name}.json" not in files:
-            raise InvalidTarFileContents(f"{dataset_name}.json not in .tar file")
-        else:
-            return
+    if f"{dataset_name}.json" not in files:
+        raise InvalidTarFileContents(f"{dataset_name}.json not in .tar file")
 
-    if len(files) == 3:
-        if (
-            f"{dataset_name}.json" not in files
-            or f"{dataset_name}.csv.encr" not in files
-            or f"{dataset_name}.symkey.encr" not in files
-        ):
+    if len(files) > 1:
+        if f"{dataset_name}.symkey.encr" not in files:
             raise InvalidTarFileContents(
-                f"Tar file for {dataset_name} does not contain the "
-                f"required {dataset_name}.csv.encr "
-                f"or {dataset_name}.symkey.encr file "
-                f"or {dataset_name}.json file "
+                f"Tar file for {dataset_name} does not contain the required "
+                f"{dataset_name}.symkey.encr file"
             )
-    else:
-        raise InvalidTarFileContents(
-            f"Tar file for {dataset_name} contains "
-            f"incorrect number ({len(files)}) of files: {files}"
-        )
+
+        chunk_files = [str for str in files if str.endswith(".csv.encr")]
+
+        if len(chunk_files) == 0:
+            raise InvalidTarFileContents(
+                f"Tar file for {dataset_name} does not contain any chunks files"
+            )
+
+
+def _combine_csv_files(input_dir: Path, output_file: Path) -> None:
+    sorted_chunkpaths = _get_sorted_file_names(input_dir)
+    logger.debug(f"\nCombining {len(sorted_chunkpaths)} files into {output_file}")
+
+    combined_file = open(output_file, "wb")
+    for chunk_number, file_name in sorted_chunkpaths.items():
+        chunkpath = input_dir / file_name
+        with open(chunkpath, "rb") as chunk_file:
+            chunk_data = chunk_file.read()
+            combined_file.write(chunk_data)
+    combined_file.close()
+
+
+# Turn files_names in input dir into a dictionary with the chunk number as key
+# Then return the sorted dictionary
+def _get_sorted_file_names(input_dir: Path) -> dict:
+    files_names = [f for f in os.listdir(input_dir) if f.endswith(".csv")]
+    # Regex to extract the chunk number from the file name
+    pattern = r".*chunk_(\d+).*"
+    file_name_dict = {}
+    for name in files_names:
+        match = re.match(pattern, name)
+        if match:
+            number = match.group(1)
+            file_name_dict[int(number)] = name
+        else:
+            logger.debug("No number found in the filename.")
+
+    # sort the dictionary by key
+    file_name_dict = dict(sorted(file_name_dict.items()))
+    return file_name_dict
