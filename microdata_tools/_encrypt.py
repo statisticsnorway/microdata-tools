@@ -1,8 +1,8 @@
 import logging
 import os
 from pathlib import Path
-import shutil
 import tarfile
+import shutil
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
@@ -14,6 +14,8 @@ from microdata_tools.exceptions import ValidationException
 from microdata_tools._utils import check_exists
 
 logger = logging.getLogger()
+
+CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
 
 def _encrypt_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
@@ -58,24 +60,36 @@ def _encrypt_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) ->
 
     dataset_output_dir = output_dir / dataset_name
     os.makedirs(dataset_output_dir)
+    os.makedirs(dataset_output_dir / "chunks", exist_ok=True)
 
-    encrypted_file = dataset_output_dir / f"{dataset_name}.csv.encr"
     encrypted_symkey_file = dataset_output_dir / f"{dataset_name}.symkey.encr"
 
     # Generate and store symmetric key for this file
     symkey = Fernet.generate_key()
 
     # Encrypt csv file
+    chunk_count = 0
+    logger.debug(f"Chunk size: {CHUNK_SIZE_BYTES} Bytes")
+
     with open(csv_file, "rb") as file:
-        data = file.read()  # Read the bytes of the input file
+        while True:
+            data = file.read(CHUNK_SIZE_BYTES)
+            if not data:
+                break
 
-    fernet = Fernet(symkey)
-    encrypted = fernet.encrypt(data)
+            chunk_count += 1
+            fernet = Fernet(symkey)
+            encrypted = fernet.encrypt(data)
 
-    with open(encrypted_file, "wb") as file:
-        file.write(encrypted)
+            chunk_file = (
+                dataset_output_dir
+                / "chunks"
+                / f"{dataset_name}_chunk_{chunk_count}.csv.encr"
+            )
+            with open(chunk_file, "wb") as chunk_output:
+                chunk_output.write(encrypted)
 
-    logger.debug(f"Csv file {csv_file} encrypted into {encrypted_file}")
+    logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
     encrypted_sym_key = public_key.encrypt(
         symkey,
@@ -103,26 +117,32 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
 
     check_exists(input_dir)
 
-    if len(list((input_dir / dataset_name).iterdir())) == 0:
-        raise ValidationException(f"No files found in {input_dir / dataset_name}")
+    dataset_dir = input_dir / dataset_name
+
+    if not dataset_dir.exists():
+        raise ValidationException(f"Dataset directory {dataset_dir} not found")
 
     tar_file_name = f"{dataset_name}.tar"
     full_tar_file_name = input_dir / tar_file_name
-    files_to_tar = [
-        input_dir / dataset_name / f"{dataset_name}.csv.encr",
-        input_dir / dataset_name / f"{dataset_name}.symkey.encr",
-        input_dir / dataset_name / f"{dataset_name}.json",
-    ]
 
-    json_file = input_dir / dataset_name / f"{dataset_name}.json"
+    json_file = dataset_dir / f"{dataset_name}.json"
     if not json_file.exists():
         raise ValidationException(f"The required file {json_file} not found")
 
+    # dataset_dir / "chunks" / f"{dataset_name}_chunk_1.csv.encr"
+
+    files_to_tar = [dataset_dir / f"{dataset_name}.json"]
+    chunk_dir = dataset_dir / "chunks"
+    if chunk_dir.exists():
+        chunk_files = [file for file in chunk_dir.iterdir()]
+
+        files_to_tar.extend([dataset_dir / f"{dataset_name}.symkey.encr"])
+        files_to_tar.extend(chunk_files)
+
     with tarfile.open(full_tar_file_name, "w") as tar:
         for file in files_to_tar:
-            if file.exists():
-                logger.debug(f"Adding {file} to tar..")
-                tar.add(file, arcname=file.name)
+            tar.add(file, arcname=file.name)
 
-    shutil.rmtree(input_dir / dataset_name)
+    shutil.rmtree(dataset_dir)
+
     logger.debug(f"Archive {full_tar_file_name} created")
