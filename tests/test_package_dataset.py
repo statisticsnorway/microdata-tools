@@ -23,45 +23,48 @@ def teardown_function():
 
 
 def test_package_dataset():
+    dataset_name = "VALID"
+
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
     package_dataset(
         rsa_keys_dir=RSA_KEYS_DIRECTORY,
-        dataset_dir=Path(f"{INPUT_DIRECTORY}/DATASET_1"),
+        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=OUTPUT_DIRECTORY,
     )
 
-    result_file = OUTPUT_DIRECTORY / "DATASET_1.tar"
+    result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()
 
-    assert not Path(OUTPUT_DIRECTORY / "DATASET_1").exists()
+    assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
         assert len(tarred_files) == 3
-        assert "DATASET_1_chunk_1.csv.encr" in tarred_files
-        assert "DATASET_1.symkey.encr" in tarred_files
-        assert "DATASET_1.json" in tarred_files
+        assert f"{dataset_name}_chunk_1.csv.encr" in tarred_files
+        assert f"{dataset_name}.symkey.encr" in tarred_files
+        assert f"{dataset_name}.json" in tarred_files
 
 
 def test_package_dataset_just_json():
+    dataset_name = "ONLY_JSON"
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
     package_dataset(
         rsa_keys_dir=RSA_KEYS_DIRECTORY,
-        dataset_dir=Path(f"{INPUT_DIRECTORY}/DATASET_2"),
+        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=OUTPUT_DIRECTORY,
     )
 
-    result_file = OUTPUT_DIRECTORY / "DATASET_2.tar"
+    result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()
 
-    assert not Path(OUTPUT_DIRECTORY / "DATASET_2").exists()
+    assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
         assert len(tarred_files) == 1
-        assert "DATASET_2.json" in tarred_files
+        assert f"{dataset_name}.json" in tarred_files
 
 
 def _create_rsa_public_key(target_dir: Path):
