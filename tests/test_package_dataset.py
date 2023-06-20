@@ -38,7 +38,8 @@ def test_package_dataset():
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert "DATASET_1.csv.encr" in tarred_files
+        assert len(tarred_files) == 3
+        assert "DATASET_1_chunk_1.csv.encr" in tarred_files
         assert "DATASET_1.symkey.encr" in tarred_files
         assert "DATASET_1.json" in tarred_files
 
@@ -59,6 +60,7 @@ def test_package_dataset_just_json():
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
+        assert len(tarred_files) == 1
         assert "DATASET_2.json" in tarred_files
 
 
