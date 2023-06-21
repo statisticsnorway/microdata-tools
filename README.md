@@ -1,5 +1,5 @@
 # microdata-tools
-Tools for the microdata.no platform
+Tools for the [microdata.no](https://www.microdata.no/) platform
 
 ## Installation
 `microdata-tools` can be installed from PyPI using pip:
