@@ -18,6 +18,13 @@ logger = logging.getLogger()
 
 
 def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
+    """
+    Decrypts a dataset as follows:
+        1. Decrypts the symmetric key using the RSA private key.
+        2. Decrypts each chunk using the symmetric key.
+        3. Merges the decrypted chunks into a single file.
+    """
+
     dataset_name = dataset_dir.stem
     encrypted_csv_file = Path(dataset_dir / f"{dataset_name}_chunk_1.csv.encr")
     output_dataset_dir = output_dir / dataset_name
@@ -25,11 +32,8 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
 
-        # if chunk_dir.exists():
-        #     logger.info(f"Encrypted file found in {dataset_dir}")
-
         # Create temp directory for decrypted chunks
-        decrypted_dir = output_dir / "decrypted"
+        decrypted_dir = output_dataset_dir / "decrypted"
         os.makedirs(decrypted_dir, exist_ok=True)
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
@@ -56,6 +60,8 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
                 label=None,
             ),
         )
+        fernet = Fernet(decrypted_symkey)
+
         # Decrypt all the encrypted csv files in the directory
         for encrypted_file in dataset_dir.glob(f"{dataset_name}_chunk_*.csv.encr"):
             csv_file = encrypted_file.stem
@@ -64,7 +70,6 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
             with open(encrypted_file, "rb") as file:
                 data = file.read()
 
-            fernet = Fernet(decrypted_symkey)
             try:
                 decrypted_data = fernet.decrypt(data)
 

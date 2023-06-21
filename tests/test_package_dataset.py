@@ -55,7 +55,7 @@ def test_package_dataset_multiple_chunks():
         rsa_keys_dir=RSA_KEYS_DIRECTORY,
         dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=OUTPUT_DIRECTORY,
-        chunk_size=5,
+        chunk_size_bytes=5,
     )
 
     result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"

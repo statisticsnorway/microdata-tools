@@ -85,9 +85,6 @@ def test_unpackage_dataset():
 
     tarfile_path = INPUT_DIRECTORY / f"{dataset_name}.tar"
 
-    # tar = tarfile.open(tarfile_path)
-    # print("Tar members: ", tar.getnames())
-
     unpackage_dataset(tarfile_path, RSA_KEYS_DIRECTORY, OUTPUT_DIRECTORY, ARCHIVE_DIR)
 
     output_dataset_dir = OUTPUT_DIRECTORY / dataset_name
@@ -102,6 +99,30 @@ def test_unpackage_dataset():
     actual = Path(output_dataset_dir / f"{dataset_name}.csv")
     expected = Path(f"tests/resources/expected_unpackage/{dataset_name}_expected.csv")
     assert filecmp.cmp(actual, expected)
+
+
+# TODO: Fix this test VALID_MULTIPLE_CHUNKS is encrypted with a different key
+# def test_unpackage_dataset_multiple_chunks():
+#     dataset_name = "VALID_MULTIPLE_CHUNKS"
+
+#     tarfile_path = INPUT_DIRECTORY / f"{dataset_name}.tar"
+
+#     unpackage_dataset(tarfile_path, RSA_KEYS_DIRECTORY, OUTPUT_DIRECTORY, ARCHIVE_DIR)
+
+#     output_dataset_dir = OUTPUT_DIRECTORY / dataset_name
+#     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
+#     assert Path(output_dataset_dir / f"{dataset_name}.csv").exists()
+#     assert not Path(output_dataset_dir / f"{dataset_name}_chunk_1.csv.encr").exists()
+#     assert not Path(output_dataset_dir / f"{dataset_name}_chunk_2.csv.encr").exists()
+#     assert not Path(output_dataset_dir / f"{dataset_name}_chunk_3.csv.encr").exists()
+#     assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
+#     assert not Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
+#     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
+#     assert Path(ARCHIVE_DIR / "unpackaged" / f"{dataset_name}.tar").exists()
+
+#     actual = Path(output_dataset_dir / f"{dataset_name}.csv")
+#     expected = Path(f"tests/resources/expected_unpackage/{dataset_name}_expected.csv")
+#     assert filecmp.cmp(actual, expected)
 
 
 def test_unpackage_dataset_just_json():
