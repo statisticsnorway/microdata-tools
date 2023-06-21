@@ -47,9 +47,6 @@ def package_dataset(
             )
 
         if len(csv_files) == 1:
-            # check if symkey exists
-            check_exists(dataset_dir / f"{dataset_name}.symkey.encr")
-
             _encrypt_dataset(
                 rsa_keys_dir=rsa_keys_dir,
                 dataset_dir=dataset_dir,
