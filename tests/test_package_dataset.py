@@ -9,7 +9,7 @@ from cryptography.hazmat.backends import default_backend
 from microdata_tools import package_dataset
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
-INPUT_DIRECTORY = Path("tests/resources/input")
+INPUT_DIRECTORY = Path("tests/resources/input_package")
 OUTPUT_DIRECTORY = Path("tests/resources/output")
 
 
