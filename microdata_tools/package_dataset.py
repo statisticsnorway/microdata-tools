@@ -7,11 +7,14 @@ from microdata_tools._encrypt import _tar_encrypted_dataset, _encrypt_dataset
 
 logger = logging.getLogger()
 
+CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
+
 
 def package_dataset(
     rsa_keys_dir: Path,
     dataset_dir: Path,
     output_dir: Path,
+    chunk_size: int = CHUNK_SIZE_BYTES,
 ) -> None:
     """
     Packages a dataset. It will encrypt and tar the dataset using
@@ -36,6 +39,7 @@ def package_dataset(
             rsa_keys_dir=rsa_keys_dir,
             dataset_dir=dataset_dir,
             output_dir=output_dir,
+            chunk_size=chunk_size,
         )
     else:
         if not dataset_output_dir.exists():

@@ -18,12 +18,18 @@ logger = logging.getLogger()
 CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
 
-def _encrypt_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
+def _encrypt_dataset(
+    rsa_keys_dir: Path,
+    dataset_dir: Path,
+    output_dir: Path,
+    chunk_size_bytes: int = CHUNK_SIZE_BYTES,
+) -> None:
     """
     Encrypts a dataset as follows:
         1. Generates the symmetric key for this dataset.
-        2. Encrypts the dataset using the symmetric key.
-        3. Encrypts the symmetric key using the RSA public key.
+        2. Splits the dataset into chunks.
+        3. Encrypts each chunk using the symmetric key.
+        4. Encrypts the symmetric key using the RSA public key.
     """
 
     check_exists(rsa_keys_dir)
@@ -60,19 +66,19 @@ def _encrypt_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) ->
 
     # Generate and store symmetric key for this file
     symkey = Fernet.generate_key()
+    fernet = Fernet(symkey)
 
     # Encrypt csv file
     chunk_count = 0
-    logger.debug(f"Chunk size: {CHUNK_SIZE_BYTES} Bytes")
+    logger.debug(f"Chunk size: {chunk_size_bytes} Bytes")
 
     with open(csv_file, "rb") as file:
         while True:
-            data = file.read(CHUNK_SIZE_BYTES)
+            data = file.read(chunk_size_bytes)
             if not data:
                 break
 
             chunk_count += 1
-            fernet = Fernet(symkey)
             encrypted = fernet.encrypt(data)
 
             chunk_file = (
@@ -122,8 +128,6 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
     json_file = dataset_dir / f"{dataset_name}.json"
     if not json_file.exists():
         raise ValidationException(f"The required file {json_file} not found")
-
-    # dataset_dir / "chunks" / f"{dataset_name}_chunk_1.csv.encr"
 
     files_to_tar = [dataset_dir / f"{dataset_name}.json"]
     chunk_dir = dataset_dir / "chunks"
