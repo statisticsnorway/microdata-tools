@@ -43,12 +43,6 @@ def _encrypt_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) ->
 
     csv_files = [file for file in dataset_dir.iterdir() if file.suffix == ".csv"]
 
-    if len(csv_files) == 0:
-        raise ValidationException(f"No csv files found in {dataset_dir}")
-
-    if len(csv_files) > 1:
-        raise ValidationException(f"There should only be one csv file in {dataset_dir}")
-
     csv_file = csv_files[0]
     dataset_name = csv_file.stem
 
