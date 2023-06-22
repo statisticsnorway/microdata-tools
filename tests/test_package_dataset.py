@@ -43,8 +43,8 @@ def test_package_dataset():
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert len(tarred_files) == 3
-        assert f"{dataset_name}_chunk_1.csv.encr" in tarred_files
+        assert len(tarred_files) == 4  # the chunk dir adds an extra "file" when peeking
+        assert "chunks/1.csv.encr" in tarred_files
         assert f"{dataset_name}.symkey.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
 
@@ -68,10 +68,10 @@ def test_package_dataset_multiple_chunks():
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert len(tarred_files) == 5
-        assert f"{dataset_name}_chunk_1.csv.encr" in tarred_files
-        assert f"{dataset_name}_chunk_2.csv.encr" in tarred_files
-        assert f"{dataset_name}_chunk_3.csv.encr" in tarred_files
+        assert len(tarred_files) == 6  # the chunk dir adds an extra "file" when peeking
+        assert "chunks/1.csv.encr" in tarred_files
+        assert "chunks/2.csv.encr" in tarred_files
+        assert "chunks/3.csv.encr" in tarred_files
         assert f"{dataset_name}.symkey.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
 

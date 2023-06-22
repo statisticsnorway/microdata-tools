@@ -92,7 +92,7 @@ def test_unpackage_dataset():
     output_dataset_dir = OUTPUT_DIRECTORY / dataset_name
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
     assert Path(output_dataset_dir / f"{dataset_name}.csv").exists()
-    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_1.csv.encr").exists()
+    assert not Path(output_dataset_dir / "chunks/1.csv.encr").exists()
     assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
     assert not Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
@@ -125,9 +125,9 @@ def test_unpackage_dataset_multiple_chunks():
     output_dataset_dir = OUTPUT_DIRECTORY / dataset_name
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
     assert Path(output_dataset_dir / f"{dataset_name}.csv").exists()
-    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_1.csv.encr").exists()
-    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_2.csv.encr").exists()
-    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_3.csv.encr").exists()
+    assert not Path(output_dataset_dir / "chunks/1.csv.encr").exists()
+    assert not Path(output_dataset_dir / "chunks/2.csv.encr").exists()
+    assert not Path(output_dataset_dir / "chunks/3.csv.encr").exists()
     assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
     assert not Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()

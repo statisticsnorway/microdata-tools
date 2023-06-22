@@ -80,11 +80,7 @@ def _encrypt_dataset(
             chunk_count += 1
             encrypted = fernet.encrypt(data)
 
-            chunk_file = (
-                dataset_output_dir
-                / "chunks"
-                / f"{dataset_name}_chunk_{chunk_count}.csv.encr"
-            )
+            chunk_file = dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
             with open(chunk_file, "wb") as chunk_output:
                 chunk_output.write(encrypted)
 
@@ -130,15 +126,20 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
 
     files_to_tar = [dataset_dir / f"{dataset_name}.json"]
     chunk_dir = dataset_dir / "chunks"
+
     if chunk_dir.exists():
         chunk_files = [file for file in chunk_dir.iterdir()]
+        if len(chunk_files) == 0:
+            raise ValidationException(f"No files found in {chunk_dir}")
 
         files_to_tar.extend([dataset_dir / f"{dataset_name}.symkey.encr"])
-        files_to_tar.extend(chunk_files)
+        # files_to_tar.extend(chunk_files)
 
     with tarfile.open(full_tar_file_name, "w") as tar:
         for file in files_to_tar:
-            tar.add(file, arcname=file.name)
+            tar.add(file, arcname=os.path.basename(file))
+        if chunk_dir.exists():
+            tar.add(chunk_dir, arcname=os.path.basename(chunk_dir))
 
     shutil.rmtree(dataset_dir)
 

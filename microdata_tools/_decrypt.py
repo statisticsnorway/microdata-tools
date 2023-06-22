@@ -3,8 +3,7 @@ import os
 from pathlib import Path
 import shutil
 import tarfile
-import re
-from typing import List
+from typing import List, Tuple
 
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
@@ -26,8 +25,9 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     """
 
     dataset_name = dataset_dir.stem
-    encrypted_csv_file = Path(dataset_dir / f"{dataset_name}_chunk_1.csv.encr")
     output_dataset_dir = output_dir / dataset_name
+    chunk_dir = dataset_dir / "chunks"
+    first_encrypted_chunk = Path(chunk_dir / "1.csv.encr")
 
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
@@ -39,7 +39,7 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
 
-    if encrypted_csv_file.exists():
+    if chunk_dir.exists() and first_encrypted_chunk.exists():
         logger.info(f"Encrypted file found in {dataset_dir}")
 
         with open(Path(rsa_keys_dir / "microdata_private_key.pem"), "rb") as key_file:
@@ -64,25 +64,26 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
         fernet = Fernet(decrypted_symkey)
 
         # Decrypt all the encrypted csv files in the directory
-        for encrypted_file in dataset_dir.glob(f"{dataset_name}_chunk_*.csv.encr"):
-            csv_file = encrypted_file.stem
+        for encrypted_file in chunk_dir.iterdir():
+            if encrypted_file.name.endswith(".csv.encr"):
+                csv_file = encrypted_file.stem
 
-            # Decrypt csv file
-            with open(encrypted_file, "rb") as file:
-                data = file.read()
+                # Decrypt csv file
+                with open(encrypted_file, "rb") as file:
+                    data = file.read()
 
-            try:
-                decrypted_data = fernet.decrypt(data)
+                try:
+                    decrypted_data = fernet.decrypt(data)
 
-                with open(decrypted_dir / f"{csv_file}", "wb") as file:
-                    file.write(decrypted_data)
+                    with open(decrypted_dir / f"{csv_file}", "wb") as file:
+                        file.write(decrypted_data)
 
-            except InvalidToken as exc:
-                raise InvalidKeyError(
-                    f"Not able to decrypt {encrypted_csv_file}, is symkey correct?"
-                ) from exc
+                except InvalidToken as exc:
+                    raise InvalidKeyError(
+                        f"Not able to decrypt {encrypted_file}, is symkey correct?"
+                    ) from exc
 
-        logger.debug(f"Decrypted {encrypted_csv_file}")
+                logger.debug(f"Decrypted {encrypted_file}")
 
         # Merges the decrypted csv files into a single file
         _combine_csv_files(decrypted_dir, dataset_dir / f"{dataset_name}.csv")
@@ -144,30 +145,17 @@ def _combine_csv_files(input_dir: Path, output_file: Path) -> None:
     sorted_chunkpaths = _get_sorted_file_names(input_dir)
     logger.debug(f"\nCombining {len(sorted_chunkpaths)} files into {output_file}")
 
-    combined_file = open(output_file, "wb")
-    for chunk_number, file_name in sorted_chunkpaths.items():
-        chunkpath = input_dir / file_name
-        with open(chunkpath, "rb") as chunk_file:
-            chunk_data = chunk_file.read()
-            combined_file.write(chunk_data)
-    combined_file.close()
+    with open(output_file, "wb") as combined_file:
+        for chunk_number, file_name in sorted_chunkpaths:
+            with open(file_name, "rb") as chunk_file:
+                chunk_data = chunk_file.read()
+                combined_file.write(chunk_data)
 
 
 # Turn files_names in input dir into a dictionary with the chunk number as key
 # Then return the sorted dictionary
-def _get_sorted_file_names(input_dir: Path) -> dict:
-    files_names = [f for f in os.listdir(input_dir) if f.endswith(".csv")]
-    # Regex to extract the chunk number from the file name
-    pattern = r".*chunk_(\d+).*"
-    file_name_dict = {}
-    for name in files_names:
-        match = re.match(pattern, name)
-        if match:
-            number = match.group(1)
-            file_name_dict[int(number)] = name
-        else:
-            logger.debug("No number found in the filename.")
-
-    # sort the dictionary by key
-    file_name_dict = dict(sorted(file_name_dict.items()))
-    return file_name_dict
+def _get_sorted_file_names(directory: Path) -> List[Tuple]:
+    try:
+        return sorted([(int(f.stem), f) for f in directory.iterdir() if f.is_file()])
+    except ValueError as e:
+        raise InvalidTarFileContents("Failed to sort files in chunk directory ") from e
