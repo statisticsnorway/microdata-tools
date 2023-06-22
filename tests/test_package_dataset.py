@@ -8,6 +8,8 @@ from cryptography.hazmat.backends import default_backend
 
 from microdata_tools import package_dataset
 
+from unittest.mock import patch
+
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
 INPUT_DIRECTORY = Path("tests/resources/input_package")
 OUTPUT_DIRECTORY = Path("tests/resources/output")
@@ -51,12 +53,12 @@ def test_package_dataset_multiple_chunks():
 
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
-    package_dataset(
-        rsa_keys_dir=RSA_KEYS_DIRECTORY,
-        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
-        output_dir=OUTPUT_DIRECTORY,
-        chunk_size_bytes=5,
-    )
+    with patch("microdata_tools._encrypt.CHUNK_SIZE_BYTES", new=5):
+        package_dataset(
+            rsa_keys_dir=RSA_KEYS_DIRECTORY,
+            dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
+            output_dir=OUTPUT_DIRECTORY,
+        )
 
     result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()

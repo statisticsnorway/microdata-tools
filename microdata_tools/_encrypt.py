@@ -22,7 +22,6 @@ def _encrypt_dataset(
     rsa_keys_dir: Path,
     dataset_dir: Path,
     output_dir: Path,
-    chunk_size_bytes: int = CHUNK_SIZE_BYTES,
 ) -> None:
     """
     Encrypts a dataset as follows:
@@ -70,11 +69,11 @@ def _encrypt_dataset(
 
     # Encrypt csv file
     chunk_count = 0
-    logger.debug(f"Chunk size: {chunk_size_bytes} Bytes")
+    logger.debug(f"Chunk size: {CHUNK_SIZE_BYTES} Bytes")
 
     with open(csv_file, "rb") as file:
         while True:
-            data = file.read(chunk_size_bytes)
+            data = file.read(CHUNK_SIZE_BYTES)
             if not data:
                 break
 

@@ -9,15 +9,8 @@ from microdata_tools._utils import check_exists
 
 logger = logging.getLogger()
 
-CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
-
-def package_dataset(
-    rsa_keys_dir: Path,
-    dataset_dir: Path,
-    output_dir: Path,
-    chunk_size_bytes: int = CHUNK_SIZE_BYTES,
-) -> None:
+def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
     """
     Packages a dataset. It will encrypt and tar the dataset using
     the provided RSA public key. Only the CSV file will be encrypted.
@@ -51,7 +44,6 @@ def package_dataset(
                 rsa_keys_dir=rsa_keys_dir,
                 dataset_dir=dataset_dir,
                 output_dir=output_dir,
-                chunk_size_bytes=chunk_size_bytes,
             )
         else:
             if not dataset_output_dir.exists():
