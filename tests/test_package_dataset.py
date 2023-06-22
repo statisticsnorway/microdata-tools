@@ -5,8 +5,8 @@ import tarfile
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
+from pytest import MonkeyPatch
 
-from unittest.mock import patch
 
 from microdata_tools import package_dataset
 
@@ -49,17 +49,18 @@ def test_package_dataset():
         assert f"{dataset_name}.json" in tarred_files
 
 
-def test_package_dataset_multiple_chunks():
+def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     dataset_name = "VALID"
 
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
-    with patch("microdata_tools._encrypt.CHUNK_SIZE_BYTES", new=5):
-        package_dataset(
-            rsa_keys_dir=RSA_KEYS_DIRECTORY,
-            dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
-            output_dir=OUTPUT_DIRECTORY,
-        )
+    monkeypatch.setattr("microdata_tools._encrypt.CHUNK_SIZE_BYTES", 5)
+
+    package_dataset(
+        rsa_keys_dir=RSA_KEYS_DIRECTORY,
+        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
+        output_dir=OUTPUT_DIRECTORY,
+    )
 
     result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()

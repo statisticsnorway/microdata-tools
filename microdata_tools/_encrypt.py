@@ -133,7 +133,6 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
             raise ValidationException(f"No files found in {chunk_dir}")
 
         files_to_tar.extend([dataset_dir / f"{dataset_name}.symkey.encr"])
-        # files_to_tar.extend(chunk_files)
 
     with tarfile.open(full_tar_file_name, "w") as tar:
         for file in files_to_tar:

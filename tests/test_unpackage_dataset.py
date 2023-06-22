@@ -5,8 +5,7 @@ import tarfile
 from pathlib import Path
 from typing import List
 
-import pytest
-from unittest.mock import patch
+from pytest import MonkeyPatch, fail, raises
 
 from microdata_tools import package_dataset, unpackage_dataset
 from microdata_tools._decrypt import _validate_tar_contents
@@ -38,7 +37,7 @@ def test_validate_tar_contents():
     try:
         _validate_tar_contents(tar.getnames(), dataset_name)
     except InvalidTarFileContents:
-        pytest.fail("InvalidTarFileContents raised unexpectedly")
+        fail("InvalidTarFileContents raised unexpectedly")
 
 
 def test_validate_tar_contents_only_json():
@@ -50,7 +49,7 @@ def test_validate_tar_contents_only_json():
     try:
         _validate_tar_contents(tar.getnames(), dataset_name)
     except InvalidTarFileContents:
-        pytest.fail("InvalidTarFileContents raised unexpectedly")
+        fail("InvalidTarFileContents raised unexpectedly")
 
 
 def test_validate_tar_contents_missing_symkey():
@@ -59,7 +58,7 @@ def test_validate_tar_contents_missing_symkey():
 
     tar = tarfile.open(tarfile_path)
 
-    with pytest.raises(InvalidTarFileContents) as e:
+    with raises(InvalidTarFileContents) as e:
         _validate_tar_contents(tar.getnames(), dataset_name)
         assert (
             str(e.value)
@@ -74,7 +73,7 @@ def test_validate_tar_contents_missing_chunk():
 
     tar = tarfile.open(tarfile_path)
 
-    with pytest.raises(InvalidTarFileContents) as e:
+    with raises(InvalidTarFileContents) as e:
         _validate_tar_contents(tar.getnames(), dataset_name)
         assert (
             str(e.value)
@@ -103,7 +102,7 @@ def test_unpackage_dataset():
     assert filecmp.cmp(actual, expected)
 
 
-def test_unpackage_dataset_multiple_chunks():
+def test_unpackage_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     dataset_name = "VALID"
     rsa_key = Path("tests/resources/rsa_keys")
 
@@ -111,12 +110,13 @@ def test_unpackage_dataset_multiple_chunks():
     assert Path(rsa_key / "microdata_public_key.pem").exists()
 
     # Produces more than 10 chunks
-    with patch("microdata_tools._encrypt.CHUNK_SIZE_BYTES", new=1):
-        package_dataset(
-            rsa_keys_dir=rsa_key,
-            dataset_dir=Path(f"tests/resources/input_package/{dataset_name}"),
-            output_dir=INPUT_DIRECTORY,
-        )
+    monkeypatch.setattr("microdata_tools._encrypt.CHUNK_SIZE_BYTES", 1)
+
+    package_dataset(
+        rsa_keys_dir=rsa_key,
+        dataset_dir=Path(f"tests/resources/input_package/{dataset_name}"),
+        output_dir=INPUT_DIRECTORY,
+    )
 
     result_file = INPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()
