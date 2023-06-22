@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import List
 
 import pytest
+from unittest.mock import patch
 
-from microdata_tools import unpackage_dataset
+from microdata_tools import package_dataset, unpackage_dataset
 from microdata_tools._decrypt import _validate_tar_contents
 from microdata_tools.exceptions import InvalidTarFileContents
+from tests.test_package_dataset import _create_rsa_public_key
 
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_test_key")
@@ -101,28 +103,39 @@ def test_unpackage_dataset():
     assert filecmp.cmp(actual, expected)
 
 
-# TODO: Fix this test VALID_MULTIPLE_CHUNKS is encrypted with a different key
-# def test_unpackage_dataset_multiple_chunks():
-#     dataset_name = "VALID_MULTIPLE_CHUNKS"
+def test_unpackage_dataset_multiple_chunks():
+    dataset_name = "VALID"
+    rsa_key = Path("tests/resources/rsa_keys")
 
-#     tarfile_path = INPUT_DIRECTORY / f"{dataset_name}.tar"
+    _create_rsa_public_key(target_dir=rsa_key)
+    assert Path(rsa_key / "microdata_public_key.pem").exists()
 
-#     unpackage_dataset(tarfile_path, RSA_KEYS_DIRECTORY, OUTPUT_DIRECTORY, ARCHIVE_DIR)
+    with patch("microdata_tools._encrypt.CHUNK_SIZE_BYTES", new=5):
+        package_dataset(
+            rsa_keys_dir=rsa_key,
+            dataset_dir=Path(f"tests/resources/input_package/{dataset_name}"),
+            output_dir=INPUT_DIRECTORY,
+        )
 
-#     output_dataset_dir = OUTPUT_DIRECTORY / dataset_name
-#     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
-#     assert Path(output_dataset_dir / f"{dataset_name}.csv").exists()
-#     assert not Path(output_dataset_dir / f"{dataset_name}_chunk_1.csv.encr").exists()
-#     assert not Path(output_dataset_dir / f"{dataset_name}_chunk_2.csv.encr").exists()
-#     assert not Path(output_dataset_dir / f"{dataset_name}_chunk_3.csv.encr").exists()
-#     assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
-#     assert not Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
-#     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
-#     assert Path(ARCHIVE_DIR / "unpackaged" / f"{dataset_name}.tar").exists()
+    result_file = INPUT_DIRECTORY / f"{dataset_name}.tar"
+    assert result_file.exists()
 
-#     actual = Path(output_dataset_dir / f"{dataset_name}.csv")
-#     expected = Path(f"tests/resources/expected_unpackage/{dataset_name}_expected.csv")
-#     assert filecmp.cmp(actual, expected)
+    unpackage_dataset(result_file, rsa_key, OUTPUT_DIRECTORY, ARCHIVE_DIR)
+
+    output_dataset_dir = OUTPUT_DIRECTORY / dataset_name
+    assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
+    assert Path(output_dataset_dir / f"{dataset_name}.csv").exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_1.csv.encr").exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_2.csv.encr").exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}_chunk_3.csv.encr").exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
+    assert not Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
+    assert not Path(INPUT_DIRECTORY / dataset_name).exists()
+    assert Path(ARCHIVE_DIR / "unpackaged" / f"{dataset_name}.tar").exists()
+
+    actual = Path(output_dataset_dir / f"{dataset_name}.csv")
+    expected = Path(f"tests/resources/expected_unpackage/{dataset_name}_expected.csv")
+    assert filecmp.cmp(actual, expected)
 
 
 def test_unpackage_dataset_just_json():

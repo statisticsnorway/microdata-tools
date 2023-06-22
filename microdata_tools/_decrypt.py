@@ -32,9 +32,10 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
 
-        # Create temp directory for decrypted chunks
-        decrypted_dir = output_dataset_dir / "decrypted"
-        os.makedirs(decrypted_dir, exist_ok=True)
+    # Create temp directory for decrypted chunks
+    decrypted_dir = output_dataset_dir / "decrypted"
+    os.makedirs(decrypted_dir, exist_ok=True)
+
     if not output_dataset_dir.exists():
         os.makedirs(output_dataset_dir)
 

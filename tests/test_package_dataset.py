@@ -6,9 +6,10 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
 
+from unittest.mock import patch
+
 from microdata_tools import package_dataset
 
-from unittest.mock import patch
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
 INPUT_DIRECTORY = Path("tests/resources/input_package")
@@ -114,3 +115,12 @@ def _create_rsa_public_key(target_dir: Path):
     public_key_location = target_dir / "microdata_public_key.pem"
     with open(public_key_location, "wb") as file:
         file.write(microdata_public_key_pem)
+
+    with open(target_dir / "microdata_private_key.pem", "wb") as file:
+        file.write(
+            private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        )
