@@ -110,7 +110,8 @@ def test_unpackage_dataset_multiple_chunks():
     _create_rsa_public_key(target_dir=rsa_key)
     assert Path(rsa_key / "microdata_public_key.pem").exists()
 
-    with patch("microdata_tools._encrypt.CHUNK_SIZE_BYTES", new=5):
+    # Produces more than 10 chunks
+    with patch("microdata_tools._encrypt.CHUNK_SIZE_BYTES", new=1):
         package_dataset(
             rsa_keys_dir=rsa_key,
             dataset_dir=Path(f"tests/resources/input_package/{dataset_name}"),
