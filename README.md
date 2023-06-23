@@ -44,17 +44,18 @@ The packaged file is then stored in `output_dir/archive/unpackaged` after a succ
 
 ## Example
 Python script that uses a RSA public key named `microdata_public_key.pem` and packages a dataset:
+
 ```py
 from pathlib import Path
 from microdata_tools import package_dataset
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
-DATASET_DIRECTORY = Path("tests/resources/input/DATASET_1")
+DATASET_DIRECTORY = Path("tests/resources/input_package/DATASET_1")
 OUTPUT_DIRECTORY = Path("tests/resources/output")
 
 package_dataset(
-    rsa_keys_dir=RSA_KEYS_DIRECTORY,
-    dataset_dir=DATASET_DIRECTORY,
-    output_dir=OUTPUT_DIRECTORY,
+   rsa_keys_dir=RSA_KEYS_DIRECTORY,
+   dataset_dir=DATASET_DIRECTORY,
+   output_dir=OUTPUT_DIRECTORY,
 )
 ```
