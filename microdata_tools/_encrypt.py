@@ -128,11 +128,17 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
     chunk_dir = dataset_dir / "chunks"
 
     if chunk_dir.exists():
+
         chunk_files = [file for file in chunk_dir.iterdir()]
         if len(chunk_files) == 0:
             raise ValidationException(f"No files found in {chunk_dir}")
 
-        files_to_tar.extend([dataset_dir / f"{dataset_name}.symkey.encr"])
+        md5_file = dataset_dir / f"{dataset_name}.md5"
+        if not md5_file.exists():
+            raise ValidationException(f"The required file {md5_file} is missing")
+
+        files_to_tar.extend([dataset_dir / f"{dataset_name}.symkey.encr",
+                             dataset_dir / f"{dataset_name}.md5"])
 
     with tarfile.open(full_tar_file_name, "w") as tar:
         for file in files_to_tar:
