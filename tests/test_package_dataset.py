@@ -43,10 +43,11 @@ def test_package_dataset():
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert len(tarred_files) == 4  # the chunk dir adds an extra "file" when peeking
+        assert len(tarred_files) == 5  # the chunk dir adds an extra "file" when peeking
         assert "chunks/1.csv.encr" in tarred_files
         assert f"{dataset_name}.symkey.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
+        assert f"{dataset_name}.md5" in tarred_files
 
 
 def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
@@ -69,12 +70,13 @@ def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert len(tarred_files) == 6  # the chunk dir adds an extra "file" when peeking
+        assert len(tarred_files) == 7  # the chunk dir adds an extra "file" when peeking
         assert "chunks/1.csv.encr" in tarred_files
         assert "chunks/2.csv.encr" in tarred_files
         assert "chunks/3.csv.encr" in tarred_files
         assert f"{dataset_name}.symkey.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
+        assert f"{dataset_name}.md5" in tarred_files
 
 
 def test_package_dataset_just_json():
