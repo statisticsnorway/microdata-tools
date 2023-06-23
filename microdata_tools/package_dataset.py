@@ -5,7 +5,7 @@ from pathlib import Path
 
 from microdata_tools._encrypt import _tar_encrypted_dataset, _encrypt_dataset
 from microdata_tools.exceptions import ValidationException
-from microdata_tools._utils import check_exists
+from microdata_tools._utils import check_exists, write_checksum_to_file
 
 logger = logging.getLogger()
 
@@ -40,6 +40,7 @@ def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> 
             )
 
         if len(csv_files) == 1:
+            write_checksum_to_file(csv_files[0])
             _encrypt_dataset(
                 rsa_keys_dir=rsa_keys_dir,
                 dataset_dir=dataset_dir,
@@ -48,6 +49,12 @@ def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> 
         else:
             if not dataset_output_dir.exists():
                 os.makedirs(dataset_output_dir)
+
+        if Path(dataset_dir / f"{dataset_name}.md5").exists():
+            shutil.copyfile(
+                dataset_dir / f"{dataset_name}.md5",
+                dataset_output_dir / f"{dataset_name}.md5",
+            )
 
         shutil.copyfile(
             dataset_dir / f"{dataset_name}.json",
