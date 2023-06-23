@@ -18,7 +18,7 @@ logger = logging.getLogger()
 CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
 
-def _encrypt_dataset(
+def encrypt_dataset(
     rsa_keys_dir: Path,
     dataset_dir: Path,
     output_dir: Path,

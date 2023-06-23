@@ -3,7 +3,7 @@ import os
 import shutil
 from pathlib import Path
 
-from microdata_tools._encrypt import _tar_encrypted_dataset, _encrypt_dataset
+from microdata_tools._encrypt import _tar_encrypted_dataset, encrypt_dataset
 from microdata_tools.exceptions import ValidationException
 from microdata_tools._utils import check_exists
 
@@ -40,7 +40,7 @@ def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> 
             )
 
         if len(csv_files) == 1:
-            _encrypt_dataset(
+            encrypt_dataset(
                 rsa_keys_dir=rsa_keys_dir,
                 dataset_dir=dataset_dir,
                 output_dir=output_dir,
