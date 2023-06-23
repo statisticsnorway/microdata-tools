@@ -5,11 +5,14 @@ import tarfile
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
+from pytest import MonkeyPatch
+
 
 from microdata_tools import package_dataset
 
+
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
-INPUT_DIRECTORY = Path("tests/resources/input")
+INPUT_DIRECTORY = Path("tests/resources/input_package")
 OUTPUT_DIRECTORY = Path("tests/resources/output")
 
 
@@ -23,43 +26,76 @@ def teardown_function():
 
 
 def test_package_dataset():
+    dataset_name = "VALID"
+
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
     package_dataset(
         rsa_keys_dir=RSA_KEYS_DIRECTORY,
-        dataset_dir=Path(f"{INPUT_DIRECTORY}/DATASET_1"),
+        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=OUTPUT_DIRECTORY,
     )
 
-    result_file = OUTPUT_DIRECTORY / "DATASET_1.tar"
+    result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()
 
-    assert not Path(OUTPUT_DIRECTORY / "DATASET_1").exists()
+    assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert "DATASET_1.csv.encr" in tarred_files
-        assert "DATASET_1.symkey.encr" in tarred_files
-        assert "DATASET_1.json" in tarred_files
+        assert len(tarred_files) == 4  # the chunk dir adds an extra "file" when peeking
+        assert "chunks/1.csv.encr" in tarred_files
+        assert f"{dataset_name}.symkey.encr" in tarred_files
+        assert f"{dataset_name}.json" in tarred_files
+
+
+def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
+    dataset_name = "VALID"
+
+    _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
+
+    monkeypatch.setattr("microdata_tools._encrypt.CHUNK_SIZE_BYTES", 5)
+
+    package_dataset(
+        rsa_keys_dir=RSA_KEYS_DIRECTORY,
+        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
+        output_dir=OUTPUT_DIRECTORY,
+    )
+
+    result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
+    assert result_file.exists()
+
+    assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
+
+    with tarfile.open(result_file, "r:") as tar:
+        tarred_files = [file.name for file in tar.getmembers()]
+        assert len(tarred_files) == 6  # the chunk dir adds an extra "file" when peeking
+        assert "chunks/1.csv.encr" in tarred_files
+        assert "chunks/2.csv.encr" in tarred_files
+        assert "chunks/3.csv.encr" in tarred_files
+        assert f"{dataset_name}.symkey.encr" in tarred_files
+        assert f"{dataset_name}.json" in tarred_files
 
 
 def test_package_dataset_just_json():
+    dataset_name = "ONLY_JSON"
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
     package_dataset(
         rsa_keys_dir=RSA_KEYS_DIRECTORY,
-        dataset_dir=Path(f"{INPUT_DIRECTORY}/DATASET_2"),
+        dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=OUTPUT_DIRECTORY,
     )
 
-    result_file = OUTPUT_DIRECTORY / "DATASET_2.tar"
+    result_file = OUTPUT_DIRECTORY / f"{dataset_name}.tar"
     assert result_file.exists()
 
-    assert not Path(OUTPUT_DIRECTORY / "DATASET_2").exists()
+    assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert "DATASET_2.json" in tarred_files
+        assert len(tarred_files) == 1
+        assert f"{dataset_name}.json" in tarred_files
 
 
 def _create_rsa_public_key(target_dir: Path):
@@ -80,3 +116,12 @@ def _create_rsa_public_key(target_dir: Path):
     public_key_location = target_dir / "microdata_public_key.pem"
     with open(public_key_location, "wb") as file:
         file.write(microdata_public_key_pem)
+
+    with open(target_dir / "microdata_private_key.pem", "wb") as file:
+        file.write(
+            private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+        )
