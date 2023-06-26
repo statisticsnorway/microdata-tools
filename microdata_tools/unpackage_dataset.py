@@ -3,7 +3,11 @@ import os
 from pathlib import Path
 import shutil
 from typing import Union
-from microdata_tools._utils import check_exists
+from microdata_tools._utils import (
+    check_exists,
+    compare_checksum_with_file,
+    calculate_checksum,
+)
 from microdata_tools._decrypt import decrypt, untar_encrypted_dataset
 
 logger = logging.getLogger()
@@ -18,6 +22,7 @@ def unpackage_dataset(
     """
     Unpackages a dataset. It will untar and decrypt the dataset using
     the provided RSA private key. Only the CSV file will be decrypted.
+    Validates the checksum of the CSV file.
 
     :param packaged_file_path:
         a Path to the .tar file containing the dataset files
@@ -46,6 +51,7 @@ def unpackage_dataset(
     try:
         untar_encrypted_dataset(packaged_file_path, dataset_name, dataset_dir)
         decrypt(rsa_keys_dir, dataset_dir, output_dir)
+        _validate_csv_consistency(dataset_name, dataset_dir, output_dir)
         if archive_dir is not None:
             _archive(dataset_name, dataset_dir.parent, archive_dir, "unpackaged")
         logger.info(f"Unpackaged {packaged_file_path}")
@@ -53,6 +59,16 @@ def unpackage_dataset(
         if archive_dir is not None:
             _archive(dataset_name, dataset_dir.parent, archive_dir, "failed")
         logger.exception(f"Failed to unpackage {dataset_name}", exc_info=exc)
+
+
+def _validate_csv_consistency(dataset_name, dataset_dir, output_dir):
+    if Path(output_dir / dataset_name / f"{dataset_name}.csv").exists():
+        calculated_checksum = calculate_checksum(
+            output_dir / dataset_name / f"{dataset_name}.csv"
+        )
+        compare_checksum_with_file(
+            dataset_dir / f"{dataset_name}.md5", calculated_checksum
+        )
 
 
 def _archive(

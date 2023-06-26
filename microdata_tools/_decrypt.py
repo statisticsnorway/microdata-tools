@@ -140,6 +140,12 @@ def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
                 f"Tar file for {dataset_name} does not contain any chunks files"
             )
 
+        if f"{dataset_name}.md5" not in files:
+            raise InvalidTarFileContents(
+                f"Tar file for {dataset_name} does not contain the required "
+                f"{dataset_name}.md5 file"
+            )
+
 
 def _combine_csv_files(input_dir: Path, output_file: Path) -> None:
     sorted_chunkpaths = _get_sorted_file_names(input_dir)
