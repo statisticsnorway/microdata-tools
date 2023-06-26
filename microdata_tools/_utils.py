@@ -30,5 +30,7 @@ def write_checksum_to_file(csv_file: Path) -> None:
 def compare_checksum_with_file(md5_file: Path, calculated_checksum: str) -> None:
     with open(md5_file, "r") as file:
         checksum_from_file = file.readlines()[0]
-        if (calculated_checksum != checksum_from_file.strip()):
-            raise CsvConsistencyException("MD5 checksums do not match. The csv file may be corrupted!")
+        if calculated_checksum != checksum_from_file.strip():
+            raise CsvConsistencyException(
+                "MD5 checksums do not match. The csv file may be corrupted!"
+            )

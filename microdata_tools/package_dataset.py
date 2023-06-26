@@ -14,6 +14,7 @@ def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> 
     """
     Packages a dataset. It will encrypt and tar the dataset using
     the provided RSA public key. Only the CSV file will be encrypted.
+    Creates a checksum file for the CSV file.
 
     :param rsa_keys_dir:
         directory containing public key file microdata_public_key.pem
