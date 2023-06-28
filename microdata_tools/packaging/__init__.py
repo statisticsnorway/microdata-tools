@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Union
 
 from microdata_tools.packaging._encrypt import _tar_encrypted_dataset, encrypt_dataset
-from microdata_tools.exceptions import ValidationException
+from microdata_tools.packaging.exceptions import ValidationException
 from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._utils import (
     check_exists,

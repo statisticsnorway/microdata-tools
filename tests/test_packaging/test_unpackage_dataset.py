@@ -9,7 +9,7 @@ from pytest import MonkeyPatch, fail, raises
 
 from microdata_tools import package_dataset, unpackage_dataset
 from microdata_tools.packaging._decrypt import _validate_tar_contents
-from microdata_tools.exceptions import InvalidTarFileContents
+from microdata_tools.packaging.exceptions import InvalidTarFileContents
 from tests.test_packaging.test_package_dataset import _create_rsa_public_key
 
 
