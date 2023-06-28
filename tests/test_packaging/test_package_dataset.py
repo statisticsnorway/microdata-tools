@@ -55,7 +55,7 @@ def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
 
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
-    monkeypatch.setattr("microdata_tools._encrypt.CHUNK_SIZE_BYTES", 5)
+    monkeypatch.setattr("microdata_tools.packaging._encrypt.CHUNK_SIZE_BYTES", 5)
 
     package_dataset(
         rsa_keys_dir=RSA_KEYS_DIRECTORY,

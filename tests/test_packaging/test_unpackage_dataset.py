@@ -8,9 +8,9 @@ from typing import List
 from pytest import MonkeyPatch, fail, raises
 
 from microdata_tools import package_dataset, unpackage_dataset
-from microdata_tools._decrypt import _validate_tar_contents
+from microdata_tools.packaging._decrypt import _validate_tar_contents
 from microdata_tools.exceptions import InvalidTarFileContents
-from tests.test_package_dataset import _create_rsa_public_key
+from tests.test_packaging.test_package_dataset import _create_rsa_public_key
 
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_test_key")
@@ -110,7 +110,7 @@ def test_unpackage_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     assert Path(rsa_key / "microdata_public_key.pem").exists()
 
     # Produces more than 10 chunks
-    monkeypatch.setattr("microdata_tools._encrypt.CHUNK_SIZE_BYTES", 1)
+    monkeypatch.setattr("microdata_tools.packaging._encrypt.CHUNK_SIZE_BYTES", 1)
 
     package_dataset(
         rsa_keys_dir=rsa_key,

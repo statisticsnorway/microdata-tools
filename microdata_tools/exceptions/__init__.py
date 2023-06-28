@@ -11,4 +11,3 @@ class InvalidKeyError(Exception):
 
 class CsvConsistencyException(Exception):
     ...
-
