@@ -1,6 +1,8 @@
 from pathlib import Path
 import hashlib
-from microdata_tools.exceptions import ValidationException, CsvConsistencyException
+from microdata_tools.packaging.exceptions import (
+    ValidationException, CsvConsistencyException
+)
 
 
 def check_exists(path: Path):

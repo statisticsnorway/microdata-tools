@@ -10,8 +10,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from microdata_tools.exceptions import InvalidKeyError, InvalidTarFileContents
-from microdata_tools._utils import check_exists
+from microdata_tools.packaging.exceptions import InvalidKeyError, InvalidTarFileContents
+from microdata_tools.packaging._utils import check_exists
 
 logger = logging.getLogger()
 
