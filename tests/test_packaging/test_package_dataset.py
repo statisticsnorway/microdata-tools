@@ -11,9 +11,9 @@ from pytest import MonkeyPatch
 from microdata_tools import package_dataset
 
 
-RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
-INPUT_DIRECTORY = Path("tests/resources/input_package")
-OUTPUT_DIRECTORY = Path("tests/resources/output")
+RSA_KEYS_DIRECTORY = Path("tests/resources/packaging/rsa_keys")
+INPUT_DIRECTORY = Path("tests/resources/packaging/input_package")
+OUTPUT_DIRECTORY = Path("tests/resources/packaging/output")
 
 
 def setup_function():
@@ -43,7 +43,9 @@ def test_package_dataset():
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert len(tarred_files) == 5  # the chunk dir adds an extra "file" when peeking
+        assert (
+            len(tarred_files) == 5
+        )  # the chunk dir adds an extra "file" when peeking
         assert "chunks/1.csv.encr" in tarred_files
         assert f"{dataset_name}.symkey.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
@@ -55,7 +57,9 @@ def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
 
     _create_rsa_public_key(target_dir=RSA_KEYS_DIRECTORY)
 
-    monkeypatch.setattr("microdata_tools.packaging._encrypt.CHUNK_SIZE_BYTES", 5)
+    monkeypatch.setattr(
+        "microdata_tools.packaging._encrypt.CHUNK_SIZE_BYTES", 5
+    )
 
     package_dataset(
         rsa_keys_dir=RSA_KEYS_DIRECTORY,
@@ -70,7 +74,9 @@ def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
-        assert len(tarred_files) == 7  # the chunk dir adds an extra "file" when peeking
+        assert (
+            len(tarred_files) == 7
+        )  # the chunk dir adds an extra "file" when peeking
         assert "chunks/1.csv.encr" in tarred_files
         assert "chunks/2.csv.encr" in tarred_files
         assert "chunks/3.csv.encr" in tarred_files
