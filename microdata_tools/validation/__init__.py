@@ -39,7 +39,7 @@ def get_unit_id_type_for_unit_type(unit_id: str) -> Union[str, None]:
     return UNIT_ID_TYPE_FOR_UNIT_TYPE.get_unit_id_type_for_unit_type(unit_id)
 
 
-def validate(
+def validate_dataset(
     dataset_name: str,
     working_directory: str = "",
     input_directory: str = "",
