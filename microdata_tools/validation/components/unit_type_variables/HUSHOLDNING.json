@@ -1,0 +1,61 @@
+{
+  "shortName": "HUSHOLDNING_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Husholdningsidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Household identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for husholdning i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for household in microdata"
+    }
+  ],
+  "dataType": "LONG",
+  "unitType": {
+    "requiresPseudonymization": true,
+    "shortName": "HUSHOLDNING",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Husholdning"
+      },
+      {
+        "languageCode": "en",
+        "value": "Household"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "En husholdning består av personer som er fast bosatt i samme bolig (boenhet) eller institusjon. En privathusholdning består av personer som er fast bosatt i samme bolig, der denne boligen ikke er en institusjon. Privathusholdninger deles inn i bo- og kosthusholdninger. Bohusholdninger består av personer som er fast bosatt i samme bolig, mens kosthusholdning består av personer som er fast bosatt i samme bolig og har felles kost. En felleshusholdning består av personer som er fast bosatt, og får dekket sine behov for kost, pleie og omsorg, på en institusjon."
+      },
+      {
+        "languageCode": "en",
+        "value": "A household consists of persons who are permanently resident in the same dwelling (dwelling unit) or institution. A private household consists of persons who are permanently resident in the same dwelling, but the dwelling is not an institution. An institutional household consists of persons who are permanently resident, and whose needs for food, nursing and care, are covered in the institution."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert personnummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized national identity number"
+      }
+    ]
+  }
+}

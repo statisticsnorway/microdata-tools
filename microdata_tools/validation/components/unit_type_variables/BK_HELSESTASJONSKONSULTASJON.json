@@ -1,0 +1,62 @@
+{
+    "shortName": "BK_HELSESTASJONSKONSULTASJONS_ID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Helsestasjonskonsultasjon-identifikator"
+      },
+      {
+        "languageCode": "en",
+        "value": "Health center visit identifier"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Unik identifikator for helsestasjonskonsultasjon i Bergen kommune"
+      },
+      {
+        "languageCode": "en",
+        "value": "Unique identifier for health center visit for Bergen municipality"
+      }
+    ],
+    "dataType": "LONG",
+    "unitType": {
+      "shortName": "BK_HELSESTASJONSKONSULTASJON",
+      "requiresPseudonymization": false,
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Helsestasjonsbekonsultasjon i Bergen kommune"
+        },
+        {
+          "languageCode": "en",
+          "value": "Health center visit in Bergen municipality"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "En helsestasjonskonsultasjon er en enkeltkonsultasjon på helsestasjon."
+        },
+        {
+          "languageCode": "en",
+          "value": "A health center visit is a distinct visit to a health center."
+        }
+      ]
+    },
+    "format": "RandomUInt48",
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert helsestasjonskonsultasjonbesøksid"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonymized healt center visit id"
+        }
+      ]
+    }
+  }
+  
