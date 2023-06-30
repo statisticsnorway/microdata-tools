@@ -1,11 +1,120 @@
-def validate_dataset(
+from pathlib import Path
+import string
+from pyarrow import parquet
+from typing import List, Union
+from microdata_tools.validation.components.unit_id_types import (
+    UNIT_ID_TYPE_FOR_UNIT_TYPE,
+)
+from microdata_tools.validation.exceptions import (
+    InvalidDatasetException,
+    InvalidDatasetName,
+)
+from microdata_tools.validation.adapter import local_storage
+from microdata_tools.validation.steps import (
+    metadata_reader,
+    dataset_validator,
+    data_reader,
+)
+
+
+def validate_dataset_name(dataset_name: str) -> None:
+    """
+    Validates that the name of the dataset only contains valid
+    characters (uppercase A-Z, numbers 0-9 and _)
+    """
+    valid_characters = string.ascii_uppercase + string.digits + "_"
+    if not all([character in valid_characters for character in dataset_name]):
+        raise InvalidDatasetName(
+            f'"{dataset_name}" contains invalid characters. '
+            'Please use only uppercase A-Z, numbers 0-9 or "_"'
+        )
+
+
+def get_unit_id_type_for_unit_type(unit_id: str) -> Union[str, None]:
+    """
+    Returns the unitIdType for the supplied unitType. Returns None
+    if supplied unitType has no attached unitIdType.
+    Raises a UnregisteredUnitTypeError on unregistered unitType.
+    """
+    return UNIT_ID_TYPE_FOR_UNIT_TYPE.get_unit_id_type_for_unit_type(unit_id)
+
+
+def validate(
     dataset_name: str,
-    input_directory: str = "",
     working_directory: str = "",
+    input_directory: str = "",
     keep_temporary_files: bool = False,
-    metadata_ref_directory: str = ""
-):
-    ...
+) -> List[str]:
+    """
+    Validate a dataset and return a list of errors.
+    If the dataset is valid, the list will be empty.
+    """
+    validate_dataset_name(dataset_name)
+
+    input_directory_path = Path(input_directory)
+    metadata_file_path = (
+        input_directory_path / dataset_name / f"{dataset_name}.json"
+    )
+    (
+        working_directory_path,
+        working_directory_was_generated,
+    ) = local_storage.resolve_working_directory(working_directory)
+
+    data_errors = []
+    try:
+        # Read and validate metadata
+        metadata_dict = metadata_reader.run_reader(
+            dataset_name, metadata_file_path
+        )
+        measure_data_type = metadata_dict["measureVariables"][0]["dataType"]
+        temporality_type = metadata_dict["temporalityType"]
+        code_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
+            "codeList"
+        )
+        sentinel_list = metadata_dict["measureVariables"][0][
+            "valueDomain"
+        ].get("sentinelAndMissingValues")
+
+        # Read data
+        table = data_reader.run_reader(
+            dataset_name, input_directory_path, measure_data_type
+        )
+
+        # Enrich metadata with temporal data
+        temporal_data = data_reader.get_temporal_data(table, temporality_type)
+        data_reader._metadata_update_temporal_coverage(
+            metadata_dict, temporal_data
+        )
+
+        # Write files to working directory
+        parquet_path = working_directory_path / f"{dataset_name}.parquet"
+        parquet.write_table(table, parquet_path)
+        local_storage.write_json(
+            working_directory_path / f"{dataset_name}.json", metadata_dict
+        )
+
+        # Validate data
+        dataset_validator.validate_dataset(
+            parquet_path,
+            measure_data_type,
+            code_list,
+            sentinel_list,
+            temporality_type,
+        )
+    except InvalidDatasetException as e:
+        data_errors = e.errors
+    except Exception as e:
+        # Raise unexpected exceptions to user
+        raise e
+    finally:
+        # Delete temporary files
+        if not keep_temporary_files:
+            local_storage.clean_up_temporary_files(
+                dataset_name,
+                working_directory_path,
+                delete_working_directory=working_directory_was_generated,
+            )
+    return data_errors
 
 
 def validate_metadata(
@@ -13,14 +122,37 @@ def validate_metadata(
     input_directory: str = "",
     working_directory: str = "",
     keep_temporary_files: bool = False,
-    metadata_ref_directory: str = ""
-):
-    ...
+) -> List[dict]:
+    """
+    Validate metadata and return a list of errors.
+    If the metadata is valid, the list will be empty.
+    """
+    data_errors = []
 
+    validate_dataset_name(dataset_name)
 
-def inline_metadata(
-        metadata_file_path: str,
-        metadata_ref_directory: str,
-        output_file_path: str = ""
-):
-    ...
+    input_directory_path = Path(input_directory)
+    (
+        working_directory_path,
+        working_directory_was_generated,
+    ) = local_storage.resolve_working_directory(working_directory)
+
+    try:
+        metadata_file_path = (
+            input_directory_path / dataset_name / f"{dataset_name}.json"
+        )
+        metadata_reader.run_reader(dataset_name, metadata_file_path)
+    except InvalidDatasetException as e:
+        data_errors = e.errors
+    except Exception as e:
+        # Raise unexpected exceptions to user
+        raise e
+    finally:
+        # Delete temporary files
+        if not keep_temporary_files:
+            local_storage.clean_up_temporary_files(
+                dataset_name,
+                working_directory_path,
+                delete_working_directory=working_directory_was_generated,
+            )
+    return data_errors
