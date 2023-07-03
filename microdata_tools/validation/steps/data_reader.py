@@ -20,17 +20,17 @@ def get_temporal_data(
 ) -> Dict[str, int]:
     temporal_data = {}
     if temporality_type == "FIXED":
-        stop_max = compute.max(table["epoch_stop"]).as_py()
+        stop_max = compute.max(table["stop_epoch_days"]).as_py()
         temporal_data["start"] = "1900-01-01"
         temporal_data["latest"] = (
             datetime(1970, 1, 1) + timedelta(days=stop_max)
         ).strftime("%Y-%m-%d")
     else:
         start_min, start_max = (
-            compute.min_max(table["epoch_start"]).as_py().values()
+            compute.min_max(table["start_epoch_days"]).as_py().values()
         )
         stop_min, stop_max = (
-            compute.min_max(table["epoch_stop"]).as_py().values()
+            compute.min_max(table["stop_epoch_days"]).as_py().values()
         )
         min_date = min(
             [date for date in [start_min, stop_min] if date is not None]
@@ -50,14 +50,16 @@ def get_temporal_data(
             (datetime(1970, 1, 1) + timedelta(days=status_days)).strftime(
                 "%Y-%m-%d"
             )
-            for status_days in compute.unique(table["epoch_start"]).to_pylist()
+            for status_days in compute.unique(
+                table["start_epoch_days"]
+            ).to_pylist()
         ]
     return temporal_data
 
 
 def get_csv_read_options():
     return csv.ReadOptions(
-        column_names=["identifier", "measure", "start", "stop", "attributes"]
+        column_names=["unit_id", "value", "start", "stop", "attributes"]
     )
 
 
@@ -72,11 +74,14 @@ def get_csv_convert_options(measure_data_type: str):
     elif measure_data_type == "DATE":
         pyarrow_data_type = pyarrow.date32()
     else:
-        raise ValueError("TODO")
+        raise ValidationError(
+            "Unsupported measure data type",
+            errors=[f"Unsupported measure data type: {measure_data_type}"],
+        )
     return csv.ConvertOptions(
         column_types={
-            "identifier": pyarrow.string(),
-            "measure": pyarrow_data_type,
+            "unit_id": pyarrow.string(),
+            "value": pyarrow_data_type,
             "start": pyarrow.date32(),
             "stop": pyarrow.date32(),
             "attributes": pyarrow.string(),
@@ -99,11 +104,11 @@ def sanitize_data(
             "Error when reading dataset", errors=[str(e)]
         ) from e
 
-    identifier = compute.utf8_trim(table["identifier"], " ")
+    identifier = compute.utf8_trim(table["unit_id"], " ")
     measure = (
-        table["measure"]
+        table["value"]
         if measure_data_type != "STRING"
-        else compute.utf8_trim(table["measure"], " ")
+        else compute.utf8_trim(table["value"], " ")
     )
     epoch_start = compute.cast(table["start"], target_type=pyarrow.int32())
     epoch_stop = compute.cast(table["stop"], target_type=pyarrow.int32())
@@ -121,11 +126,11 @@ def sanitize_data(
             epoch_stop,
         ],
         names=[
-            "identifier",
-            "measure",
+            "unit_id",
+            "value",
             "start_year",
-            "epoch_start",
-            "epoch_stop",
+            "start_epoch_days",
+            "stop_epoch_days",
         ],
     )
 
