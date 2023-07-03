@@ -87,6 +87,17 @@ def status_temporal_variables_check(parquet_path: str):
       for any given row
     """
     invalid_rows = dataset.dataset(parquet_path).to_table(
+        filter=(
+            dataset.field("epoch_stop").is_null()
+            | dataset.field("epoch_start").is_null()
+        ),
+        columns=["identifier"],
+    )
+    if len(invalid_rows) > 0:
+        raise ValueError(
+            "No row can have an empty start or stop column with temporalityType: STATUS"
+        )
+    invalid_rows = dataset.dataset(parquet_path).to_table(
         filter=dataset.field("epoch_start") != dataset.field("epoch_stop"),
         columns=["identifier"],
     )
@@ -104,7 +115,7 @@ def event_temporal_variables_check(parquet_path: str):
     start_is_null_filter = dataset.field("epoch_start").is_null()
     start_be_stop_filter = dataset.field("epoch_start") >= dataset.field(
         "epoch_stop"
-    )
+    )  # If epoch_stop is null this test will be ignored by pyarrow
     invalid_rows = dataset.dataset(parquet_path).to_table(
         filter=(start_is_null_filter | start_be_stop_filter),
         columns=["identifier"],
