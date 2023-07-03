@@ -9,6 +9,8 @@ import pyarrow
 from pyarrow import csv
 from pyarrow import compute, ArrowInvalid
 
+from microdata_tools.validation.exceptions import ValidationError
+
 
 logger = logging.getLogger()
 
@@ -93,7 +95,9 @@ def sanitize_data(
             convert_options=get_csv_convert_options(measure_data_type),
         )
     except ArrowInvalid as e:
-        raise ValueError(str(e)) from e
+        raise ValidationError(
+            "Error when reading dataset", errors=[str(e)]
+        ) from e
 
     identifier = compute.utf8_trim(table["identifier"], " ")
     measure = (

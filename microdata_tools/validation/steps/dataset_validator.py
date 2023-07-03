@@ -1,6 +1,15 @@
 from typing import List, Union
 from pyarrow import dataset, compute, Table
 
+from microdata_tools.validation.exceptions import ValidationError
+
+
+def _format_error_message(invalid_rows: Table, message: str):
+    invalid_identifiers = (
+        invalid_rows.column("identifier").slice(0, 5).to_pylist()
+    )
+    return f"{message}. For rows with identifiers: {invalid_identifiers}..."
+
 
 def valid_value_column_check(
     parquet_path: str,
@@ -240,7 +249,13 @@ def no_overlapping_timespans_check(parquet_path: str):
                 identifier_time_spans["epoch_start_list"][i].as_py(),
                 identifier_time_spans["epoch_stop_list"][i].as_py(),
             ):
-                raise ValueError("TODO")
+                raise ValidationError(
+                    "Found overlapping timespans for dataset",
+                    errors=[
+                        "Invalid overlapping timespans for identifier"
+                        f' "{identifier_time_spans["identifier"][i]}"'
+                    ],
+                )
 
 
 def validate_dataset(

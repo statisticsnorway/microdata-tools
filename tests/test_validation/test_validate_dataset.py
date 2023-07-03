@@ -57,7 +57,9 @@ def test_validate_valid_dataset_wrong_delimiter():
         keep_temporary_files=True,
         input_directory=INPUT_DIR,
     )
-    assert data_errors == ['Invalid field separator ",". Use ";".']
+    assert data_errors == [
+        "CSV parse error: Expected 5 columns, got 1: 10000000000000,1,,2021-01-01,"
+    ]
 
 
 def test_validate_valid_dataset_delete_temporary_files():
@@ -82,7 +84,7 @@ def test_validate_valid_dataset_delete_generated_dir():
         ]
         assert not data_errors
         for file in temp_files:
-            assert file in ["tests", "docs", "microdata_validator"]
+            assert file in ["tests", "docs", "microdata_tools"]
 
 
 def test_validate_valid_dataset_delete_working_files():
@@ -113,8 +115,8 @@ def test_validate_invalid_dates():
         input_directory=INPUT_DIR,
     )
     assert data_errors == [
-        'row 4: STOP date not valid - "1927-13-01"',
-        'row 15: STOP date not valid - "1940-02-31"',
+        "In CSV column #3: CSV conversion error to date32[day]: "
+        "invalid value '1927-13-01'"
     ]
 
 
@@ -125,14 +127,7 @@ def test_invalid_date_ranges():
         input_directory=INPUT_DIR,
     )
     assert data_errors == [
-        (
-            "row 4: Previous STOP-date greater than STOP-date "
-            "- 1926-02-02 > 1926-02-01"
-        ),
-        (
-            "row 13: Previous STOP-date greater than STOP-date"
-            " - 1940-01-31 > 1939-02-01"
-        ),
+        'Invalid overlapping timespans for identifier "00000000000003"'
     ]
 
 
