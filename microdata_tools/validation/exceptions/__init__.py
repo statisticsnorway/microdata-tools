@@ -18,7 +18,9 @@ class InvalidDatasetName(Exception):
     ...
 
 
-class InvalidDatasetException(Exception):
-    def __init__(self, message: str, errors: list):
+class ValidationError(Exception):
+    errors: list[str] = []
+
+    def __init__(self, dataset_name: str, errors: list[str]):
         self.errors = errors
-        Exception.__init__(self, message)
+        super().__init__(f"Errors found while validating {dataset_name}")

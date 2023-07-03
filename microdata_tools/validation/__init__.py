@@ -5,10 +5,7 @@ from typing import List, Union
 from microdata_tools.validation.components.unit_id_types import (
     UNIT_ID_TYPE_FOR_UNIT_TYPE,
 )
-from microdata_tools.validation.exceptions import (
-    InvalidDatasetException,
-    InvalidDatasetName,
-)
+from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.steps import (
     metadata_reader,
@@ -22,11 +19,17 @@ def validate_dataset_name(dataset_name: str) -> None:
     Validates that the name of the dataset only contains valid
     characters (uppercase A-Z, numbers 0-9 and _)
     """
+    invalid_leading_characters = string.digits + "_"
     valid_characters = string.ascii_uppercase + string.digits + "_"
-    if not all([character in valid_characters for character in dataset_name]):
-        raise InvalidDatasetName(
-            f'"{dataset_name}" contains invalid characters. '
-            'Please use only uppercase A-Z, numbers 0-9 or "_"'
+    if dataset_name[0] in invalid_leading_characters or not all(
+        [character in valid_characters for character in dataset_name]
+    ):
+        raise ValidationError(
+            dataset_name,
+            [
+                f'"{dataset_name}" contains invalid characters. '
+                'Please use only uppercase A-Z, numbers 0-9 or "_"',
+            ],
         )
 
 
@@ -49,19 +52,20 @@ def validate_dataset(
     Validate a dataset and return a list of errors.
     If the dataset is valid, the list will be empty.
     """
-    validate_dataset_name(dataset_name)
-
-    input_directory_path = Path(input_directory)
-    metadata_file_path = (
-        input_directory_path / dataset_name / f"{dataset_name}.json"
-    )
-    (
-        working_directory_path,
-        working_directory_was_generated,
-    ) = local_storage.resolve_working_directory(working_directory)
-
-    data_errors = []
     try:
+        validate_dataset_name(dataset_name)
+
+        input_directory_path = Path(input_directory)
+        metadata_file_path = (
+            input_directory_path / dataset_name / f"{dataset_name}.json"
+        )
+        (
+            working_directory_path,
+            working_directory_was_generated,
+        ) = local_storage.resolve_working_directory(working_directory)
+
+        data_errors = []
+
         # Read and validate metadata
         metadata_dict = metadata_reader.run_reader(
             dataset_name, metadata_file_path
@@ -82,7 +86,7 @@ def validate_dataset(
 
         # Enrich metadata with temporal data
         temporal_data = data_reader.get_temporal_data(table, temporality_type)
-        data_reader._metadata_update_temporal_coverage(
+        data_reader.metadata_update_temporal_coverage(
             metadata_dict, temporal_data
         )
 
@@ -101,7 +105,7 @@ def validate_dataset(
             sentinel_list,
             temporality_type,
         )
-    except InvalidDatasetException as e:
+    except ValidationError as e:
         data_errors = e.errors
     except Exception as e:
         # Raise unexpected exceptions to user
@@ -127,22 +131,27 @@ def validate_metadata(
     Validate metadata and return a list of errors.
     If the metadata is valid, the list will be empty.
     """
-    data_errors = []
-
-    validate_dataset_name(dataset_name)
-
-    input_directory_path = Path(input_directory)
-    (
-        working_directory_path,
-        working_directory_was_generated,
-    ) = local_storage.resolve_working_directory(working_directory)
-
     try:
+        data_errors = []
+
+        validate_dataset_name(dataset_name)
+
+        input_directory_path = Path(input_directory)
+        (
+            working_directory_path,
+            working_directory_was_generated,
+        ) = local_storage.resolve_working_directory(working_directory)
+
         metadata_file_path = (
             input_directory_path / dataset_name / f"{dataset_name}.json"
         )
-        metadata_reader.run_reader(dataset_name, metadata_file_path)
-    except InvalidDatasetException as e:
+        metadata_dict = metadata_reader.run_reader(
+            dataset_name, metadata_file_path
+        )
+        local_storage.write_json(
+            working_directory_path / f"{dataset_name}.json", metadata_dict
+        )
+    except ValidationError as e:
         data_errors = e.errors
     except Exception as e:
         # Raise unexpected exceptions to user

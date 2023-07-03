@@ -30,12 +30,14 @@ def valid_value_column_check(
     if code_list:
         unique_codes = list(
             set(code_list_item["code"] for code_list_item in code_list)
-        ) + list(
-            set(
-                sentinel_list_item["code"]
-                for sentinel_list_item in sentinel_list
-            )
         )
+        if sentinel_list is not None:
+            unique_codes += list(
+                set(
+                    sentinel_list_item["code"]
+                    for sentinel_list_item in sentinel_list
+                )
+            )
         invalid_code_filter = ~dataset.field("measure").isin(unique_codes)
         invalid_rows = dataset.dataset(parquet_path).to_table(
             filter=invalid_code_filter, columns=["measure"]

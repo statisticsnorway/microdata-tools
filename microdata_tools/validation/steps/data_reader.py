@@ -16,18 +16,13 @@ logger = logging.getLogger()
 def get_temporal_data(
     table: pyarrow.Table, temporality_type: str
 ) -> Dict[str, int]:
-    if temporality_type == "STATUS":
-        return {
-            "statusDates": compute.unique(table["epoch_start"]).to_pylist()
-        }
-    elif temporality_type == "FIXED":
-        stop_max = compute.max(table["epoch_stop"]).as_py().values()
-        return {
-            "start": None,
-            "latest": (
-                datetime(1970, 1, 1) + timedelta(days=stop_max)
-            ).strftime("%Y-%m-%d"),
-        }
+    temporal_data = {}
+    if temporality_type == "FIXED":
+        stop_max = compute.max(table["epoch_stop"]).as_py()
+        temporal_data["start"] = "1900-01-01"
+        temporal_data["latest"] = (
+            datetime(1970, 1, 1) + timedelta(days=stop_max)
+        ).strftime("%Y-%m-%d")
     else:
         start_min, start_max = (
             compute.min_max(table["epoch_start"]).as_py().values()
@@ -41,14 +36,21 @@ def get_temporal_data(
         max_date = max(
             [date for date in [start_max, stop_max] if date is not None]
         )
-        return {
-            "start": (
-                datetime(1970, 1, 1) + timedelta(days=min_date)
-            ).strftime("%Y-%m-%d"),
-            "latest": (
-                datetime(1970, 1, 1) + timedelta(days=max_date)
-            ).strftime("%Y-%m-%d"),
-        }
+        temporal_data["start"] = (
+            datetime(1970, 1, 1) + timedelta(days=min_date)
+        ).strftime("%Y-%m-%d")
+        temporal_data["latest"] = (
+            datetime(1970, 1, 1) + timedelta(days=max_date)
+        ).strftime("%Y-%m-%d")
+
+    if temporality_type == "STATUS":
+        temporal_data["statusDates"] = [
+            (datetime(1970, 1, 1) + timedelta(days=status_days)).strftime(
+                "%Y-%m-%d"
+            )
+            for status_days in compute.unique(table["epoch_start"]).to_pylist()
+        ]
+    return temporal_data
 
 
 def get_csv_read_options():
@@ -124,7 +126,7 @@ def sanitize_data(
     )
 
 
-def _metadata_update_temporal_coverage(
+def metadata_update_temporal_coverage(
     metadata: dict, temporal_data: dict
 ) -> None:
     logger.debug(
@@ -134,8 +136,6 @@ def _metadata_update_temporal_coverage(
     temporality_type = metadata["temporalityType"]
     data_revision["temporalCoverageStart"] = temporal_data["start"]
     data_revision["temporalCoverageLatest"] = temporal_data["latest"]
-    if temporality_type == "FIXED":
-        data_revision["temporalCoverageStart"] = "1900-01-01"
     if temporality_type == "STATUS":
         temporal_status_dates_list = temporal_data["statusDates"]
         temporal_status_dates_list.sort()
