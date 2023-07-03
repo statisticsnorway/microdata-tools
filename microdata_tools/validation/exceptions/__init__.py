@@ -1,3 +1,6 @@
+from typing import List
+
+
 class UnregisteredUnitTypeError(Exception):
     ...
 
@@ -19,7 +22,7 @@ class InvalidDatasetName(Exception):
 
 
 class ValidationError(Exception):
-    errors: list[str] = []
+    errors: List[str] = []
 
     def __init__(self, dataset_name: str, errors: list[str]):
         self.errors = errors
