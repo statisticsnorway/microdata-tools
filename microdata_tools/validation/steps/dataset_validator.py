@@ -4,11 +4,14 @@ from pyarrow import dataset, compute, Table
 from microdata_tools.validation.exceptions import ValidationError
 
 
-def _format_error_message(invalid_rows: Table, message: str):
+def _get_error_list(invalid_rows: Table, message: str):
     invalid_identifiers = (
         invalid_rows.column("unit_id").slice(0, 5).to_pylist()
     )
-    return f"{message}. For rows with identifiers: {invalid_identifiers}..."
+    return [
+        f"{message} for row with identifier: {identifier}"
+        for identifier in invalid_identifiers
+    ]
 
 
 def valid_value_column_check(
@@ -34,7 +37,10 @@ def valid_value_column_check(
         filter=invalid_rows_filter, columns=["unit_id"]
     )
     if len(invalid_rows) > 0:
-        raise ValueError("valid_value_column_check")
+        raise ValueError(
+            "Invalid value in #2 column",
+            errors=_get_error_list(invalid_rows, "Invalid value in #2 column"),
+        )
 
     if code_list:
         unique_codes = list(
@@ -52,7 +58,12 @@ def valid_value_column_check(
             filter=invalid_code_filter, columns=["value"]
         )
         if len(invalid_rows) > 0:
-            raise ValueError("invalid code list rows")
+            raise ValueError(
+                "Value in #2 column not in code list",
+                errors=_get_error_list(
+                    invalid_rows, "Value in #2 column not in code list"
+                ),
+            )
 
 
 def valid_unit_id_check(parquet_path: str):
@@ -68,7 +79,12 @@ def valid_unit_id_check(parquet_path: str):
         filter=invalid_rows_filter, columns=["unit_id"]
     )
     if len(invalid_rows) > 0:
-        raise ValueError("valid_unit_id_column_check")
+        raise ValueError(
+            "Invalid identifier in #1 column",
+            errors=_get_error_list(
+                invalid_rows, "Invalid identifier in #1 column"
+            ),
+        )
 
 
 def fixed_temporal_variables_check(parquet_path: str):
@@ -84,7 +100,12 @@ def fixed_temporal_variables_check(parquet_path: str):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError("valid_unit_id_column_check")
+        raise ValueError(
+            "Invalid #3 and/or #4 columns",
+            errors=_get_error_list(
+                invalid_rows, "Invalid #3 and/or #4 columns"
+            ),
+        )
 
 
 def status_temporal_variables_check(parquet_path: str):
@@ -104,8 +125,10 @@ def status_temporal_variables_check(parquet_path: str):
     )
     if len(invalid_rows) > 0:
         raise ValueError(
-            "No row can have an empty start or stop column with "
-            "temporalityType: STATUS"
+            "Invalid #3 and/or #4 columns",
+            errors=_get_error_list(
+                invalid_rows, "Invalid #3 and/or #4 columns"
+            ),
         )
     invalid_rows = dataset.dataset(parquet_path).to_table(
         filter=dataset.field("start_epoch_days")
@@ -113,7 +136,12 @@ def status_temporal_variables_check(parquet_path: str):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError("start did not equal stop")
+        raise ValueError(
+            "#3 column not equal to #4 column",
+            errors=_get_error_list(
+                invalid_rows, "#3 column not equal to #4 column"
+            ),
+        )
 
 
 def event_temporal_variables_check(parquet_path: str):
@@ -132,7 +160,12 @@ def event_temporal_variables_check(parquet_path: str):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(f"valid_event_temporal_columns_check {invalid_rows}")
+        raise ValueError(
+            "Invalid #3 and/or #4 columns",
+            errors=_get_error_list(
+                invalid_rows, "Invalid #3 and/or #4 columns"
+            ),
+        )
 
 
 def accumulated_temporal_variables_check(parquet_path: str):
@@ -154,7 +187,10 @@ def accumulated_temporal_variables_check(parquet_path: str):
     )
     if len(invalid_rows) > 0:
         raise ValueError(
-            f"valid_accumulated_temporal_columns_check {invalid_rows}"
+            "Invalid #3 and/or #4 columns",
+            errors=_get_error_list(
+                invalid_rows, "Invalid #3 and/or #4 columns"
+            ),
         )
 
 
@@ -183,7 +219,10 @@ def only_unique_identifiers_check(parquet_path: str):
         bucket_row_count = len(bucket_table)
         unique_identifiers_count = len(compute.unique(bucket_table["unit_id"]))
         if unique_identifiers_count != bucket_row_count:
-            raise ValueError("identifier diff")
+            raise ValueError(
+                "Duplicate identifiers in #1 column",
+                errors=["Duplicate identifiers in #1 column"],
+            )
 
 
 def status_uniquesness_check(parquet_path: str):
@@ -202,7 +241,14 @@ def status_uniquesness_check(parquet_path: str):
         )
         unique_identifiers = compute.unique(status_table["unit_id"])
         if len(unique_identifiers) != len(status_table):
-            raise ValueError("status uniqueness fail")
+            raise ValueError(
+                "Same unit_id (#1 Column) has duplicate dates "
+                "(#3 and #4 column)",
+                errors=[
+                    "Same unit_id (#1 Column) has duplicate dates "
+                    "(#3 and #4 column)"
+                ],
+            )
 
 
 def no_overlapping_timespans_check(parquet_path: str):
