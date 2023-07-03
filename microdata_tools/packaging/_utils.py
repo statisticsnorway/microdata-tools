@@ -1,7 +1,8 @@
 from pathlib import Path
 import hashlib
 from microdata_tools.packaging.exceptions import (
-    ValidationException, CsvConsistencyException
+    ValidationException,
+    CsvConsistencyException,
 )
 
 
@@ -29,7 +30,9 @@ def write_checksum_to_file(csv_file: Path) -> None:
         file.write(calculate_checksum(csv_file))
 
 
-def compare_checksum_with_file(md5_file: Path, calculated_checksum: str) -> None:
+def compare_checksum_with_file(
+    md5_file: Path, calculated_checksum: str
+) -> None:
     with open(md5_file, "r") as file:
         checksum_from_file = file.readlines()[0]
         if calculated_checksum != checksum_from_file.strip():

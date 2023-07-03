@@ -10,7 +10,10 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from microdata_tools.packaging.exceptions import InvalidKeyError, InvalidTarFileContents
+from microdata_tools.packaging.exceptions import (
+    InvalidKeyError,
+    InvalidTarFileContents,
+)
 from microdata_tools.packaging._utils import check_exists
 
 logger = logging.getLogger()
@@ -42,7 +45,9 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     if chunk_dir.exists() and first_encrypted_chunk.exists():
         logger.info(f"Encrypted file found in {dataset_dir}")
 
-        with open(Path(rsa_keys_dir / "microdata_private_key.pem"), "rb") as key_file:
+        with open(
+            Path(rsa_keys_dir / "microdata_private_key.pem"), "rb"
+        ) as key_file:
             private_key = serialization.load_pem_private_key(
                 key_file.read(), password=None, backend=default_backend()
             )
@@ -98,7 +103,9 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
     _copy_metadata_file(dataset_dir, dataset_name, output_dataset_dir)
 
 
-def _copy_decrypted_data_to_output_dir(dataset_dir, dataset_name, output_dataset_dir):
+def _copy_decrypted_data_to_output_dir(
+    dataset_dir, dataset_name, output_dataset_dir
+):
     data_file_path = dataset_dir / f"{dataset_name}.csv"
     shutil.copy(
         data_file_path,
@@ -116,7 +123,9 @@ def _copy_metadata_file(dataset_dir, dataset_name, output_dataset_dir):
     os.remove(metadata_file_path)
 
 
-def untar_encrypted_dataset(input_file: Path, dataset_name: str, untar_dir: Path):
+def untar_encrypted_dataset(
+    input_file: Path, dataset_name: str, untar_dir: Path
+):
     with tarfile.open(input_file) as tar:
         _validate_tar_contents(tar.getnames(), dataset_name)
         tar.extractall(path=untar_dir)
@@ -149,7 +158,9 @@ def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
 
 def _combine_csv_files(input_dir: Path, output_file: Path) -> None:
     sorted_chunkpaths = _get_sorted_file_names(input_dir)
-    logger.debug(f"\nCombining {len(sorted_chunkpaths)} files into {output_file}")
+    logger.debug(
+        f"\nCombining {len(sorted_chunkpaths)} files into {output_file}"
+    )
 
     with open(output_file, "wb") as combined_file:
         for chunk_number, file_name in sorted_chunkpaths:
@@ -162,6 +173,10 @@ def _combine_csv_files(input_dir: Path, output_file: Path) -> None:
 # Then return the sorted dictionary
 def _get_sorted_file_names(directory: Path) -> List[Tuple]:
     try:
-        return sorted([(int(f.stem), f) for f in directory.iterdir() if f.is_file()])
+        return sorted(
+            [(int(f.stem), f) for f in directory.iterdir() if f.is_file()]
+        )
     except ValueError as e:
-        raise InvalidTarFileContents("Failed to sort files in chunk directory ") from e
+        raise InvalidTarFileContents(
+            "Failed to sort files in chunk directory "
+        ) from e
