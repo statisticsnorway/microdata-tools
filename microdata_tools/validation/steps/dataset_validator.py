@@ -317,16 +317,15 @@ def validate_dataset(
     valid_value_column_check(
         parquet_path, measure_data_type, code_list, sentinel_list
     )
-    match temporality_type:
-        case "FIXED":
-            fixed_temporal_variables_check(parquet_path)
-            only_unique_identifiers_check(parquet_path)
-        case "STATUS":
-            status_temporal_variables_check(parquet_path)
-            status_uniquesness_check(parquet_path)
-        case "ACCUMULATED":
-            accumulated_temporal_variables_check(parquet_path)
-            no_overlapping_timespans_check(parquet_path)
-        case "EVENT":
-            event_temporal_variables_check(parquet_path)
-            no_overlapping_timespans_check(parquet_path)
+    if temporality_type == "FIXED":
+        fixed_temporal_variables_check(parquet_path)
+        only_unique_identifiers_check(parquet_path)
+    elif temporality_type == "STATUS":
+        status_temporal_variables_check(parquet_path)
+        status_uniquesness_check(parquet_path)
+    elif temporality_type == "ACCUMULATED":
+        accumulated_temporal_variables_check(parquet_path)
+        no_overlapping_timespans_check(parquet_path)
+    elif temporality_type == "EVENT":
+        event_temporal_variables_check(parquet_path)
+        no_overlapping_timespans_check(parquet_path)
