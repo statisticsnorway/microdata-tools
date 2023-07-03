@@ -1,0 +1,246 @@
+{
+  "temporalityType": "STATUS",
+  "sensitivityLevel": "PERSON_GENERAL",
+  "populationDescription": [
+    {
+      "languageCode": "no",
+      "value": "Personer med utdannelse i Norge"
+    }
+  ],
+  "spatialCoverageDescription": [
+    {
+      "languageCode": "no",
+      "value": "Norge"
+    }
+  ],
+  "dataRevision": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "F\u00f8rste publisering."
+      }
+    ],
+    "temporalEndOfSeries": false,
+    "temporalCoverageStart": "1990-01-01",
+    "temporalCoverageLatest": "1994-01-01",
+    "temporalStatusDates": [
+      "1990-01-01",
+      "1991-01-01",
+      "1992-01-01",
+      "1993-01-01",
+      "1994-01-01"
+    ]
+  },
+  "subjectFields": [
+    [
+      {
+        "languageCode": "no",
+        "value": "Befolkning"
+      }
+    ]
+  ],
+  "identifierVariables": [
+    {
+      "shortName": "PERSONID_1",
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Personidentifikator"
+        },
+        {
+          "languageCode": "en",
+          "value": "Person identifier"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Identifikator for person i microdata"
+        },
+        {
+          "languageCode": "en",
+          "value": "Identifier for person in microdata"
+        }
+      ],
+      "dataType": "LONG",
+      "unitType": {
+        "shortName": "PERSON",
+        "requiresPseudonymization": true,
+        "name": [
+          {
+            "languageCode": "no",
+            "value": "Person"
+          },
+          {
+            "languageCode": "en",
+            "value": "Person"
+          }
+        ],
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Person er et enkeltmenneske, individ."
+          },
+          {
+            "languageCode": "en",
+            "value": "Person is a single person, an individual."
+          }
+        ]
+      },
+      "format": "RandomUInt48",
+      "valueDomain": {
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Pseudonymisert personnummer"
+          },
+          {
+            "languageCode": "en",
+            "value": "Pseudonymized national identity number"
+          }
+        ]
+      }
+    }
+  ],
+  "measureVariables": [
+    {
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Utdanning"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Utdanningsniv\u00e5 for person"
+        }
+      ],
+      "dataType": "STRING",
+      "valueDomain": {
+        "codeList": [
+          {
+            "code": "1",
+            "categoryTitle": [
+              {
+                "languageCode": "no",
+                "value": "Grunnskole"
+              }
+            ],
+            "validFrom": "1926-01-01"
+          },
+          {
+            "code": "2",
+            "categoryTitle": [
+              {
+                "languageCode": "no",
+                "value": "Videreg\u00e5ende skole"
+              }
+            ],
+            "validFrom": "1926-01-01"
+          },
+          {
+            "code": "3",
+            "categoryTitle": [
+              {
+                "languageCode": "no",
+                "value": "Bachelorgrad"
+              }
+            ],
+            "validFrom": "1926-01-01"
+          },
+          {
+            "code": "4",
+            "categoryTitle": [
+              {
+                "languageCode": "no",
+                "value": "Mastergrad"
+              }
+            ],
+            "validFrom": "1926-01-01"
+          },
+          {
+            "code": "5",
+            "categoryTitle": [
+              {
+                "languageCode": "no",
+                "value": "Doktorgrad"
+              }
+            ],
+            "validFrom": "1926-01-01"
+          }
+        ]
+      },
+      "shortName": "SYNT_UTDANNING"
+    }
+  ],
+  "attributeVariables": [
+    {
+      "variableRole": "Start",
+      "shortName": "START",
+      "dataType": "DATE",
+      "valueDomain": {
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Dato oppgitt i dager siden 1970-01-01"
+          }
+        ]
+      },
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        },
+        {
+          "languageCode": "en",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        }
+      ],
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Startdato"
+        },
+        {
+          "languageCode": "en",
+          "value": "Start date"
+        }
+      ]
+    },
+    {
+      "variableRole": "Stop",
+      "shortName": "STOP",
+      "dataType": "DATE",
+      "valueDomain": {
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Dato oppgitt i dager siden 1970-01-01"
+          }
+        ]
+      },
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        },
+        {
+          "languageCode": "en",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        }
+      ],
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Stoppdato"
+        },
+        {
+          "languageCode": "en",
+          "value": "Stop date"
+        }
+      ]
+    }
+  ],
+  "shortName": "SYNT_UTDANNING"
+}

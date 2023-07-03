@@ -1,0 +1,23 @@
+{
+    "temporalityType": "FIXED",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{"languageCode": "no", "value": "Kjønn for en populasjon"}],
+    "spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+    "dataRevision": {
+      "description": [{"languageCode": "no","value": "Første publisering."}],
+      "temporalEndOfSeries": false
+    },
+    "subjectFields": [
+      [{"languageCode": "no", "value": "Helsetjenester"}]
+    ],
+    "identifierVariables": [{"unitType": "PERSON"}],
+    "measureVariables": [
+        {
+            "unitType": "PERSON",
+            "name": [{"languageCode": "no", "value": "Mor FNR"}],
+            "description": [{"languageCode": "no", "value": "Fødselsnummer til Mor"}],
+            "dataType": "STRING"
+        }
+    ]
+  }
+  

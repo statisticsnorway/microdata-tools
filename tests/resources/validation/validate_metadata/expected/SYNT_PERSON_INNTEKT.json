@@ -1,0 +1,206 @@
+{
+  "temporalityType": "ACCUMULATED",
+  "sensitivityLevel": "PERSON_GENERAL",
+  "populationDescription": [
+    {
+      "languageCode": "no",
+      "value": "Bosatte i Norge"
+    }
+  ],
+  "spatialCoverageDescription": [
+    {
+      "languageCode": "no",
+      "value": "Norge"
+    }
+  ],
+  "subjectFields": [
+    [
+      {
+        "languageCode": "no",
+        "value": "\u00d8konomi"
+      }
+    ],
+    [
+      {
+        "languageCode": "no",
+        "value": "Samfunn"
+      }
+    ]
+  ],
+  "dataRevision": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "F\u00f8rste publisering."
+      }
+    ],
+    "temporalEndOfSeries": false
+  },
+  "identifierVariables": [
+    {
+      "shortName": "PERSONID_1",
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Personidentifikator"
+        },
+        {
+          "languageCode": "en",
+          "value": "Person identifier"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Identifikator for person i microdata"
+        },
+        {
+          "languageCode": "en",
+          "value": "Identifier for person in microdata"
+        }
+      ],
+      "dataType": "LONG",
+      "unitType": {
+        "shortName": "PERSON",
+        "requiresPseudonymization": true,
+        "name": [
+          {
+            "languageCode": "no",
+            "value": "Person"
+          },
+          {
+            "languageCode": "en",
+            "value": "Person"
+          }
+        ],
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Person er et enkeltmenneske, individ."
+          },
+          {
+            "languageCode": "en",
+            "value": "Person is a single person, an individual."
+          }
+        ]
+      },
+      "format": "RandomUInt48",
+      "valueDomain": {
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Pseudonymisert personnummer"
+          },
+          {
+            "languageCode": "en",
+            "value": "Pseudonymized national identity number"
+          }
+        ]
+      }
+    }
+  ],
+  "measureVariables": [
+    {
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Personens inntekt"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Personens rapporterte inntekt"
+        }
+      ],
+      "dataType": "LONG",
+      "uriDefinition": [],
+      "valueDomain": {
+        "uriDefinition": [],
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "\u00c5rlig personinntekt"
+          }
+        ],
+        "measurementType": "CURRENCY",
+        "measurementUnitDescription": [
+          {
+            "languageCode": "no",
+            "value": "Norske Kroner"
+          }
+        ]
+      },
+      "shortName": "SYNT_PERSON_INNTEKT"
+    }
+  ],
+  "attributeVariables": [
+    {
+      "variableRole": "Start",
+      "shortName": "START",
+      "dataType": "DATE",
+      "valueDomain": {
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Dato oppgitt i dager siden 1970-01-01"
+          }
+        ]
+      },
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        },
+        {
+          "languageCode": "en",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        }
+      ],
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Startdato"
+        },
+        {
+          "languageCode": "en",
+          "value": "Start date"
+        }
+      ]
+    },
+    {
+      "variableRole": "Stop",
+      "shortName": "STOP",
+      "dataType": "DATE",
+      "valueDomain": {
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Dato oppgitt i dager siden 1970-01-01"
+          }
+        ]
+      },
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        },
+        {
+          "languageCode": "en",
+          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+        }
+      ],
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Stoppdato"
+        },
+        {
+          "languageCode": "en",
+          "value": "Stop date"
+        }
+      ]
+    }
+  ],
+  "shortName": "SYNT_PERSON_INNTEKT"
+}

@@ -1,0 +1,22 @@
+{
+    "temporalityType": "FIXED",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{"languageCode": "no", "value": "Alle personer registrert bosatt i Norge"}],
+    "spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+    "subjectFields": [
+      [{"languageCode": "no", "value": "Befolkning"}]
+    ],
+    "dataRevision": {
+      "description": [{"languageCode": "no","value": "Første publisering."}],
+      "temporalEndOfSeries": false
+    },
+    "identifierVariables": [{"unitType": "PERSON"}],
+    "measureVariables": [
+      {
+        "name": [{"languageCode": "no", "value": "Mors fødselsnummer"}],
+        "description": [{"languageCode": "no", "value": "Fødselsnummer til personens biologiske mor"}],
+        "unitType": "PERSON"
+      }
+    ]
+  }
+  

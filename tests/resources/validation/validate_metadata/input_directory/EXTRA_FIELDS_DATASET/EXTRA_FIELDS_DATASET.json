@@ -1,0 +1,64 @@
+{
+    "temporalityType": "EVENT",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{"languageCode": "no", "value": "Alle personer registrert bosatt i Norge"}],
+    "spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+    "newTypeOfField": "INVALID",
+    "subjectFields": [
+      [{"languageCode": "no", "value": "Befolkning"}]
+    ],
+    "dataRevision": {
+      "description": [{"languageCode": "no","value": "Første publisering."}],
+      "temporalEndOfSeries": false,
+      "newTypeOfField": "INVALID"
+    },
+    "identifierVariables": [{"unitType": "PERSON", "invalidField": "here"}],
+    "measureVariables": [
+      {
+        "name": [{"languageCode": "no", "value": "Sivilstand"}],
+        "description": [{"languageCode": "no", "value": "Sivilstand i forhold til ekteskapslovgivningen"}],
+        "subjectFields": [
+          [{"languageCode": "no", "value": "Befolkning"}]
+        ],
+        "dataType": "STRING",
+        "uriDefinition": ["https://www.ssb.no/a/metadata/conceptvariable/vardok/91/nb"],
+        "valueDomain": {
+          "uriDefinition": ["https://www.ssb.no/klass/klassifikasjoner/19"],
+          "codeList":[
+              {
+                "code": "1",
+                "categoryTitle": [{"languageCode": "no", "value": "Ugift"}],
+                "validFrom": "1926-01-01"
+              },
+              {
+                "code": "2",
+                "categoryTitle": [{"languageCode": "no", "value": "Gift"}],
+                "validFrom": "1926-01-01"
+              },
+              {
+                "code": "3",
+                "categoryTitle": [{"languageCode": "no", "value": "Enke/Enkemann"}],
+                "validFrom": "1926-01-01",
+                "validTo": "2020-01-01"
+              },
+              {
+                "code": "4",
+                "categoryTitle": [{"languageCode": "no", "value": "Skilt"}],
+                "validFrom": "1926-01-01",
+                "validUntil": "2020-01-01"
+              }
+            ],
+          "sentinelAndMissingValues" : [
+            {
+              "code": "0",
+              "categoryTitle": [
+                  {"languageCode": "no", "value": "Siviltand ukjent"}
+              ],
+              "validFrom": "1900-01-01"
+            }
+          ]
+        }
+      }
+    ]
+  }
+  
