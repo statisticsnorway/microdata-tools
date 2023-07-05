@@ -170,7 +170,7 @@ def event_temporal_variables_check(parquet_path: str):
 
 def accumulated_temporal_variables_check(parquet_path: str):
     """
-    Any given row in a table with temporalityType=EVENT is valid only if:
+    Any given row in a table with temporalityType=ACCUMULATED is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
     * The stop_epoch_days is non-null (int32) value bigger than start_epoch_days
     """
