@@ -1,0 +1,61 @@
+{
+  "shortName": "FORETAK_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Foretaksidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Enterprise identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for foretak i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for enterprise in microdata"
+    }
+  ],
+  "dataType": "LONG",
+  "unitType": {
+    "shortName": "FORETAK",
+    "requiresPseudonymization": true,
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Foretak"
+      },
+      {
+        "languageCode": "en",
+        "value": "Enterprise"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Foretak er definert som den minste kombinasjonen av juridiske enheter som produserer varer eller tjenester, og som til ei viss grad har selvstendig beslutningsmyndighet."
+      },
+      {
+        "languageCode": "en",
+        "value": "The Standard Industrial Classification (SIC) defines an enterprise as the minimum combination of legal entities that produce goods or services, and which to a certain degree has independent decision-making powers."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert organisasjonsnummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized organisation number"
+      }
+    ]
+  }
+}

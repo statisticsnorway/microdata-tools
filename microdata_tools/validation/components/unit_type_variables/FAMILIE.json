@@ -1,0 +1,61 @@
+{
+  "shortName": "FAMILIE_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Familieidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Family identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for familie i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for family in microdata"
+    }
+  ],
+  "dataType": "LONG",
+  "unitType": {
+    "shortName": "FAMILIE",
+    "requiresPseudonymization": true,
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Familie"
+      },
+      {
+        "languageCode": "en",
+        "value": "Family"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "En familie består av personer som er fast bosatt i samme bolig, og som er knyttet til hverandre som ektefeller, samboere, registrerte partnere og/eller som foreldre og ugifte barn (uansett det ugifte barnets alder). En familie kan høyst bestå av to (påfølgende) generasjoner, og kun ett ektepar/partnerskap/samboerpar. Som familie regnes også enkeltpersoner, slik at alle personer er med i en familie og en husholdning, enten sammen med andre personer, eller alene."
+      },
+      {
+        "languageCode": "en",
+        "value": "A family consists of persons who are permanently resident in the same dwelling, and who are linked to each other as spouses, cohabitants, registered partners and/or as parents and unmarried children (regardless of the age of the unmarried child(ren)). A family can, at most, consist of two (consecutive) generations, and only one married/cohabiting couple. Individuals are also regarded as families, whereby all persons belong to a family and a household, either with others, or on their own."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert personnummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized national identity number"
+      }
+    ]
+  }
+}

@@ -10,6 +10,8 @@ packages = [{include = "microdata_tools"}]
 [tool.poetry.dependencies]
 python = ">=3.7.2,<4.0"
 cryptography = "^41.0.1"
+pydantic = "^1.10.9"
+pyarrow = "^12.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -22,3 +24,6 @@ cryptography = "^41.0.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length=79

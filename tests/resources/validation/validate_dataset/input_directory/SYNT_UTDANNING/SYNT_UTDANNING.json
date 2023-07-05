@@ -1,0 +1,50 @@
+{
+    "temporalityType": "STATUS",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{"languageCode": "no", "value": "Personer med utdannelse i Norge"}],
+    "spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+    "subjectFields": [
+      [{"languageCode": "no", "value": "Befolkning"}]
+    ],
+    "dataRevision": {
+      "description": [{"languageCode": "no","value": "Første publisering."}],
+      "temporalEndOfSeries": false
+    },
+    "identifierVariables": [{"unitType": "PERSON"}],
+    "measureVariables": [
+      {
+        "name": [{"languageCode": "no", "value": "Utdanning"}],
+        "description": [{"languageCode": "no", "value": "Utdanningsnivå for person"}],
+        "dataType": "STRING",
+        "valueDomain": {
+          "codeList": [
+            {
+              "code": "1",
+              "categoryTitle": [{"languageCode": "no", "value": "Grunnskole"}],
+              "validFrom": "1926-01-01"
+            },
+            {
+              "code": "2",
+              "categoryTitle": [{"languageCode": "no", "value": "Videregående skole"}],
+              "validFrom": "1926-01-01"
+            },
+            {
+              "code": "3",
+              "categoryTitle": [{"languageCode": "no", "value": "Bachelorgrad"}],
+              "validFrom": "1926-01-01"
+            },
+            {
+              "code": "4",
+              "categoryTitle": [{"languageCode": "no", "value": "Mastergrad"}],
+              "validFrom": "1926-01-01"
+            },
+            {
+              "code": "5",
+              "categoryTitle": [{"languageCode": "no", "value": "Doktorgrad"}],
+              "validFrom": "1926-01-01"
+            }
+          ]
+        }
+      }
+    ]
+  }

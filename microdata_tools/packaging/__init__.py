@@ -4,7 +4,10 @@ import shutil
 from pathlib import Path
 from typing import Union
 
-from microdata_tools.packaging._encrypt import _tar_encrypted_dataset, encrypt_dataset
+from microdata_tools.packaging._encrypt import (
+    _tar_encrypted_dataset,
+    encrypt_dataset,
+)
 from microdata_tools.packaging.exceptions import ValidationException
 from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._utils import (
@@ -18,7 +21,9 @@ from microdata_tools.packaging._utils import (
 logger = logging.getLogger()
 
 
-def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
+def package_dataset(
+    rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path
+) -> None:
     """
     Packages a dataset. It will encrypt and tar the dataset using
     the provided RSA public key. Only the CSV file will be encrypted.
@@ -36,7 +41,9 @@ def package_dataset(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> 
 
     dataset_name = dataset_dir.stem
     dataset_output_dir = output_dir / dataset_name
-    csv_files = [file for file in dataset_dir.iterdir() if file.suffix == ".csv"]
+    csv_files = [
+        file for file in dataset_dir.iterdir() if file.suffix == ".csv"
+    ]
 
     try:
         # check if json exists
@@ -116,7 +123,9 @@ def unpackage_dataset(
         decrypt(rsa_keys_dir, dataset_dir, output_dir)
         _validate_csv_consistency(dataset_name, dataset_dir, output_dir)
         if archive_dir is not None:
-            _archive(dataset_name, dataset_dir.parent, archive_dir, "unpackaged")
+            _archive(
+                dataset_name, dataset_dir.parent, archive_dir, "unpackaged"
+            )
         logger.info(f"Unpackaged {packaged_file_path}")
     except Exception as exc:
         if archive_dir is not None:
