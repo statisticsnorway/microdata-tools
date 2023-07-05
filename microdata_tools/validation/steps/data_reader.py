@@ -111,7 +111,7 @@ def _sanitize_data(
         else compute.utf8_trim(table["value"], " ")
     )
     if measure_data_type == "DATE":
-        measure = measure.cast(pyarrow.int32()).cast(pyarrow.int16())
+        measure = measure.cast(pyarrow.int32()).cast(pyarrow.int64())
     epoch_start = table["start"].cast(pyarrow.int32()).cast(pyarrow.int16())
     epoch_stop = table["stop"].cast(pyarrow.int32()).cast(pyarrow.int16())
     start_year = compute.utf8_slice_codeunits(
