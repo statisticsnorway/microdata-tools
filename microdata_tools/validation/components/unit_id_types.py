@@ -19,7 +19,7 @@ UNIT_ID_TYPE_FOR_UNIT_TYPE = {
 }
 
 
-def get_unit_id_type_for_unit_type(unit_type: str) -> Union[str, None]:
+def get(unit_type: str) -> Union[str, None]:
     try:
         return UNIT_ID_TYPE_FOR_UNIT_TYPE[unit_type]
     except KeyError as e:

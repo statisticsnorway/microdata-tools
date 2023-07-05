@@ -2,9 +2,7 @@ from pathlib import Path
 import string
 from pyarrow import parquet
 from typing import List, Union
-from microdata_tools.validation.components.unit_id_types import (
-    UNIT_ID_TYPE_FOR_UNIT_TYPE,
-)
+from microdata_tools.validation.components import unit_id_types
 from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.steps import (
@@ -39,7 +37,7 @@ def get_unit_id_type_for_unit_type(unit_id: str) -> Union[str, None]:
     if supplied unitType has no attached unitIdType.
     Raises a UnregisteredUnitTypeError on unregistered unitType.
     """
-    return UNIT_ID_TYPE_FOR_UNIT_TYPE.get_unit_id_type_for_unit_type(unit_id)
+    return unit_id_types.get(unit_id)
 
 
 def validate_dataset(
