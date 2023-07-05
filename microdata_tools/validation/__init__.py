@@ -12,7 +12,7 @@ from microdata_tools.validation.steps import (
 )
 
 
-def validate_dataset_name(dataset_name: str) -> None:
+def _validate_dataset_name(dataset_name: str) -> None:
     """
     Validates that the name of the dataset only contains valid
     characters (uppercase A-Z, numbers 0-9 and _)
@@ -51,7 +51,7 @@ def validate_dataset(
     If the dataset is valid, the list will be empty.
     """
     try:
-        validate_dataset_name(dataset_name)
+        _validate_dataset_name(dataset_name)
 
         input_directory_path = Path(input_directory)
         metadata_file_path = (
@@ -132,7 +132,7 @@ def validate_metadata(
     try:
         data_errors = []
 
-        validate_dataset_name(dataset_name)
+        _validate_dataset_name(dataset_name)
 
         input_directory_path = Path(input_directory)
         (

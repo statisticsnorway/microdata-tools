@@ -57,13 +57,13 @@ def get_temporal_data(
     return temporal_data
 
 
-def get_csv_read_options():
+def _get_csv_read_options():
     return csv.ReadOptions(
         column_names=["unit_id", "value", "start", "stop", "attributes"]
     )
 
 
-def get_csv_convert_options(measure_data_type: str):
+def _get_csv_convert_options(measure_data_type: str):
     pyarrow_data_type = None
     if measure_data_type == "STRING":
         pyarrow_data_type = pyarrow.string()
@@ -89,15 +89,15 @@ def get_csv_convert_options(measure_data_type: str):
     )
 
 
-def sanitize_data(
+def _sanitize_data(
     input_data_path: Path, measure_data_type: str
 ) -> pyarrow.Table:
     try:
         table = csv.read_csv(
             input_data_path,
             parse_options=csv.ParseOptions(delimiter=";"),
-            read_options=get_csv_read_options(),
-            convert_options=get_csv_convert_options(measure_data_type),
+            read_options=_get_csv_read_options(),
+            convert_options=_get_csv_convert_options(measure_data_type),
         )
     except ArrowInvalid as e:
         raise ValidationError(
@@ -160,7 +160,7 @@ def run_reader(
     input_data_path = input_dataset_dir / f"{dataset_name}.csv"
 
     logger.debug(f'Start reading dataset "{dataset_name}"')
-    table = sanitize_data(input_data_path, measure_data_type)
+    table = _sanitize_data(input_data_path, measure_data_type)
 
     logger.debug(f'OK - reading dataset "{dataset_name}"')
     return table

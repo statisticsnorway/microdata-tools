@@ -14,7 +14,7 @@ def _get_error_list(invalid_rows: Table, message: str):
     ]
 
 
-def valid_value_column_check(
+def _valid_value_column_check(
     parquet_path: str,
     data_type: str,
     code_list: Union[list, None],
@@ -66,7 +66,7 @@ def valid_value_column_check(
             )
 
 
-def valid_unit_id_check(parquet_path: str):
+def _valid_unit_id_check(parquet_path: str):
     """
     Any given cell in the unit_id column is valid only if:
     * The cell contains a a valid non-null value
@@ -87,7 +87,7 @@ def valid_unit_id_check(parquet_path: str):
         )
 
 
-def fixed_temporal_variables_check(parquet_path: str):
+def _fixed_temporal_variables_check(parquet_path: str):
     """
     Any given row in a table with temporalityType=FIXED is valid only if:
     * The start_epoch_days column contains null (empty)
@@ -108,7 +108,7 @@ def fixed_temporal_variables_check(parquet_path: str):
         )
 
 
-def status_temporal_variables_check(parquet_path: str):
+def _status_temporal_variables_check(parquet_path: str):
     """
     Any given row in a table with temporalityType=STATUS is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -144,7 +144,7 @@ def status_temporal_variables_check(parquet_path: str):
         )
 
 
-def event_temporal_variables_check(parquet_path: str):
+def _event_temporal_variables_check(parquet_path: str):
     """
     Any given row in a table with temporalityType=EVENT is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -168,7 +168,7 @@ def event_temporal_variables_check(parquet_path: str):
         )
 
 
-def accumulated_temporal_variables_check(parquet_path: str):
+def _accumulated_temporal_variables_check(parquet_path: str):
     """
     Any given row in a table with temporalityType=ACCUMULATED is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -194,7 +194,7 @@ def accumulated_temporal_variables_check(parquet_path: str):
         )
 
 
-def only_unique_identifiers_check(parquet_path: str):
+def _only_unique_identifiers_check(parquet_path: str):
     """
     A table with temporalityType=FIXED is only valid if all
     cells in the unit_id column are unique.
@@ -225,7 +225,7 @@ def only_unique_identifiers_check(parquet_path: str):
             )
 
 
-def status_uniquesness_check(parquet_path: str):
+def _status_uniquesness_check(parquet_path: str):
     """
     A table with temporalityType=STATUS is valid only if all
     cells in the unit_id column are unique per status date.
@@ -251,7 +251,7 @@ def status_uniquesness_check(parquet_path: str):
             )
 
 
-def no_overlapping_timespans_check(parquet_path: str):
+def _no_overlapping_timespans_check(parquet_path: str):
     """
     A table with temporalityType=(EVENT|ACCUMULATED) is valid
     only if all rows for a given identifier contains no overlapping
@@ -313,19 +313,19 @@ def validate_dataset(
     sentinel_list: Union[List, None],
     temporality_type: str,
 ) -> None:
-    valid_unit_id_check(parquet_path)
-    valid_value_column_check(
+    _valid_unit_id_check(parquet_path)
+    _valid_value_column_check(
         parquet_path, measure_data_type, code_list, sentinel_list
     )
     if temporality_type == "FIXED":
-        fixed_temporal_variables_check(parquet_path)
-        only_unique_identifiers_check(parquet_path)
+        _fixed_temporal_variables_check(parquet_path)
+        _only_unique_identifiers_check(parquet_path)
     elif temporality_type == "STATUS":
-        status_temporal_variables_check(parquet_path)
-        status_uniquesness_check(parquet_path)
+        _status_temporal_variables_check(parquet_path)
+        _status_uniquesness_check(parquet_path)
     elif temporality_type == "ACCUMULATED":
-        accumulated_temporal_variables_check(parquet_path)
-        no_overlapping_timespans_check(parquet_path)
+        _accumulated_temporal_variables_check(parquet_path)
+        _no_overlapping_timespans_check(parquet_path)
     elif temporality_type == "EVENT":
-        event_temporal_variables_check(parquet_path)
-        no_overlapping_timespans_check(parquet_path)
+        _event_temporal_variables_check(parquet_path)
+        _no_overlapping_timespans_check(parquet_path)
