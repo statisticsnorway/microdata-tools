@@ -12,3 +12,7 @@ class InvalidKeyError(Exception):
 
 class CsvConsistencyException(Exception):
     ...
+
+
+class UnpackagingError(Exception):
+    ...

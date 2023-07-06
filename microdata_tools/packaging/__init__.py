@@ -7,7 +7,10 @@ from microdata_tools.packaging._encrypt import (
     _tar_encrypted_dataset,
     encrypt_dataset,
 )
-from microdata_tools.packaging.exceptions import ValidationException
+from microdata_tools.packaging.exceptions import (
+    UnpackagingError,
+    ValidationException,
+)
 from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._utils import (
     check_exists,
@@ -125,7 +128,7 @@ def unpackage_dataset(
         logger.info(f"Unpackaged {packaged_file_path}")
     except Exception as exc:
         logger.exception(f"Failed to unpackage {dataset_name}", exc_info=exc)
-        raise exc
+        raise UnpackagingError("Failed to unpackage dataset") from exc
 
 
 def _validate_csv_consistency(dataset_name, dataset_dir, output_dir):
