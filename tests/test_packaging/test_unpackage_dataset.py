@@ -171,12 +171,11 @@ def test_unpackage_dataset_just_json():
 def test_unpackage_dataset_failed():
     dataset_name = "MISSING_CHUNK"
     packaged_file_path = INPUT_DIRECTORY / f"{dataset_name}.tar"
-    try:
+
+    with raises(UnpackagingError):
         unpackage_dataset(
             packaged_file_path, RSA_KEYS_DIRECTORY, OUTPUT_DIRECTORY
         )
-    except UnpackagingError:
-        pass
 
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
