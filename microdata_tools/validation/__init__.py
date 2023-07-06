@@ -51,6 +51,7 @@ def validate_dataset(
     Validate a dataset and return a list of errors.
     If the dataset is valid, the list will be empty.
     """
+    data_errors = []
     try:
         _validate_dataset_name(dataset_name)
         (
@@ -60,8 +61,6 @@ def validate_dataset(
         input_dataset_directory = Path(input_directory) / dataset_name
         input_metadata_path = input_dataset_directory / f"{dataset_name}.json"
         input_data_path = input_dataset_directory / f"{dataset_name}.csv"
-
-        data_errors = []
 
         # Read and validate metadata
         metadata_dict = metadata_reader.run_reader(
@@ -126,9 +125,8 @@ def validate_metadata(
     Validate metadata and return a list of errors.
     If the metadata is valid, the list will be empty.
     """
+    data_errors = []
     try:
-        data_errors = []
-
         _validate_dataset_name(dataset_name)
         (
             working_directory_path,
