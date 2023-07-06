@@ -9,7 +9,10 @@ from pytest import MonkeyPatch, fail, raises
 
 from microdata_tools import package_dataset, unpackage_dataset
 from microdata_tools.packaging._decrypt import _validate_tar_contents
-from microdata_tools.packaging.exceptions import InvalidTarFileContents
+from microdata_tools.packaging.exceptions import (
+    InvalidTarFileContents,
+    UnpackagingError,
+)
 from tests.test_packaging.test_package_dataset import _create_rsa_public_key
 
 
@@ -172,7 +175,7 @@ def test_unpackage_dataset_failed():
         unpackage_dataset(
             packaged_file_path, RSA_KEYS_DIRECTORY, OUTPUT_DIRECTORY
         )
-    except InvalidTarFileContents:
+    except UnpackagingError:
         pass
 
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
