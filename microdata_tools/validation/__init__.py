@@ -1,6 +1,6 @@
 from pathlib import Path
 import string
-from pyarrow import parquet
+from pyarrow import parquet, dataset
 from typing import List, Union
 from microdata_tools.validation.components import unit_id_types
 from microdata_tools.validation.exceptions import ValidationError
@@ -9,6 +9,7 @@ from microdata_tools.validation.steps import (
     metadata_reader,
     dataset_validator,
     data_reader,
+    metadata_enricher,
 )
 
 
@@ -52,21 +53,19 @@ def validate_dataset(
     """
     try:
         _validate_dataset_name(dataset_name)
-
-        input_directory_path = Path(input_directory)
-        metadata_file_path = (
-            input_directory_path / dataset_name / f"{dataset_name}.json"
-        )
         (
             working_directory_path,
             working_directory_was_generated,
         ) = local_storage.resolve_working_directory(working_directory)
+        input_dataset_directory = Path(input_directory) / dataset_name
+        input_metadata_path = input_dataset_directory / f"{dataset_name}.json"
+        input_data_path = input_dataset_directory / f"{dataset_name}.csv"
 
         data_errors = []
 
         # Read and validate metadata
         metadata_dict = metadata_reader.run_reader(
-            dataset_name, metadata_file_path
+            dataset_name, input_metadata_path
         )
         measure_data_type = metadata_dict["measureVariables"][0]["dataType"]
         temporality_type = metadata_dict["temporalityType"]
@@ -78,13 +77,11 @@ def validate_dataset(
         ].get("sentinelAndMissingValues")
 
         # Read data
-        table = data_reader.run_reader(
-            dataset_name, input_directory_path, measure_data_type
-        )
+        table = data_reader.run_reader(input_data_path, measure_data_type)
 
         # Enrich metadata with temporal data
         temporal_data = data_reader.get_temporal_data(table, temporality_type)
-        data_reader.metadata_update_temporal_coverage(
+        metadata_enricher.metadata_update_temporal_coverage(
             metadata_dict, temporal_data
         )
 
@@ -97,7 +94,7 @@ def validate_dataset(
 
         # Validate data
         dataset_validator.validate_dataset(
-            parquet_path,
+            dataset.dataset(parquet_path),
             measure_data_type,
             code_list,
             sentinel_list,
@@ -133,18 +130,15 @@ def validate_metadata(
         data_errors = []
 
         _validate_dataset_name(dataset_name)
-
-        input_directory_path = Path(input_directory)
         (
             working_directory_path,
             working_directory_was_generated,
         ) = local_storage.resolve_working_directory(working_directory)
+        input_dataset_directory = Path(input_directory) / dataset_name
+        input_metadata_path = input_dataset_directory / f"{dataset_name}.json"
 
-        metadata_file_path = (
-            input_directory_path / dataset_name / f"{dataset_name}.json"
-        )
         metadata_dict = metadata_reader.run_reader(
-            dataset_name, metadata_file_path
+            dataset_name, input_metadata_path
         )
         local_storage.write_json(
             working_directory_path / f"{dataset_name}.json", metadata_dict
