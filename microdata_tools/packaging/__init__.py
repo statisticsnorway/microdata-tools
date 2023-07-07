@@ -2,13 +2,15 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Union
 
 from microdata_tools.packaging._encrypt import (
     _tar_encrypted_dataset,
     encrypt_dataset,
 )
-from microdata_tools.packaging.exceptions import ValidationException
+from microdata_tools.packaging.exceptions import (
+    UnpackagingError,
+    ValidationException,
+)
 from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._utils import (
     check_exists,
@@ -87,7 +89,6 @@ def unpackage_dataset(
     packaged_file_path: Path,
     rsa_keys_dir: Path,
     output_dir: Path,
-    archive_dir: Union[Path, None],
 ) -> None:
     """
     Unpackages a dataset. It will untar and decrypt the dataset using
@@ -100,8 +101,6 @@ def unpackage_dataset(
         directory containing the private key file microdata_private_key.pem
     :param output_dir:
         output directory
-    :param archive_dir:
-        optional archive directory where the .tar file will be moved
     :return:
         None
     """
@@ -122,15 +121,14 @@ def unpackage_dataset(
         untar_encrypted_dataset(packaged_file_path, dataset_name, dataset_dir)
         decrypt(rsa_keys_dir, dataset_dir, output_dir)
         _validate_csv_consistency(dataset_name, dataset_dir, output_dir)
-        if archive_dir is not None:
-            _archive(
-                dataset_name, dataset_dir.parent, archive_dir, "unpackaged"
-            )
+
+        if Path(dataset_dir).exists():
+            shutil.rmtree(dataset_dir)
+
         logger.info(f"Unpackaged {packaged_file_path}")
     except Exception as exc:
-        if archive_dir is not None:
-            _archive(dataset_name, dataset_dir.parent, archive_dir, "failed")
         logger.exception(f"Failed to unpackage {dataset_name}", exc_info=exc)
+        raise UnpackagingError("Failed to unpackage dataset") from exc
 
 
 def _validate_csv_consistency(dataset_name, dataset_dir, output_dir):
@@ -141,22 +139,3 @@ def _validate_csv_consistency(dataset_name, dataset_dir, output_dir):
         compare_checksum_with_file(
             dataset_dir / f"{dataset_name}.md5", calculated_checksum
         )
-
-
-def _archive(
-    dataset_name: str, input_dir: Path, archive_dir: Path, sub_dir: str
-) -> None:
-    archive_sub_dir = archive_dir / sub_dir
-
-    if not archive_sub_dir.exists():
-        os.makedirs(archive_sub_dir)
-
-    shutil.move(
-        input_dir / f"{dataset_name}.tar",
-        archive_sub_dir / f"{dataset_name}.tar",
-    )
-
-    if Path(input_dir / dataset_name).exists():
-        shutil.rmtree(input_dir / dataset_name)
-
-    logger.debug(f"Archived files for {dataset_name} in {archive_sub_dir}")
