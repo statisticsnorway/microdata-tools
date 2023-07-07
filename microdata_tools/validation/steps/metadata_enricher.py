@@ -4,9 +4,7 @@ import logging
 logger = logging.getLogger()
 
 
-def metadata_update_temporal_coverage(
-    metadata: dict, temporal_data: dict
-) -> None:
+def enrich_with_temporal_coverage(metadata: dict, temporal_data: dict) -> None:
     logger.debug(
         "Append temporal coverage (start, stop, status dates) to metadata"
     )

@@ -80,7 +80,7 @@ def validate_dataset(
 
         # Enrich metadata with temporal data
         temporal_data = data_reader.get_temporal_data(table, temporality_type)
-        metadata_enricher.metadata_update_temporal_coverage(
+        metadata_enricher.enrich_with_temporal_coverage(
             metadata_dict, temporal_data
         )
 
