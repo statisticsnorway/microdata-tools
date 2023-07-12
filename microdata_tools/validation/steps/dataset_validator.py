@@ -38,8 +38,8 @@ def _valid_value_column_check(
         filter=invalid_rows_filter, columns=["unit_id"]
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid value in #2 column",
+        raise ValidationError(
+            "#2 column",
             errors=_get_error_list(invalid_rows, "Invalid value in #2 column"),
         )
 
@@ -59,11 +59,12 @@ def _valid_value_column_check(
             filter=invalid_code_filter, columns=["value"]
         )
         if len(invalid_rows) > 0:
-            raise ValueError(
-                "Value in #2 column not in code list",
-                errors=_get_error_list(
-                    invalid_rows, "Value in #2 column not in code list"
-                ),
+            invalid_codes = (
+                invalid_rows.column("value").slice(0, 5).to_pylist()
+            )
+            raise ValidationError(
+                "#2 column",
+                errors=[f"{code} not in code list" for code in invalid_codes],
             )
 
 
@@ -80,8 +81,8 @@ def _valid_unit_id_check(data: FileSystemDataset):
         filter=invalid_rows_filter, columns=["unit_id"]
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid identifier in #1 column",
+        raise ValidationError(
+            "#1 column",
             errors=_get_error_list(
                 invalid_rows, "Invalid identifier in #1 column"
             ),
@@ -101,8 +102,8 @@ def _fixed_temporal_variables_check(data: FileSystemDataset):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
@@ -125,8 +126,8 @@ def _status_temporal_variables_check(data: FileSystemDataset):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
@@ -137,8 +138,8 @@ def _status_temporal_variables_check(data: FileSystemDataset):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "#3 column not equal to #4 column",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "#3 column not equal to #4 column"
             ),
@@ -161,8 +162,8 @@ def _event_temporal_variables_check(data: FileSystemDataset):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
@@ -187,8 +188,8 @@ def _accumulated_temporal_variables_check(data: FileSystemDataset):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
@@ -218,8 +219,8 @@ def _only_unique_identifiers_check(data: FileSystemDataset):
         bucket_row_count = len(bucket_table)
         unique_identifiers_count = len(compute.unique(bucket_table["unit_id"]))
         if unique_identifiers_count != bucket_row_count:
-            raise ValueError(
-                "Duplicate identifiers in #1 column",
+            raise ValidationError(
+                "#1 column",
                 errors=["Duplicate identifiers in #1 column"],
             )
 
@@ -238,9 +239,8 @@ def _status_uniquesness_check(data: FileSystemDataset):
         )
         unique_identifiers = compute.unique(status_table["unit_id"])
         if len(unique_identifiers) != len(status_table):
-            raise ValueError(
-                "Same unit_id (#1 Column) has duplicate dates "
-                "(#3 and #4 column)",
+            raise ValidationError(
+                "#1, #3 and #4 columns",
                 errors=[
                     "Same unit_id (#1 Column) has duplicate dates "
                     "(#3 and #4 column)"
@@ -293,7 +293,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
                 identifier_time_spans["stop_epoch_days_list"][i].as_py(),
             ):
                 raise ValidationError(
-                    "Found overlapping timespans for dataset",
+                    "#1, #3 and #4 columns",
                     errors=[
                         "Invalid overlapping timespans for identifier"
                         f' "{identifier_time_spans["unit_id"][i]}"'
