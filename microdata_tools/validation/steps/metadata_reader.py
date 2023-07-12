@@ -1,16 +1,12 @@
-import logging
 from pathlib import Path
+from typing import Dict
 
 from microdata_tools.validation.model import validate_metadata_model
-from microdata_tools.validation.model.metadata import Metadata
 from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.components import (
     temporal_attributes,
     unit_type_variables,
 )
-
-
-logger = logging.getLogger()
 
 
 def _insert_centralized_variable_definitions(metadata: dict):
@@ -30,8 +26,7 @@ def _insert_centralized_variable_definitions(metadata: dict):
     ] + metadata.get("attributeVariables", [])
 
 
-def run_reader(dataset_name: str, metadata_file_path: Path) -> Metadata:
-    logger.debug("Validating metadata JSON with JSON schema")
+def run_reader(dataset_name: str, metadata_file_path: Path) -> Dict:
     metadata_dict = local_storage.load_json(metadata_file_path)
     validate_metadata_model(metadata_dict)
     _insert_centralized_variable_definitions(metadata_dict)
