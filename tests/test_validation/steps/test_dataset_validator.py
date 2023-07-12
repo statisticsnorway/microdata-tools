@@ -6,8 +6,7 @@ from microdata_tools.validation.steps import dataset_validator
 
 
 def teardown_module():
-    # test_data._delete_parquet_files()
-    ...
+    test_data._delete_parquet_files()
 
 
 def test_measure_code_list_validation():
