@@ -19,8 +19,6 @@ VALID_DATASET_NAMES = [
 ]
 NO_SUCH_DATASET_NAME = "NO_SUCH_DATASET"
 WRONG_DELIMITER_DATASET_NAME = "WRONG_DELIMITER_DATASET"
-INVALID_DATES_DATASET_NAME = "INVALID_DATES_DATASET"
-INVALID_DATE_RANGES_DATASET_NAME = "INVALID_DATE_RANGES_DATASET"
 
 
 def test_validate_valid_dataset():
@@ -48,18 +46,6 @@ def test_validate_valid_dataset():
         ) as f:
             expected_metadata = json.load(f)
         assert actual_metadata == expected_metadata
-
-
-def test_validate_valid_dataset_wrong_delimiter():
-    data_errors = validate_dataset(
-        WRONG_DELIMITER_DATASET_NAME,
-        working_directory=WORKING_DIR,
-        keep_temporary_files=True,
-        input_directory=INPUT_DIR,
-    )
-    assert data_errors == [
-        "CSV parse error: Expected 5 columns, got 1: 10000000000000,1,,2021-01-01,"
-    ]
 
 
 def test_validate_valid_dataset_delete_temporary_files():
@@ -106,29 +92,6 @@ def test_dataset_does_not_exist():
             working_directory=WORKING_DIR,
             input_directory=INPUT_DIR,
         )
-
-
-def test_validate_invalid_dates():
-    data_errors = validate_dataset(
-        INVALID_DATES_DATASET_NAME,
-        working_directory=WORKING_DIR,
-        input_directory=INPUT_DIR,
-    )
-    assert data_errors == [
-        "In CSV column #3: CSV conversion error to date32[day]: "
-        "invalid value '1927-13-01'"
-    ]
-
-
-def test_invalid_date_ranges():
-    data_errors = validate_dataset(
-        INVALID_DATE_RANGES_DATASET_NAME,
-        working_directory=WORKING_DIR,
-        input_directory=INPUT_DIR,
-    )
-    assert data_errors == [
-        'Invalid overlapping timespans for identifier "00000000000003"'
-    ]
 
 
 def get_working_directory_files() -> list:

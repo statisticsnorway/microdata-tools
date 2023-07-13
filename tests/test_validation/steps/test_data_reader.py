@@ -9,6 +9,13 @@ from microdata_tools.validation.exceptions import ValidationError
 
 INPUT_DIR = Path("tests/resources/validation/steps/data_reader")
 
+EXPECTED_COLUMNS = {
+    "unit_id": ["000001", "000002", "000002"],
+    "start_year": [None, "2020", "2020"],
+    "start_epoch_days": [None, 18262, 18262],
+    "stop_epoch_days": [18262, 18262, 18262],
+}
+
 
 def test_get_temporal_data():
     table_schema = pyarrow.schema(
@@ -64,53 +71,28 @@ def test_get_temporal_data():
     }
 
 
-def test_sanitize_data():
-    expected_columns = {
-        "unit_id": ["000001", "000002", "000002"],
-        "start_year": [None, "2020", "2020"],
-        "start_epoch_days": [None, 18262, 18262],
-        "stop_epoch_days": [18262, 18262, 18262],
-    }
+def test_sanitize_long():
     long_data_path = INPUT_DIR / "LONG.csv"
     assert data_reader._sanitize_data(long_data_path, "LONG").to_pydict() == {
-        **expected_columns,
+        **EXPECTED_COLUMNS,
         "value": [12345, 12345, 12345],
     }
+    with pytest.raises(ValidationError) as e:
+        invalid_data_path = INPUT_DIR / "LONG_INVALID_VALUE.csv"
+        assert data_reader._sanitize_data(invalid_data_path, "LONG")
+    assert e.value.errors == [
+        "In CSV column #1: CSV conversion error to int64: invalid value 'abc123'"
+    ]
+
+
+def test_sanitize_double():
     double_data_path = INPUT_DIR / "DOUBLE.csv"
     assert data_reader._sanitize_data(
         double_data_path, "DOUBLE"
     ).to_pydict() == {
-        **expected_columns,
+        **EXPECTED_COLUMNS,
         "value": [12345.12345, 12345.12345, 12345.12345],
     }
-    date_data_path = INPUT_DIR / "DATE.csv"
-    assert data_reader._sanitize_data(date_data_path, "DATE").to_pydict() == {
-        **expected_columns,
-        "value": [18262, 18262, 18262],
-    }
-    string_data_path = INPUT_DIR / "STRING.csv"
-    assert data_reader._sanitize_data(
-        string_data_path, "STRING"
-    ).to_pydict() == {
-        **expected_columns,
-        "value": ["abc123", "abc123", "abc123"],
-    }
-
-    with pytest.raises(ValidationError) as e:
-        invalid_data_path = INPUT_DIR / "STRING_INVALID_DATE.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "STRING")
-    assert e.value.errors == [
-        "In CSV column #3: CSV conversion error to date32[day]: invalid value "
-        "'2020-13-01'"
-    ]
-
-    with pytest.raises(ValidationError) as e:
-        invalid_data_path = INPUT_DIR / "STRING_INVALID_DELIMITER.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "STRING")
-    assert e.value.errors == [
-        "CSV parse error: Expected 5 columns, got 1: 000001,abc123,2020-01-01,"
-    ]
-
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "DOUBLE_INVALID_FORMAT.csv"
         assert data_reader._sanitize_data(invalid_data_path, "DOUBLE")
@@ -119,13 +101,52 @@ def test_sanitize_data():
         "'12345,12345'"
     ]
 
+
+def test_sanitize_date():
+    date_data_path = INPUT_DIR / "DATE.csv"
+    assert data_reader._sanitize_data(date_data_path, "DATE").to_pydict() == {
+        **EXPECTED_COLUMNS,
+        "value": [18262, 18262, 18262],
+    }
     with pytest.raises(ValidationError) as e:
-        invalid_data_path = INPUT_DIR / "LONG_INVALID_VALUE.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "LONG")
+        invalid_data_path = INPUT_DIR / "DATE_INVALID_VALUE.csv"
+        assert data_reader._sanitize_data(invalid_data_path, "DATE")
     assert e.value.errors == [
-        "In CSV column #1: CSV conversion error to int64: invalid value 'abc123'"
+        "In CSV column #1: CSV conversion error to date32[day]: invalid value "
+        "'2020-13-01'"
     ]
 
+
+def test_sanitize_string():
+    string_data_path = INPUT_DIR / "STRING.csv"
+    assert data_reader._sanitize_data(
+        string_data_path, "STRING"
+    ).to_pydict() == {
+        **EXPECTED_COLUMNS,
+        "value": ["abc123", "abc123", "abc123"],
+    }
+
+
+def test_sanitize_data_invalid_start_stop():
+    with pytest.raises(ValidationError) as e:
+        invalid_data_path = INPUT_DIR / "STRING_INVALID_START_STOP.csv"
+        assert data_reader._sanitize_data(invalid_data_path, "STRING")
+    assert e.value.errors == [
+        "In CSV column #3: CSV conversion error to date32[day]: invalid value "
+        "'2020-13-01'"
+    ]
+
+
+def test_sanitize_data_wrong_delimiter():
+    with pytest.raises(ValidationError) as e:
+        invalid_data_path = INPUT_DIR / "STRING_INVALID_DELIMITER.csv"
+        assert data_reader._sanitize_data(invalid_data_path, "STRING")
+    assert e.value.errors == [
+        "CSV parse error: Expected 5 columns, got 1: 000001,abc123,2020-01-01,"
+    ]
+
+
+def test_sanitize_data_empty_file():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_EMPTY_FILE.csv"
         assert data_reader._sanitize_data(invalid_data_path, "STRING")
