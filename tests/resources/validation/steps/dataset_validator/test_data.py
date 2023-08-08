@@ -43,7 +43,9 @@ FIXED_STRING_CODELIST = [
 FIXED_STRING_CODELIST_SENTINEL = [
     {
         "code": "0",
-        "categoryTitle": [{"languageCode": "no", "value": "Siviltand ukjent"}],
+        "categoryTitle": [
+            {"languageCode": "no", "value": "Sivilstand ukjent"}
+        ],
     }
 ]
 FIXED_STRING_CODELIST_DS = _dataset_from_dict(
