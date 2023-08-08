@@ -137,30 +137,6 @@ def _sanitize_data(
     )
 
 
-def metadata_update_temporal_coverage(
-    metadata: dict, temporal_data: dict
-) -> None:
-    logger.debug(
-        "Append temporal coverage (start, stop, status dates) to metadata"
-    )
-    data_revision = metadata["dataRevision"]
-    temporality_type = metadata["temporalityType"]
-    data_revision["temporalCoverageStart"] = temporal_data["start"]
-    data_revision["temporalCoverageLatest"] = temporal_data["latest"]
-    if temporality_type == "STATUS":
-        temporal_status_dates_list = temporal_data["statusDates"]
-        temporal_status_dates_list.sort()
-        data_revision["temporalStatusDates"] = temporal_status_dates_list
-
-
-def run_reader(
-    dataset_name: str, input_directory: Path, measure_data_type: str
-) -> pyarrow.Table:
-    input_dataset_dir = input_directory / dataset_name
-    input_data_path = input_dataset_dir / f"{dataset_name}.csv"
-
-    logger.debug(f'Start reading dataset "{dataset_name}"')
+def run_reader(input_data_path: Path, measure_data_type: str) -> pyarrow.Table:
     table = _sanitize_data(input_data_path, measure_data_type)
-
-    logger.debug(f'OK - reading dataset "{dataset_name}"')
     return table

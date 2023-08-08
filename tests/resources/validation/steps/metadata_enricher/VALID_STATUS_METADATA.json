@@ -1,0 +1,24 @@
+{
+    "temporalityType": "STATUS",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{ "languageCode": "no", "value": "Bosatte i Norge" }],
+    "spatialCoverageDescription": [{ "languageCode": "no", "value": "Norge" }],
+    "subjectFields": [[{ "languageCode": "no", "value": "Samfunn" }]],
+    "dataRevision": {
+      "description": [{ "languageCode": "no", "value": "Første publisering." }],
+      "temporalEndOfSeries": false
+    },
+    "identifierVariables": [
+      { "unitType": "PERSON" }
+    ],
+    "measureVariables": [
+      {
+        "name": [{ "languageCode": "no", "value": "Eksempel" }],
+        "description": [{ "languageCode": "no", "value": "Eksempel på event variabel" }],
+        "dataType": "LONG",
+        "valueDomain": {
+          "description": [{ "languageCode": "no", "value": "Eksempelverdier" }]
+        }
+      }
+    ]
+  }

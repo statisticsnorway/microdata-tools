@@ -28,7 +28,7 @@ def validate_metadata_model(metadata_json: Dict) -> Metadata:
         error_messages = [
             _format_pydantic_error(error) for error in e.errors()
         ]
-        raise ValidationError("Invalid metadata file", errors=error_messages)
+        raise ValidationError("metadata file", errors=error_messages)
     except Exception as e:
         logger.exception(e)
         raise e

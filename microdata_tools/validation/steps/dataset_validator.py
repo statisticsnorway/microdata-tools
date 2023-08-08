@@ -1,5 +1,6 @@
 from typing import List, Union
 from pyarrow import dataset, compute, Table
+from pyarrow.dataset import FileSystemDataset
 
 from microdata_tools.validation.exceptions import ValidationError
 
@@ -15,7 +16,7 @@ def _get_error_list(invalid_rows: Table, message: str):
 
 
 def _valid_value_column_check(
-    parquet_path: str,
+    data: FileSystemDataset,
     data_type: str,
     code_list: Union[list, None],
     sentinel_list: Union[List, None],
@@ -33,12 +34,12 @@ def _valid_value_column_check(
         if data_type == "STRING"
         else is_null_filter
     )
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=invalid_rows_filter, columns=["unit_id"]
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid value in #2 column",
+        raise ValidationError(
+            "#2 column",
             errors=_get_error_list(invalid_rows, "Invalid value in #2 column"),
         )
 
@@ -54,19 +55,20 @@ def _valid_value_column_check(
                 )
             )
         invalid_code_filter = ~dataset.field("value").isin(unique_codes)
-        invalid_rows = dataset.dataset(parquet_path).to_table(
+        invalid_rows = data.to_table(
             filter=invalid_code_filter, columns=["value"]
         )
         if len(invalid_rows) > 0:
-            raise ValueError(
-                "Value in #2 column not in code list",
-                errors=_get_error_list(
-                    invalid_rows, "Value in #2 column not in code list"
-                ),
+            invalid_codes = (
+                invalid_rows.column("value").slice(0, 5).to_pylist()
+            )
+            raise ValidationError(
+                "#2 column",
+                errors=[f"{code} not in code list" for code in invalid_codes],
             )
 
 
-def _valid_unit_id_check(parquet_path: str):
+def _valid_unit_id_check(data: FileSystemDataset):
     """
     Any given cell in the unit_id column is valid only if:
     * The cell contains a a valid non-null value
@@ -75,19 +77,19 @@ def _valid_unit_id_check(parquet_path: str):
     is_null_filter = dataset.field("unit_id").is_null()
     is_empty_string_filter = dataset.field("unit_id") == ""
     invalid_rows_filter = is_null_filter | is_empty_string_filter
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=invalid_rows_filter, columns=["unit_id"]
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid identifier in #1 column",
+        raise ValidationError(
+            "#1 column",
             errors=_get_error_list(
                 invalid_rows, "Invalid identifier in #1 column"
             ),
         )
 
 
-def _fixed_temporal_variables_check(parquet_path: str):
+def _fixed_temporal_variables_check(data: FileSystemDataset):
     """
     Any given row in a table with temporalityType=FIXED is valid only if:
     * The start_epoch_days column contains null (empty)
@@ -95,20 +97,20 @@ def _fixed_temporal_variables_check(parquet_path: str):
     """
     start_is_valid_filter = dataset.field("start_epoch_days").is_valid()
     stop_is_null_filter = dataset.field("stop_epoch_days").is_null()
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=start_is_valid_filter | stop_is_null_filter,
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
         )
 
 
-def _status_temporal_variables_check(parquet_path: str):
+def _status_temporal_variables_check(data: FileSystemDataset):
     """
     Any given row in a table with temporalityType=STATUS is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -116,7 +118,7 @@ def _status_temporal_variables_check(parquet_path: str):
     * The start_epoch_days and stop_epoch_days columns contain the same value
       for any given row
     """
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=(
             dataset.field("stop_epoch_days").is_null()
             | dataset.field("start_epoch_days").is_null()
@@ -124,27 +126,27 @@ def _status_temporal_variables_check(parquet_path: str):
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
         )
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=dataset.field("start_epoch_days")
         != dataset.field("stop_epoch_days"),
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "#3 column not equal to #4 column",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "#3 column not equal to #4 column"
             ),
         )
 
 
-def _event_temporal_variables_check(parquet_path: str):
+def _event_temporal_variables_check(data: FileSystemDataset):
     """
     Any given row in a table with temporalityType=EVENT is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -155,20 +157,20 @@ def _event_temporal_variables_check(parquet_path: str):
     start_be_stop_filter = dataset.field("start_epoch_days") >= dataset.field(
         "stop_epoch_days"
     )  # If stop_epoch_days is null this test will be ignored by pyarrow
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=(start_is_null_filter | start_be_stop_filter),
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
         )
 
 
-def _accumulated_temporal_variables_check(parquet_path: str):
+def _accumulated_temporal_variables_check(data: FileSystemDataset):
     """
     Any given row in a table with temporalityType=ACCUMULATED is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -179,29 +181,27 @@ def _accumulated_temporal_variables_check(parquet_path: str):
     start_be_stop_filter = dataset.field("start_epoch_days") >= dataset.field(
         "stop_epoch_days"
     )
-    invalid_rows = dataset.dataset(parquet_path).to_table(
+    invalid_rows = data.to_table(
         filter=(
             start_is_null_filter | stop_is_null_filter | start_be_stop_filter
         ),
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
-        raise ValueError(
-            "Invalid #3 and/or #4 columns",
+        raise ValidationError(
+            "#3 and #4 columns",
             errors=_get_error_list(
                 invalid_rows, "Invalid #3 and/or #4 columns"
             ),
         )
 
 
-def _only_unique_identifiers_check(parquet_path: str):
+def _only_unique_identifiers_check(data: FileSystemDataset):
     """
     A table with temporalityType=FIXED is only valid if all
     cells in the unit_id column are unique.
     """
-    identifiers = dataset.dataset(parquet_path).to_table(
-        columns=["unit_id"],
-    )
+    identifiers = data.to_table(columns=["unit_id"])
     identifiers = Table.from_arrays(
         [
             compute.utf8_slice_codeunits(
@@ -219,31 +219,28 @@ def _only_unique_identifiers_check(parquet_path: str):
         bucket_row_count = len(bucket_table)
         unique_identifiers_count = len(compute.unique(bucket_table["unit_id"]))
         if unique_identifiers_count != bucket_row_count:
-            raise ValueError(
-                "Duplicate identifiers in #1 column",
+            raise ValidationError(
+                "#1 column",
                 errors=["Duplicate identifiers in #1 column"],
             )
 
 
-def _status_uniquesness_check(parquet_path: str):
+def _status_uniquesness_check(data: FileSystemDataset):
     """
     A table with temporalityType=STATUS is valid only if all
     cells in the unit_id column are unique per status date.
     """
-    all_status_dates = dataset.dataset(parquet_path).to_table(
-        columns=["start_epoch_days"],
-    )
+    all_status_dates = data.to_table(columns=["start_epoch_days"])
     unique_status_dates = compute.unique(all_status_dates["start_epoch_days"])
     for status_date in unique_status_dates:
-        status_table = dataset.dataset(parquet_path).to_table(
+        status_table = data.to_table(
             columns=["unit_id"],
             filter=dataset.field("start_epoch_days") == status_date,
         )
         unique_identifiers = compute.unique(status_table["unit_id"])
         if len(unique_identifiers) != len(status_table):
-            raise ValueError(
-                "Same unit_id (#1 Column) has duplicate dates "
-                "(#3 and #4 column)",
+            raise ValidationError(
+                "#1, #3 and #4 columns",
                 errors=[
                     "Same unit_id (#1 Column) has duplicate dates "
                     "(#3 and #4 column)"
@@ -251,7 +248,7 @@ def _status_uniquesness_check(parquet_path: str):
             )
 
 
-def _no_overlapping_timespans_check(parquet_path: str):
+def _no_overlapping_timespans_check(data: FileSystemDataset):
     """
     A table with temporalityType=(EVENT|ACCUMULATED) is valid
     only if all rows for a given identifier contains no overlapping
@@ -275,12 +272,10 @@ def _no_overlapping_timespans_check(parquet_path: str):
         for index in range(0, len(iterable), batch_size):
             yield iterable[index : index + batch_size]
 
-    identifiers = dataset.dataset(parquet_path).to_table(
-        columns=["unit_id"],
-    )
+    identifiers = data.to_table(columns=["unit_id"])
     unique_identifiers = compute.unique(identifiers["unit_id"])
     for identifier_batch in batch(unique_identifiers, 5_000_000):
-        identifier_time_spans = dataset.dataset(parquet_path).to_table(
+        identifier_time_spans = data.to_table(
             filter=dataset.field("unit_id").isin(identifier_batch),
             columns=["unit_id", "start_epoch_days", "stop_epoch_days"],
         )
@@ -298,7 +293,7 @@ def _no_overlapping_timespans_check(parquet_path: str):
                 identifier_time_spans["stop_epoch_days_list"][i].as_py(),
             ):
                 raise ValidationError(
-                    "Found overlapping timespans for dataset",
+                    "#1, #3 and #4 columns",
                     errors=[
                         "Invalid overlapping timespans for identifier"
                         f' "{identifier_time_spans["unit_id"][i]}"'
@@ -307,25 +302,25 @@ def _no_overlapping_timespans_check(parquet_path: str):
 
 
 def validate_dataset(
-    parquet_path: str,
+    data: FileSystemDataset,
     measure_data_type: str,
     code_list: Union[List, None],
     sentinel_list: Union[List, None],
     temporality_type: str,
 ) -> None:
-    _valid_unit_id_check(parquet_path)
+    _valid_unit_id_check(data)
     _valid_value_column_check(
-        parquet_path, measure_data_type, code_list, sentinel_list
+        data, measure_data_type, code_list, sentinel_list
     )
     if temporality_type == "FIXED":
-        _fixed_temporal_variables_check(parquet_path)
-        _only_unique_identifiers_check(parquet_path)
+        _fixed_temporal_variables_check(data)
+        _only_unique_identifiers_check(data)
     elif temporality_type == "STATUS":
-        _status_temporal_variables_check(parquet_path)
-        _status_uniquesness_check(parquet_path)
+        _status_temporal_variables_check(data)
+        _status_uniquesness_check(data)
     elif temporality_type == "ACCUMULATED":
-        _accumulated_temporal_variables_check(parquet_path)
-        _no_overlapping_timespans_check(parquet_path)
+        _accumulated_temporal_variables_check(data)
+        _no_overlapping_timespans_check(data)
     elif temporality_type == "EVENT":
-        _event_temporal_variables_check(parquet_path)
-        _no_overlapping_timespans_check(parquet_path)
+        _event_temporal_variables_check(data)
+        _no_overlapping_timespans_check(data)

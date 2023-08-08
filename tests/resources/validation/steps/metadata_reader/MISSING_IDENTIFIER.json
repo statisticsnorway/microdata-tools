@@ -1,0 +1,27 @@
+{
+    "temporalityType": "ACCUMULATED",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{"languageCode": "no", "value": "Alle rapporterte personinntekter i norge fra år 1234 til år 4321"}],
+    "spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+    "subjectFields": [
+      [{"languageCode": "no", "value": "Befolkning"}]
+    ],
+    "dataRevision": {
+      "description": [{"languageCode": "no","value": "Første publisering."}],
+      "temporalEndOfSeries": false
+    },
+    "measureVariables": [
+      {
+        "name": [{"languageCode": "no", "value": "Personens inntekt"}],
+        "description": [{"languageCode": "no", "value": "Personens rapporterte inntekt"}],
+        "dataType": "STRING",
+        "uriDefinition": [""],
+        "valueDomain": {
+          "uriDefinition": [],
+          "description": [{"languageCode": "no", "value":"Pseudonymisert personnummer"}],
+          "measurementType": "CURRENCY",
+          "measurementUnitDescription": [{"languageCode": "no", "value": "Norske Kroner"}]
+        }
+      }
+    ]
+  }

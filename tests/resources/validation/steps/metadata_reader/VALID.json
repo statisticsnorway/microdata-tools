@@ -1,0 +1,78 @@
+{
+    "temporalityType": "ACCUMULATED",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [
+      {
+        "languageCode": "no",
+        "value": "Bosatte i Norge"
+      }
+    ],
+    "spatialCoverageDescription": [
+      {
+        "languageCode": "no",
+        "value": "Norge"
+      }
+    ],
+    "subjectFields": [
+      [
+        {
+          "languageCode": "no",
+          "value": "Økonomi"
+        }
+      ],
+      [
+        {
+          "languageCode": "no",
+          "value": "Samfunn"
+        }
+      ]
+    ],
+    "dataRevision": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Første publisering."
+        }
+      ],
+      "temporalEndOfSeries": false
+    },
+    "identifierVariables": [
+      {
+        "unitType": "PERSON"
+      }
+    ],
+    "measureVariables": [
+      {
+        "name": [
+          {
+            "languageCode": "no",
+            "value": "Personens inntekt"
+          }
+        ],
+        "description": [
+          {
+            "languageCode": "no",
+            "value": "Personens rapporterte inntekt"
+          }
+        ],
+        "dataType": "LONG",
+        "uriDefinition": [],
+        "valueDomain": {
+          "uriDefinition": [],
+          "description": [
+            {
+              "languageCode": "no",
+              "value": "Årlig personinntekt"
+            }
+          ],
+          "measurementType": "CURRENCY",
+          "measurementUnitDescription": [
+            {
+              "languageCode": "no",
+              "value": "Norske Kroner"
+            }
+          ]
+        }
+      }
+    ]
+  }
