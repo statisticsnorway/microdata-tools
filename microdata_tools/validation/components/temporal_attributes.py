@@ -13,7 +13,7 @@ DESCRIPTIONS = {
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Start date for event",
                 },
             ],
             "name": [
@@ -25,11 +25,11 @@ DESCRIPTIONS = {
             "description": [
                 {
                     "languageCode": "no",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stoppdato/måletidspunktet for hendelsen",
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stop date for event",
                 },
             ],
             "name": [
@@ -47,7 +47,7 @@ DESCRIPTIONS = {
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Start date for event",
                 },
             ],
             "name": [
@@ -59,11 +59,11 @@ DESCRIPTIONS = {
             "description": [
                 {
                     "languageCode": "no",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stoppdato/måletidspunktet for hendelsen",
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stop date for event",
                 },
             ],
             "name": [
@@ -81,7 +81,7 @@ DESCRIPTIONS = {
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Start date for event",
                 },
             ],
             "name": [
@@ -93,11 +93,11 @@ DESCRIPTIONS = {
             "description": [
                 {
                     "languageCode": "no",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stoppdato/måletidspunktet for hendelsen",
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stop date for event",
                 },
             ],
             "name": [
@@ -115,7 +115,7 @@ DESCRIPTIONS = {
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Start date for event",
                 },
             ],
             "name": [
@@ -127,11 +127,11 @@ DESCRIPTIONS = {
             "description": [
                 {
                     "languageCode": "no",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stoppdato/måletidspunktet for hendelsen",
                 },
                 {
                     "languageCode": "en",
-                    "value": "Startdato/måletidspunktet for hendelsen",
+                    "value": "Stop date for event",
                 },
             ],
             "name": [
