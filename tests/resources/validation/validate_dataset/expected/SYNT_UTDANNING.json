@@ -194,7 +194,7 @@
         },
         {
           "languageCode": "en",
-          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+          "value": "Start date for event"
         }
       ],
       "name": [
@@ -223,11 +223,11 @@
       "description": [
         {
           "languageCode": "no",
-          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+          "value": "Stoppdato/m\u00e5letidspunktet for hendelsen"
         },
         {
           "languageCode": "en",
-          "value": "Startdato/m\u00e5letidspunktet for hendelsen"
+          "value": "Stop date for event"
         }
       ],
       "name": [
