@@ -76,7 +76,9 @@ def validate_dataset(
         ].get("sentinelAndMissingValues")
 
         # Read data
-        table = data_reader.run_reader(input_data_path, measure_data_type)
+        table = data_reader.run_reader(
+            input_data_path, measure_data_type, temporality_type
+        )
 
         # Enrich metadata with temporal data
         temporal_data = data_reader.get_temporal_data(table, temporality_type)

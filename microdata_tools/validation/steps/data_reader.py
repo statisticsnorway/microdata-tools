@@ -90,7 +90,7 @@ def _get_csv_convert_options(measure_data_type: str):
 
 
 def _sanitize_data(
-    input_data_path: Path, measure_data_type: str
+    input_data_path: Path, measure_data_type: str, temporality_type: str
 ) -> pyarrow.Table:
     try:
         table = csv.read_csv(
@@ -118,7 +118,6 @@ def _sanitize_data(
         table["start"].cast(pyarrow.string()), start=0, stop=4
     )
 
-    # generate enriched table
     return pyarrow.Table.from_arrays(
         [
             identifier,
@@ -137,6 +136,10 @@ def _sanitize_data(
     )
 
 
-def run_reader(input_data_path: Path, measure_data_type: str) -> pyarrow.Table:
-    table = _sanitize_data(input_data_path, measure_data_type)
+def run_reader(
+    input_data_path: Path, measure_data_type: str, temporality_type: str
+) -> pyarrow.Table:
+    table = _sanitize_data(
+        input_data_path, measure_data_type, temporality_type
+    )
     return table
