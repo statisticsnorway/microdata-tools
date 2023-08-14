@@ -114,26 +114,22 @@ def _sanitize_data(
         measure = measure.cast(pyarrow.int32()).cast(pyarrow.int64())
     epoch_start = table["start"].cast(pyarrow.int32()).cast(pyarrow.int16())
     epoch_stop = table["stop"].cast(pyarrow.int32()).cast(pyarrow.int16())
-    start_year = compute.utf8_slice_codeunits(
-        table["start"].cast(pyarrow.string()), start=0, stop=4
-    )
 
-    return pyarrow.Table.from_arrays(
-        [
-            identifier,
-            measure,
-            start_year,
-            epoch_start,
-            epoch_stop,
-        ],
-        names=[
-            "unit_id",
-            "value",
-            "start_year",
-            "start_epoch_days",
-            "stop_epoch_days",
-        ],
-    )
+    table_arrays = [identifier, measure, epoch_start, epoch_stop]
+    table_arrays_names = [
+        "unit_id",
+        "value",
+        "start_epoch_days",
+        "stop_epoch_days",
+    ]
+    if temporality_type in ["STATUS", "ACCUMULATED"]:
+        start_year = compute.utf8_slice_codeunits(
+            table["start"].cast(pyarrow.string()), start=0, stop=4
+        )
+        table_arrays.append(start_year)
+        table_arrays_names.append("start_year")
+
+    return pyarrow.Table.from_arrays(table_arrays, table_arrays_names)
 
 
 def run_reader(
