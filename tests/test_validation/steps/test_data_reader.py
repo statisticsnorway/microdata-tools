@@ -154,3 +154,27 @@ def test_sanitize_data_empty_file():
         invalid_data_path = INPUT_DIR / "STRING_EMPTY_FILE.csv"
         assert data_reader._sanitize_data(invalid_data_path, "STRING", "FIXED")
     assert e.value.errors == ["Empty CSV file"]
+
+
+def test_sanitize_data_start_year():
+    expected_columns = {
+        "unit_id": ["000001", "000002", "000002"],
+        "value": ["abc123", "abc123", "abc123"],
+        "start_year": ["2019", "2020", "2020"],
+    }
+    status_data_path = INPUT_DIR / "STRING_STATUS.csv"
+    assert data_reader._sanitize_data(
+        status_data_path, "STRING", "STATUS"
+    ).to_pydict() == {
+        **expected_columns,
+        "start_epoch_days": [17897, 18262, 18262],
+        "stop_epoch_days": [17897, 18262, 18262],
+    }
+    accumulated_data_path = INPUT_DIR / "STRING_ACCUMULATED.csv"
+    assert data_reader._sanitize_data(
+        accumulated_data_path, "STRING", "ACCUMULATED"
+    ).to_pydict() == {
+        **expected_columns,
+        "start_epoch_days": [17897, 18262, 18262],
+        "stop_epoch_days": [18261, 18627, 18627],
+    }
