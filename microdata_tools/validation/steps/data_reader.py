@@ -105,17 +105,17 @@ def _sanitize_data(
         ) from e
 
     identifier = compute.utf8_trim(table["unit_id"], " ")
-    measure = (
+    value = (
         table["value"]
         if measure_data_type != "STRING"
         else compute.utf8_trim(table["value"], " ")
     )
     if measure_data_type == "DATE":
-        measure = measure.cast(pyarrow.int32()).cast(pyarrow.int64())
+        value = value.cast(pyarrow.int32()).cast(pyarrow.int64())
     epoch_start = table["start"].cast(pyarrow.int32()).cast(pyarrow.int16())
     epoch_stop = table["stop"].cast(pyarrow.int32()).cast(pyarrow.int16())
 
-    table_arrays = [identifier, measure, epoch_start, epoch_stop]
+    table_arrays = [identifier, value, epoch_start, epoch_stop]
     table_arrays_names = [
         "unit_id",
         "value",
@@ -128,7 +128,6 @@ def _sanitize_data(
         )
         table_arrays.append(start_year)
         table_arrays_names.append("start_year")
-
     return pyarrow.Table.from_arrays(table_arrays, table_arrays_names)
 
 
