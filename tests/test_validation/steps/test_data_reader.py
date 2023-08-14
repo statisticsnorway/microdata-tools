@@ -72,7 +72,7 @@ def test_get_temporal_data():
 
 def test_sanitize_long():
     long_data_path = INPUT_DIR / "LONG.csv"
-    assert data_reader._sanitize_data(
+    assert data_reader.read_and_sanitize_csv(
         long_data_path, "LONG", "FIXED"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
@@ -80,7 +80,9 @@ def test_sanitize_long():
     }
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "LONG_INVALID_VALUE.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "LONG", "FIXED")
+        assert data_reader.read_and_sanitize_csv(
+            invalid_data_path, "LONG", "FIXED"
+        )
     assert e.value.errors == [
         "In CSV column #1: CSV conversion error to int64: invalid value 'abc123'"
     ]
@@ -88,7 +90,7 @@ def test_sanitize_long():
 
 def test_sanitize_double():
     double_data_path = INPUT_DIR / "DOUBLE.csv"
-    assert data_reader._sanitize_data(
+    assert data_reader.read_and_sanitize_csv(
         double_data_path, "DOUBLE", "FIXED"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
@@ -96,7 +98,9 @@ def test_sanitize_double():
     }
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "DOUBLE_INVALID_FORMAT.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "DOUBLE", "FIXED")
+        assert data_reader.read_and_sanitize_csv(
+            invalid_data_path, "DOUBLE", "FIXED"
+        )
     assert e.value.errors == [
         "In CSV column #1: CSV conversion error to double: invalid value "
         "'12345,12345'"
@@ -105,7 +109,7 @@ def test_sanitize_double():
 
 def test_sanitize_date():
     date_data_path = INPUT_DIR / "DATE.csv"
-    assert data_reader._sanitize_data(
+    assert data_reader.read_and_sanitize_csv(
         date_data_path, "DATE", "FIXED"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
@@ -113,7 +117,9 @@ def test_sanitize_date():
     }
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "DATE_INVALID_VALUE.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "DATE", "FIXED")
+        assert data_reader.read_and_sanitize_csv(
+            invalid_data_path, "DATE", "FIXED"
+        )
     assert e.value.errors == [
         "In CSV column #1: CSV conversion error to date32[day]: invalid value "
         "'2020-13-01'"
@@ -122,7 +128,7 @@ def test_sanitize_date():
 
 def test_sanitize_string():
     string_data_path = INPUT_DIR / "STRING.csv"
-    assert data_reader._sanitize_data(
+    assert data_reader.read_and_sanitize_csv(
         string_data_path, "STRING", "FIXED"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
@@ -133,7 +139,9 @@ def test_sanitize_string():
 def test_sanitize_data_invalid_start_stop():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_INVALID_START_STOP.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "STRING", "FIXED")
+        assert data_reader.read_and_sanitize_csv(
+            invalid_data_path, "STRING", "FIXED"
+        )
     assert e.value.errors == [
         "In CSV column #3: CSV conversion error to date32[day]: invalid value "
         "'2020-13-01'"
@@ -143,7 +151,9 @@ def test_sanitize_data_invalid_start_stop():
 def test_sanitize_data_wrong_delimiter():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_INVALID_DELIMITER.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "STRING", "FIXED")
+        assert data_reader.read_and_sanitize_csv(
+            invalid_data_path, "STRING", "FIXED"
+        )
     assert e.value.errors == [
         "CSV parse error: Expected 5 columns, got 1: 000001,abc123,2020-01-01,"
     ]
@@ -152,7 +162,9 @@ def test_sanitize_data_wrong_delimiter():
 def test_sanitize_data_empty_file():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_EMPTY_FILE.csv"
-        assert data_reader._sanitize_data(invalid_data_path, "STRING", "FIXED")
+        assert data_reader.read_and_sanitize_csv(
+            invalid_data_path, "STRING", "FIXED"
+        )
     assert e.value.errors == ["Empty CSV file"]
 
 
@@ -163,7 +175,7 @@ def test_sanitize_data_start_year():
         "start_year": ["2019", "2020", "2020"],
     }
     status_data_path = INPUT_DIR / "STRING_STATUS.csv"
-    assert data_reader._sanitize_data(
+    assert data_reader.read_and_sanitize_csv(
         status_data_path, "STRING", "STATUS"
     ).to_pydict() == {
         **expected_columns,
@@ -171,7 +183,7 @@ def test_sanitize_data_start_year():
         "stop_epoch_days": [17897, 18262, 18262],
     }
     accumulated_data_path = INPUT_DIR / "STRING_ACCUMULATED.csv"
-    assert data_reader._sanitize_data(
+    assert data_reader.read_and_sanitize_csv(
         accumulated_data_path, "STRING", "ACCUMULATED"
     ).to_pydict() == {
         **expected_columns,

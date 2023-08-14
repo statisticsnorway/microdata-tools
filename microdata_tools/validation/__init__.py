@@ -76,7 +76,7 @@ def validate_dataset(
         ].get("sentinelAndMissingValues")
 
         # Read data
-        table = data_reader.run_reader(
+        table = data_reader.read_and_sanitize_csv(
             input_data_path, measure_data_type, temporality_type
         )
 
