@@ -15,9 +15,125 @@ from microdata_tools.validation.exceptions import ValidationError
 logger = logging.getLogger()
 
 
+def _get_csv_read_options():
+    return csv.ReadOptions(
+        column_names=["unit_id", "value", "start", "stop", "attributes"]
+    )
+
+
+def _get_csv_convert_options(measure_data_type: str):
+    pyarrow_data_type = None
+    if measure_data_type == "STRING":
+        pyarrow_data_type = pyarrow.string()
+    elif measure_data_type == "LONG":
+        pyarrow_data_type = pyarrow.int64()
+    elif measure_data_type == "DOUBLE":
+        pyarrow_data_type = pyarrow.float64()
+    elif measure_data_type == "DATE":
+        pyarrow_data_type = pyarrow.date32()
+    else:
+        raise ValidationError(
+            "Unsupported measure data type",
+            errors=[f"Unsupported measure data type: {measure_data_type}"],
+        )
+    return csv.ConvertOptions(
+        column_types={
+            "unit_id": pyarrow.string(),
+            "value": pyarrow_data_type,
+            "start": pyarrow.date32(),
+            "stop": pyarrow.date32(),
+            "attributes": pyarrow.string(),
+        }
+    )
+
+
+def _csv_to_table(input_csv_path: Path, measure_data_type: str):
+    """
+    Read a csv into a pyarrow table. The read and convert options
+    ensures microdata formatting of the input csv.
+    """
+    try:
+        return csv.read_csv(
+            input_csv_path,
+            parse_options=csv.ParseOptions(delimiter=";"),
+            read_options=_get_csv_read_options(),
+            convert_options=_get_csv_convert_options(measure_data_type),
+        )
+    except ArrowInvalid as e:
+        raise ValidationError(
+            "Error when reading dataset", errors=[str(e)]
+        ) from e
+
+
+def _trim_unit_id(table: pyarrow.Table) -> pyarrow.Array:
+    """
+    Trim leading and trailing whitespace from the unit_id column
+    """
+    return compute.utf8_trim(table["unit_id"], " ")
+
+
+def _sanitize_value(
+    table: pyarrow.Table, measure_data_type: str
+) -> pyarrow.Array:
+    """
+    Sanitize the value column depending on the measure_data_type
+    """
+    if measure_data_type == "STRING":
+        return compute.utf8_trim(table["value"], " ")
+    elif measure_data_type == "DATE":
+        return table["value"].cast(pyarrow.int32()).cast(pyarrow.int64())
+    else:
+        return table["value"]
+
+
+def _cast_to_epoch_date(
+    table: pyarrow.Table, column_name: str
+) -> pyarrow.Array:
+    """
+    Cast column from pyarrow date (YYYY-MM-DD) to unix epoch days.
+    """
+    return table[column_name].cast(pyarrow.int32()).cast(pyarrow.int16())
+
+
+def _generate_start_year(table: pyarrow.Table) -> pyarrow.Array:
+    """
+    Generates a start year array by substringing the "start" column
+    with pyarrow dates (YYYY-MM-DD) to a string pyarrow.Array (YYYY)
+    """
+    return compute.utf8_slice_codeunits(
+        table["start"].cast(pyarrow.string()), start=0, stop=4
+    )
+
+
+def read_and_sanitize_csv(
+    input_data_path: Path, measure_data_type: str, temporality_type: str
+) -> pyarrow.Table:
+    """
+    Reads a csv file to a pyarrow table. Sanitizes values and
+    ensures the input csv data follows the requirements for the
+    microdata data model.
+    """
+    table = _csv_to_table(input_data_path, measure_data_type)
+    unit_id = _trim_unit_id(table)
+    value = _sanitize_value(table, measure_data_type)
+    epoch_start = _cast_to_epoch_date(table, "start")
+    epoch_stop = _cast_to_epoch_date(table, "stop")
+    columns = [unit_id, value, epoch_start, epoch_stop]
+    column_names = ["unit_id", "value", "start_epoch_days", "stop_epoch_days"]
+    if temporality_type in ["STATUS", "ACCUMULATED"]:
+        columns.append(_generate_start_year(table))
+        column_names.append("start_year")
+    return pyarrow.Table.from_arrays(columns, column_names)
+
+
 def get_temporal_data(
     table: pyarrow.Table, temporality_type: str
 ) -> Dict[str, int]:
+    """
+    Reads the temporal columns of the pyarrow.Table and
+    returns a dictionary with information depending on the
+    temporality_type of the data.
+    """
     temporal_data = {}
     if temporality_type == "FIXED":
         stop_max = compute.max(table["stop_epoch_days"]).as_py()
@@ -55,88 +171,3 @@ def get_temporal_data(
             ).to_pylist()
         ]
     return temporal_data
-
-
-def _get_csv_read_options():
-    return csv.ReadOptions(
-        column_names=["unit_id", "value", "start", "stop", "attributes"]
-    )
-
-
-def _get_csv_convert_options(measure_data_type: str):
-    pyarrow_data_type = None
-    if measure_data_type == "STRING":
-        pyarrow_data_type = pyarrow.string()
-    elif measure_data_type == "LONG":
-        pyarrow_data_type = pyarrow.int64()
-    elif measure_data_type == "DOUBLE":
-        pyarrow_data_type = pyarrow.float64()
-    elif measure_data_type == "DATE":
-        pyarrow_data_type = pyarrow.date32()
-    else:
-        raise ValidationError(
-            "Unsupported measure data type",
-            errors=[f"Unsupported measure data type: {measure_data_type}"],
-        )
-    return csv.ConvertOptions(
-        column_types={
-            "unit_id": pyarrow.string(),
-            "value": pyarrow_data_type,
-            "start": pyarrow.date32(),
-            "stop": pyarrow.date32(),
-            "attributes": pyarrow.string(),
-        }
-    )
-
-
-def _sanitize_data(
-    input_data_path: Path, measure_data_type: str
-) -> pyarrow.Table:
-    try:
-        table = csv.read_csv(
-            input_data_path,
-            parse_options=csv.ParseOptions(delimiter=";"),
-            read_options=_get_csv_read_options(),
-            convert_options=_get_csv_convert_options(measure_data_type),
-        )
-    except ArrowInvalid as e:
-        raise ValidationError(
-            "Error when reading dataset", errors=[str(e)]
-        ) from e
-
-    identifier = compute.utf8_trim(table["unit_id"], " ")
-    measure = (
-        table["value"]
-        if measure_data_type != "STRING"
-        else compute.utf8_trim(table["value"], " ")
-    )
-    if measure_data_type == "DATE":
-        measure = measure.cast(pyarrow.int32()).cast(pyarrow.int64())
-    epoch_start = table["start"].cast(pyarrow.int32()).cast(pyarrow.int16())
-    epoch_stop = table["stop"].cast(pyarrow.int32()).cast(pyarrow.int16())
-    start_year = compute.utf8_slice_codeunits(
-        table["start"].cast(pyarrow.string()), start=0, stop=4
-    )
-
-    # generate enriched table
-    return pyarrow.Table.from_arrays(
-        [
-            identifier,
-            measure,
-            start_year,
-            epoch_start,
-            epoch_stop,
-        ],
-        names=[
-            "unit_id",
-            "value",
-            "start_year",
-            "start_epoch_days",
-            "stop_epoch_days",
-        ],
-    )
-
-
-def run_reader(input_data_path: Path, measure_data_type: str) -> pyarrow.Table:
-    table = _sanitize_data(input_data_path, measure_data_type)
-    return table
