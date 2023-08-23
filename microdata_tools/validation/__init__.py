@@ -35,7 +35,7 @@ def _validate_dataset_name(dataset_name: str) -> None:
 
 def get_unit_id_type_for_unit_type(
     unit_id: UnitType,
-) -> Union[str, UnitIdType]:
+) -> Union[None, UnitIdType]:
     """
     Returns the unitIdType for the supplied unitType. Returns None
     if supplied unitType has no attached unitIdType.
