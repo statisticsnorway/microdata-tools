@@ -2,13 +2,20 @@ import pytest
 
 from microdata_tools import get_unit_id_type_for_unit_type
 from microdata_tools.validation.exceptions import UnregisteredUnitTypeError
+from microdata_tools.validation.model.metadata import UnitType, UnitIdType
 
 
 def test_get_unit_id_type_for_unit_type():
-    assert "FNR" == get_unit_id_type_for_unit_type("PERSON")
-    assert "FNR" == get_unit_id_type_for_unit_type("FAMILIE")
-    assert "ORGNR" == get_unit_id_type_for_unit_type("VIRKSOMHET")
-    assert get_unit_id_type_for_unit_type("KOMMUNE") is None
+    assert UnitIdType.FNR == get_unit_id_type_for_unit_type(UnitType.PERSON)
+    assert UnitIdType.FNR == get_unit_id_type_for_unit_type(UnitType.FAMILIE)
+    assert UnitIdType.ORGNR == get_unit_id_type_for_unit_type(
+        UnitType.VIRKSOMHET
+    )
+    assert get_unit_id_type_for_unit_type(UnitType.KOMMUNE) is None
+    assert (
+        get_unit_id_type_for_unit_type(UnitType.BK_HELSESTASJONSKONSULTASJON)
+        is None
+    )
 
     with pytest.raises(UnregisteredUnitTypeError) as e:
         get_unit_id_type_for_unit_type("NOT A UNIT TYPE")

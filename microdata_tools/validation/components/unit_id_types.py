@@ -1,25 +1,26 @@
 from typing import Union
 
 from microdata_tools.validation.exceptions import UnregisteredUnitTypeError
+from microdata_tools.validation.model.metadata import UnitType, UnitIdType
 
 # When updating this dictionary remember to also
 # update the Metadata model with the
 # same key value in the enum for unitType
 UNIT_ID_TYPE_FOR_UNIT_TYPE = {
-    "JOBB": "JOBBID_1",
-    "KJORETOY": "KJORETOY_ID",
-    "FAMILIE": "FNR",
-    "FORETAK": "ORGNR",
-    "HUSHOLDNING": "FNR",
-    "KOMMUNE": None,
-    "KURS": "KURSID",
-    "PERSON": "FNR",
-    "VIRKSOMHET": "ORGNR",
-    "BK_HELSESTASJONSKONSULTASJON": "BK_STASJONS_BESOKS_ID",
+    UnitType.JOBB: UnitIdType.JOBBID_1,
+    UnitType.KJORETOY: UnitIdType.KJORETOY_ID,
+    UnitType.FAMILIE: UnitIdType.FNR,
+    UnitType.FORETAK: UnitIdType.ORGNR,
+    UnitType.HUSHOLDNING: UnitIdType.FNR,
+    UnitType.KOMMUNE: None,
+    UnitType.KURS: UnitIdType.KURSID,
+    UnitType.PERSON: UnitIdType.FNR,
+    UnitType.VIRKSOMHET: UnitIdType.ORGNR,
+    UnitType.BK_HELSESTASJONSKONSULTASJON: None,
 }
 
 
-def get(unit_type: str) -> Union[str, None]:
+def get(unit_type: UnitType) -> Union[UnitIdType, None]:
     try:
         return UNIT_ID_TYPE_FOR_UNIT_TYPE[unit_type]
     except KeyError as e:

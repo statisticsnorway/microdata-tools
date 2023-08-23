@@ -46,6 +46,15 @@ class UnitType(str, Enum):
     BK_HELSESTASJONSKONSULTASJON = "BK_HELSESTASJONSKONSULTASJON"
 
 
+class UnitIdType(str, Enum):
+    JOBBID_1 = "JOBBID_1"
+    KJORETOY_ID = "KJORETOY_ID"
+    FNR = "FNR"
+    ORGNR = "ORGNR"
+    KURSID = "KURSID"
+    BK_STASJONS_BESOKS_ID = "BK_STASJONS_BESOKS_ID"
+
+
 class MultiLingualString(BaseModel):
     languageCode: LanguageCode
     value: str
@@ -96,7 +105,9 @@ class SentinelItem(BaseModel, extra=Extra.forbid):
 class ValueDomain(BaseModel, extra=Extra.forbid):
     description: Optional[conlist(MultiLingualString, min_items=1)]
     measurementType: Optional[str]
-    measurementUnitDescription: Optional[conlist(MultiLingualString, min_items=1)]
+    measurementUnitDescription: Optional[
+        conlist(MultiLingualString, min_items=1)
+    ]
     uriDefinition: Optional[List[Union[str, None]]]
     codeList: Optional[conlist(CodeListItem, min_items=1)]
     sentinelAndMissingValues: Optional[List[SentinelItem]]
@@ -124,7 +135,8 @@ class ValueDomain(BaseModel, extra=Extra.forbid):
                 )
         else:
             raise ValueError(
-                "A valueDomain must contain either a codeList " "or a description"
+                "A valueDomain must contain either a codeList "
+                "or a description"
             )
         return values
 
@@ -164,8 +176,12 @@ class Metadata(BaseModel):
     temporalityType: TemporalityType
     sensitivityLevel: SensitivityLevel
     populationDescription: conlist(MultiLingualString, min_items=1)
-    spatialCoverageDescription: Optional[conlist(MultiLingualString, min_items=1)]
-    subjectFields: conlist(conlist(MultiLingualString, min_items=1), min_items=1)
+    spatialCoverageDescription: Optional[
+        conlist(MultiLingualString, min_items=1)
+    ]
+    subjectFields: conlist(
+        conlist(MultiLingualString, min_items=1), min_items=1
+    )
     dataRevision: DataRevision
     identifierVariables: conlist(IdentifierVariable, min_items=1, max_items=1)
     measureVariables: conlist(MeasureVariable, min_items=1, max_items=1)
