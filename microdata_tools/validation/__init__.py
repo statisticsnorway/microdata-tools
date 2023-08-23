@@ -11,6 +11,7 @@ from microdata_tools.validation.steps import (
     data_reader,
     metadata_enricher,
 )
+from microdata_tools.validation.model.metadata import UnitType, UnitIdType
 
 
 def _validate_dataset_name(dataset_name: str) -> None:
@@ -32,7 +33,9 @@ def _validate_dataset_name(dataset_name: str) -> None:
         )
 
 
-def get_unit_id_type_for_unit_type(unit_id: str) -> Union[str, None]:
+def get_unit_id_type_for_unit_type(
+    unit_id: UnitType,
+) -> Union[str, UnitIdType]:
     """
     Returns the unitIdType for the supplied unitType. Returns None
     if supplied unitType has no attached unitIdType.
