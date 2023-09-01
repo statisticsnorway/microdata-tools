@@ -1,5 +1,5 @@
 {
-	"temporalityType": "EVENT",
+	"temporalityType": "ACCUMULATED",
 	"sensitivityLevel": "PERSON_GENERAL",
 	"populationDescription": [{"languageCode": "no", "value": "Alle personer registrert bosatt i Norge"}],
 	"spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
