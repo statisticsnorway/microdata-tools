@@ -24,7 +24,9 @@ def write_json(filepath: Path, content: dict) -> None:
         json.dump(content, json_file, indent=4, ensure_ascii=False)
 
 
-def resolve_working_directory(working_directory: Union[str, None]) -> Tuple[Path, bool]:
+def resolve_working_directory(
+    working_directory: Union[str, None]
+) -> Tuple[Path, bool]:
     """
     Generates a working directory if a working directory is not supplied.
     Returns a tuple with:
@@ -61,21 +63,24 @@ def clean_up_temporary_files(
                     "An exception occured while attempting to delete"
                     f"temporary files: {e}"
                 )
+                raise e
         else:
             for file in generated_files:
                 try:
                     os.remove(working_directory / file)
-                except FileNotFoundError:
+                except FileNotFoundError as e:
                     logger.error(
                         f"Could not find file {file} in working directory "
                         "when attempting to delete temporary files."
                     )
+                    raise e
     else:
         for file in generated_files:
             try:
                 os.remove(working_directory / file)
-            except FileNotFoundError:
+            except FileNotFoundError as e:
                 logger.error(
                     f"Could not find file {file} in working directory "
                     "when attempting to delete temporary files."
                 )
+                raise e
