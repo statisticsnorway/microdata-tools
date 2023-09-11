@@ -52,6 +52,17 @@ def test_validate_invalid_metadata():
     assert "field required" in data_errors[0]
 
 
+def test_invalid_dataset_name():
+    data_errors = validate_metadata(
+        "1_INVALID_DATASET_NAME",
+        input_directory=INPUT_DIR,
+    )
+    assert data_errors == [
+        '"1_INVALID_DATASET_NAME" contains invalid characters. '
+        'Please use only uppercase A-Z, numbers 0-9 or "_"'
+    ]
+
+
 def test_validate_metadata_does_not_exist():
     with pytest.raises(FileNotFoundError):
         validate_metadata(NO_SUCH_METADATA, INPUT_DIR)

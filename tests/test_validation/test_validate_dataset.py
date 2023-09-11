@@ -48,6 +48,17 @@ def test_validate_valid_dataset():
         assert actual_metadata == expected_metadata
 
 
+def test_invalid_dataset_name():
+    data_errors = validate_dataset(
+        "1_INVALID_DATASET_NAME",
+        input_directory=INPUT_DIR,
+    )
+    assert data_errors == [
+        '"1_INVALID_DATASET_NAME" contains invalid characters. '
+        'Please use only uppercase A-Z, numbers 0-9 or "_"'
+    ]
+
+
 def test_validate_valid_dataset_delete_temporary_files():
     for valid_dataset_name in VALID_DATASET_NAMES:
         data_errors = validate_dataset(
