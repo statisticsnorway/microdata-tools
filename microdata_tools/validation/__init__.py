@@ -55,6 +55,8 @@ def validate_dataset(
     If the dataset is valid, the list will be empty.
     """
     data_errors = []
+    working_directory_path = None
+
     try:
         _validate_dataset_name(dataset_name)
         (
@@ -111,7 +113,7 @@ def validate_dataset(
         raise e
     finally:
         # Delete temporary files
-        if not keep_temporary_files:
+        if not keep_temporary_files and working_directory_path:
             local_storage.clean_up_temporary_files(
                 dataset_name,
                 working_directory_path,
@@ -131,6 +133,8 @@ def validate_metadata(
     If the metadata is valid, the list will be empty.
     """
     data_errors = []
+    working_directory_path = None
+
     try:
         _validate_dataset_name(dataset_name)
         (
@@ -153,7 +157,7 @@ def validate_metadata(
         raise e
     finally:
         # Delete temporary files
-        if not keep_temporary_files:
+        if not keep_temporary_files and working_directory_path:
             local_storage.clean_up_temporary_files(
                 dataset_name,
                 working_directory_path,
