@@ -1,0 +1,62 @@
+{
+    "shortName": "NPR_EPISODEID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Episodeidentifikator"
+      },
+      {
+        "languageCode": "en",
+        "value": "Episode identifier"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Identifikator for NPR-episode"
+      },
+      {
+        "languageCode": "en",
+        "value": "Identifier for NPR episode"
+      }
+    ],
+    "dataType": "LONG",
+    "unitType": {
+      "shortName": "NPR_EPISODE",
+      "requiresPseudonymization": true,
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Episode NPR"
+        },
+        {
+          "languageCode": "en",
+          "value": "Episode NPR"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Tidsperiode hvor pasienten får helsehjelp ved én og samme helseinstitusjon for ett og samme helseproblem. En episode kan være en poliklinisk kontakt eller et avdelingsopphold (dagopphold eller døgnopphold). En episode betegner aktivitet, ikke bare behandling."
+        },
+        {
+          "languageCode": "en",
+          "value": "A temporal period during which a patient receives healthcare services at a single healthcare institution for a specific health issue. An episode may encompass outpatient encounters or inpatient stays (day or overnight admissions). An episode denotes a broader spectrum of activities beyond mere treatment."
+        }
+      ]
+    },
+    "format": "RandomUInt48",
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert episodeidentifikator"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonomized episode identifier"
+        }
+      ]
+    }
+  }
+  
