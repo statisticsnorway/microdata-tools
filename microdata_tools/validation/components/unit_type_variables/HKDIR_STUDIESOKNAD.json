@@ -1,0 +1,62 @@
+{
+    "shortName": "HKDIR_STUDIESOKNADID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Studiesøknadidentifikator"
+      },
+      {
+        "languageCode": "en",
+        "value": "Admission application identifier"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Identifikator for studiesøknad"
+      },
+      {
+        "languageCode": "en",
+        "value": "Identifier for admission application"
+      }
+    ],
+    "dataType": "LONG",
+    "unitType": {
+      "shortName": "HKDIR_STUDIESOKNAD",
+      "requiresPseudonymization": true,
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Studiesøknad HK-dir"
+        },
+        {
+          "languageCode": "en",
+          "value": "Admission application HK-dir"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "En søknad til høyere utdanning."
+        },
+        {
+          "languageCode": "en",
+          "value": "An admission application for higher education."
+        }
+      ]
+    },
+    "format": "RandomUInt48",
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert studiesøknadidentifikator"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonomized admission application identifier "
+        }
+      ]
+    }
+  }
+  
