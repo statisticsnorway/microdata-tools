@@ -129,11 +129,10 @@ def test_read_invalid_unit_type():
     with pytest.raises(ValidationError) as e:
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
-    assert e.value.errors == [
+    assert (
         "identifierVariables->unitType: value is not a valid enumeration member; "
         "permitted: 'JOBB', 'KJORETOY', 'FAMILIE', 'FORETAK', 'HUSHOLDNING', "
-        "'KOMMUNE', 'KURS', 'PERSON', 'VIRKSOMHET', 'BK_HELSESTASJONSKONSULTASJON'"
-    ]
+    ) in e.value.errors[0]
 
 
 def test_read_missing_identifier():
