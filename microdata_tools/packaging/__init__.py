@@ -69,7 +69,7 @@ def package_dataset(
                 os.makedirs(dataset_output_dir)
 
         if Path(dataset_dir / f"{dataset_name}.md5").exists():
-            shutil.copyfile(
+            shutil.move(
                 dataset_dir / f"{dataset_name}.md5",
                 dataset_output_dir / f"{dataset_name}.md5",
             )
