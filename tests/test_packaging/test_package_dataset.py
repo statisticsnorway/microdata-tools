@@ -40,6 +40,9 @@ def test_package_dataset():
     assert result_file.exists()
 
     assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
+    assert not Path(
+        INPUT_DIRECTORY / f"{dataset_name}" / f"{dataset_name}.md5"
+    ).exists()
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
@@ -71,6 +74,9 @@ def test_package_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     assert result_file.exists()
 
     assert not Path(OUTPUT_DIRECTORY / f"{dataset_name}").exists()
+    assert not Path(
+        INPUT_DIRECTORY / f"{dataset_name}" / f"{dataset_name}.md5"
+    ).exists()
 
     with tarfile.open(result_file, "r:") as tar:
         tarred_files = [file.name for file in tar.getmembers()]
