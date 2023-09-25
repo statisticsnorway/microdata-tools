@@ -20,7 +20,7 @@
       "value": "Identifier for household in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "requiresPseudonymization": true,
     "shortName": "HUSHOLDNING",

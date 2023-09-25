@@ -20,7 +20,7 @@
       "value": "Identifier for enterprise in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "shortName": "FORETAK",
     "requiresPseudonymization": true,

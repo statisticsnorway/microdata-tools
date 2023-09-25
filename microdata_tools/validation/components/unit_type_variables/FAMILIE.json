@@ -20,7 +20,7 @@
       "value": "Identifier for family in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "shortName": "FAMILIE",
     "requiresPseudonymization": true,

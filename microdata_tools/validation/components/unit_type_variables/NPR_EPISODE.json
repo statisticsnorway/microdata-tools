@@ -20,7 +20,7 @@
         "value": "Identifier for NPR episode"
       }
     ],
-    "dataType": "LONG",
+    "dataType": "STRING",
     "unitType": {
       "shortName": "NPR_EPISODE",
       "requiresPseudonymization": true,
