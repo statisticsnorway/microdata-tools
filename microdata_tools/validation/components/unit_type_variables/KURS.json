@@ -20,7 +20,7 @@
       "value": "Identifier for course in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "requiresPseudonymization": true,
     "shortName": "KURS",

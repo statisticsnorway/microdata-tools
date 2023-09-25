@@ -72,6 +72,9 @@ def validate_dataset(
             dataset_name, input_metadata_path
         )
         measure_data_type = metadata_dict["measureVariables"][0]["dataType"]
+        identifier_data_type = metadata_dict["identifierVariables"][0][
+            "dataType"
+        ]
         temporality_type = metadata_dict["temporalityType"]
         code_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
             "codeList"
@@ -82,7 +85,10 @@ def validate_dataset(
 
         # Read data
         table = data_reader.read_and_sanitize_csv(
-            input_data_path, measure_data_type, temporality_type
+            input_data_path,
+            identifier_data_type,
+            measure_data_type,
+            temporality_type,
         )
 
         # Enrich metadata with temporal data

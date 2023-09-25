@@ -20,7 +20,7 @@
         "value": "Identifier for admission application"
       }
     ],
-    "dataType": "LONG",
+    "dataType": "STRING",
     "unitType": {
       "shortName": "HKDIR_STUDIESOKNAD",
       "requiresPseudonymization": true,
