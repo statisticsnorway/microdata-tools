@@ -20,7 +20,7 @@
       "value": "Identifier for vehicles in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "requiresPseudonymization": true,
     "shortName": "KJORETOY",

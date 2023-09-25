@@ -15,31 +15,41 @@ from microdata_tools.validation.exceptions import ValidationError
 logger = logging.getLogger()
 
 
+def _microdata_data_type_to_pyarrow(
+    microdata_data_type: str,
+) -> pyarrow.lib.DataType:
+    if microdata_data_type == "STRING":
+        return pyarrow.string()
+    elif microdata_data_type == "LONG":
+        return pyarrow.int64()
+    elif microdata_data_type == "DOUBLE":
+        return pyarrow.float64()
+    elif microdata_data_type == "DATE":
+        return pyarrow.date32()
+    else:
+        raise ValidationError(
+            "Unsupported measure data type",
+            errors=[f"Unsupported measure data type: {microdata_data_type}"],
+        )
+
+
 def _get_csv_read_options():
     return csv.ReadOptions(
         column_names=["unit_id", "value", "start", "stop", "attributes"]
     )
 
 
-def _get_csv_convert_options(measure_data_type: str):
-    pyarrow_data_type = None
-    if measure_data_type == "STRING":
-        pyarrow_data_type = pyarrow.string()
-    elif measure_data_type == "LONG":
-        pyarrow_data_type = pyarrow.int64()
-    elif measure_data_type == "DOUBLE":
-        pyarrow_data_type = pyarrow.float64()
-    elif measure_data_type == "DATE":
-        pyarrow_data_type = pyarrow.date32()
-    else:
-        raise ValidationError(
-            "Unsupported measure data type",
-            errors=[f"Unsupported measure data type: {measure_data_type}"],
-        )
+def _get_csv_convert_options(
+    identifier_data_type: str, measure_data_type: str
+):
+    identifier_pyarrow_type = _microdata_data_type_to_pyarrow(
+        identifier_data_type
+    )
+    measure_pyarrow_type = _microdata_data_type_to_pyarrow(measure_data_type)
     return csv.ConvertOptions(
         column_types={
-            "unit_id": pyarrow.string(),
-            "value": pyarrow_data_type,
+            "unit_id": identifier_pyarrow_type,
+            "value": measure_pyarrow_type,
             "start": pyarrow.date32(),
             "stop": pyarrow.date32(),
             "attributes": pyarrow.string(),
@@ -47,7 +57,9 @@ def _get_csv_convert_options(measure_data_type: str):
     )
 
 
-def _csv_to_table(input_csv_path: Path, measure_data_type: str):
+def _csv_to_table(
+    input_csv_path: Path, identifier_data_type: str, measure_data_type: str
+) -> pyarrow.Table:
     """
     Read a csv into a pyarrow table. The read and convert options
     ensures microdata formatting of the input csv.
@@ -57,7 +69,9 @@ def _csv_to_table(input_csv_path: Path, measure_data_type: str):
             input_csv_path,
             parse_options=csv.ParseOptions(delimiter=";"),
             read_options=_get_csv_read_options(),
-            convert_options=_get_csv_convert_options(measure_data_type),
+            convert_options=_get_csv_convert_options(
+                identifier_data_type, measure_data_type
+            ),
         )
     except ArrowInvalid as e:
         raise ValidationError(
@@ -65,11 +79,16 @@ def _csv_to_table(input_csv_path: Path, measure_data_type: str):
         ) from e
 
 
-def _trim_unit_id(table: pyarrow.Table) -> pyarrow.Array:
+def _sanitize_unit_id(
+    table: pyarrow.Table, identifier_data_type: str
+) -> pyarrow.Array:
     """
     Trim leading and trailing whitespace from the unit_id column
     """
-    return compute.utf8_trim(table["unit_id"], " ")
+    if identifier_data_type == "STRING":
+        return compute.utf8_trim(table["unit_id"], " ")
+    else:
+        return table["unit_id"]
 
 
 def _sanitize_value(
@@ -106,15 +125,20 @@ def _generate_start_year(table: pyarrow.Table) -> pyarrow.Array:
 
 
 def read_and_sanitize_csv(
-    input_data_path: Path, measure_data_type: str, temporality_type: str
+    input_data_path: Path,
+    identifier_data_type: str,
+    measure_data_type: str,
+    temporality_type: str,
 ) -> pyarrow.Table:
     """
     Reads a csv file to a pyarrow table. Sanitizes values and
     ensures the input csv data follows the requirements for the
     microdata data model.
     """
-    table = _csv_to_table(input_data_path, measure_data_type)
-    unit_id = _trim_unit_id(table)
+    table = _csv_to_table(
+        input_data_path, identifier_data_type, measure_data_type
+    )
+    unit_id = _sanitize_unit_id(table, identifier_data_type)
     value = _sanitize_value(table, measure_data_type)
     epoch_start = _cast_to_epoch_date(table, "start")
     epoch_stop = _cast_to_epoch_date(table, "stop")

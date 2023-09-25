@@ -20,7 +20,7 @@
       "value": "Identifier for establishment in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "requiresPseudonymization": true,
     "shortName": "VIRKSOMHET",

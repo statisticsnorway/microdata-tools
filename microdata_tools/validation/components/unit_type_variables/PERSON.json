@@ -20,7 +20,7 @@
       "value": "Identifier for person in microdata"
     }
   ],
-  "dataType": "LONG",
+  "dataType": "STRING",
   "unitType": {
     "shortName": "PERSON",
     "requiresPseudonymization": true,
