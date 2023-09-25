@@ -45,16 +45,15 @@
         }
       ]
     },
-    "format": "RandomUInt48",
     "valueDomain": {
       "description": [
         {
           "languageCode": "no",
-          "value": "Pseudonymisert helsestasjonskonsultasjonbesøksid"
+          "value": "helsestasjonskonsultasjonbesøksid"
         },
         {
           "languageCode": "en",
-          "value": "Pseudonymized healt center visit id"
+          "value": "health center visit id"
         }
       ]
     }
