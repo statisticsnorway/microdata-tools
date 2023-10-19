@@ -274,7 +274,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
 
     identifiers = data.to_table(columns=["unit_id"])
     unique_identifiers = compute.unique(identifiers["unit_id"])
-    for identifier_batch in batch(unique_identifiers, 5_000_000):
+    for identifier_batch in batch(unique_identifiers, 500_000):
         identifier_time_spans = data.to_table(
             filter=dataset.field("unit_id").isin(identifier_batch),
             columns=["unit_id", "start_epoch_days", "stop_epoch_days"],
