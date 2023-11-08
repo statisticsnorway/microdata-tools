@@ -23,6 +23,7 @@ UNIT_TYPE_VARIABLES = {
     "HKDIR_STUDIESOKNAD": load_json(
         UNIT_TYPE_VARIABLES_DIR / "HKDIR_STUDIESOKNAD.json"
     ),
+    "SOSTIL": load_json(UNIT_TYPE_VARIABLES_DIR / "SOSTIL.json"),
 }
 
 

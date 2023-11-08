@@ -1,0 +1,61 @@
+{
+  "shortName": "SOSTIL_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Sosialhjelpidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Financial assistance identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for sosialhjelp i microdata"
+    },
+    {
+      "languageCode": "no",
+      "value": "Identifier for financial assistance in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "requiresPseudonymization": true,
+    "shortName": "SOSTIL",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Sosialhjelp"
+      },
+      {
+        "languageCode": "en",
+        "value": "Financial assistance"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Økonomisk sosialhjelp er en midlertidig støtte for de som ikke kan dekke nødvendige utgifter selv."
+      },
+      {
+        "languageCode": "en",
+        "value": "Financial assistance is a temporary assistance for those who are unable to financially support themselves."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert kombinasjon av personnummer, årgang (ÅÅÅÅMM), kommune og radnummer for sosialhjelp"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized combination of national identity number, year (YYYYMM), municipality and row number for financial assistance"
+      }
+    ]
+  }
+}
