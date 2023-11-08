@@ -15,7 +15,7 @@ def load_json(filepath: Path) -> dict:
         with open(filepath, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        logging.error(f"Failed to open file at {str(Path)}")
+        logging.error(f"Failed to open file at {filepath}")
         raise e
 
 
