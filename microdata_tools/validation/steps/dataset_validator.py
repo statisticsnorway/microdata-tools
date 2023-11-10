@@ -150,7 +150,7 @@ def _event_temporal_variables_check(data: FileSystemDataset):
     """
     Any given row in a table with temporalityType=EVENT is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
-    * The stop_epoch_days is either a non-null value bigger than
+    * The stop_epoch_days is either a non-null value bigger than or equal to
       start_epoch_days (int32), or null (empty)
     """
     start_is_null_filter = dataset.field("start_epoch_days").is_null()
