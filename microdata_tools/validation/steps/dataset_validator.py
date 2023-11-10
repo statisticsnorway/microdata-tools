@@ -154,11 +154,11 @@ def _event_temporal_variables_check(data: FileSystemDataset):
       start_epoch_days (int32), or null (empty)
     """
     start_is_null_filter = dataset.field("start_epoch_days").is_null()
-    start_be_stop_filter = dataset.field("start_epoch_days") >= dataset.field(
+    start_bt_stop_filter = dataset.field("start_epoch_days") > dataset.field(
         "stop_epoch_days"
     )  # If stop_epoch_days is null this test will be ignored by pyarrow
     invalid_rows = data.to_table(
-        filter=(start_is_null_filter | start_be_stop_filter),
+        filter=(start_is_null_filter | start_bt_stop_filter),
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
