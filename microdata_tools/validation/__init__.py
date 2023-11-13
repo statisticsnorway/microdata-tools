@@ -56,6 +56,7 @@ def validate_dataset(
     """
     data_errors = []
     working_directory_path = None
+    working_directory_was_generated = False
 
     try:
         _validate_dataset_name(dataset_name)
@@ -140,6 +141,7 @@ def validate_metadata(
     """
     data_errors = []
     working_directory_path = None
+    working_directory_was_generated = False
 
     try:
         _validate_dataset_name(dataset_name)
