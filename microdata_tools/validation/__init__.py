@@ -59,6 +59,7 @@ def validate_dataset(
 
     try:
         _validate_dataset_name(dataset_name)
+        local_storage.validate_dataset_dir(Path(input_directory), dataset_name)
         (
             working_directory_path,
             working_directory_was_generated,
@@ -66,7 +67,6 @@ def validate_dataset(
         input_dataset_directory = Path(input_directory) / dataset_name
         input_metadata_path = input_dataset_directory / f"{dataset_name}.json"
         input_data_path = input_dataset_directory / f"{dataset_name}.csv"
-
         # Read and validate metadata
         metadata_dict = metadata_reader.run_reader(
             dataset_name, input_metadata_path
@@ -143,6 +143,9 @@ def validate_metadata(
 
     try:
         _validate_dataset_name(dataset_name)
+        local_storage.validate_dataset_dir(
+            Path(input_directory), dataset_name, require_csv=False
+        )
         (
             working_directory_path,
             working_directory_was_generated,
