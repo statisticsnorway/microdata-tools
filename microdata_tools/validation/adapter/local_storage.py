@@ -30,6 +30,11 @@ def validate_dataset_dir(
     input_dir: Path, dataset_name: str, require_csv: bool = True
 ) -> None:
     dataset_dir = input_dir / dataset_name
+    if not dataset_dir.exists():
+        raise ValidationError(
+            f"Dataset directory {dataset_dir} not found",
+            errors=[f"Dataset directory {dataset_dir} not found"],
+        )
     if require_csv:
         if not os.path.exists(dataset_dir / f"{dataset_name}.csv"):
             raise ValidationError(
@@ -60,6 +65,9 @@ def resolve_working_directory(
         generated_working_directory = Path(str(uuid.uuid4()))
         os.mkdir(generated_working_directory)
         return generated_working_directory, True
+
+
+logger.warning("This function will be deprecated in a future release")
 
 
 def clean_up_temporary_files(
