@@ -84,6 +84,17 @@
         "validUntil": null
       },
       {
+        "code": "0100",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent arbeidskommune/kommune for utdanning"
+          }
+        ],
+        "validFrom": "1900-01-01",
+        "validUntil": null
+      },
+      {
         "code": "0101",
         "categoryTitle": [
           {
@@ -10806,6 +10817,303 @@
           }
         ],
         "validFrom": "1991-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "01",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Østfold"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "02",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Akershus"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "03",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Oslo"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "04",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hedmark"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "05",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Oppland"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "06",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Buskerud"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "07",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vestfold"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "08",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Telemark"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "09",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Aust-Agder"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "10",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vest-Agder"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "11",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Rogaland"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "12",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hordaland"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "14",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sogn og Fjordane"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "15",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Møre og Romsdal"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "16",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sør-Trøndelag"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "17",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nord-Trøndelag"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "18",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nordland"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "19",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Troms"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "20",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Finnmark"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-12-31"
+      },
+      {
+        "code": "21",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Svalbard"
+          }
+        ],
+        "validFrom": "1919-01-01",
+        "validUntil": "2019-01-01"
+      },
+      {
+        "code": "30",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Viken"
+          }
+        ],
+        "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "34",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Innlandet"
+          }
+        ],
+        "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "38",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vestfold og Telemark"
+          }
+        ],
+        "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "42",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Agder"
+          }
+        ],
+        "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "46",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vestland"
+          }
+        ],
+        "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "50",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Trøndelag"
+          }
+        ],
+        "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "54",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Troms og Finnmark"
+          }
+        ],
+        "validFrom": "2020-01-01",
         "validUntil": null
       }
     ]
