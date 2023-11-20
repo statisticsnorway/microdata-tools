@@ -84,17 +84,6 @@
         "validUntil": null
       },
       {
-        "code": "0100",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Ukjent arbeidskommune/kommune for utdanning"
-          }
-        ],
-        "validFrom": "1900-01-01",
-        "validUntil": null
-      },
-      {
         "code": "0101",
         "categoryTitle": [
           {
@@ -10820,297 +10809,297 @@
         "validUntil": null
       },
       {
-        "code": "01",
+        "code": "0100",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Østfold"
+            "value": "Ukjent kommune i Østfold"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "02",
+        "code": "0200",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Akershus"
+            "value": "Ukjent kommune i Akershus"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "03",
+        "code": "0300",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Oslo"
+            "value": "Ukjent kommune i Oslo"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": null
       },
       {
-        "code": "04",
+        "code": "0400",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Hedmark"
+            "value": "Ukjent kommune i Hedmark"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "05",
+        "code": "0500",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Oppland"
+            "value": "Ukjent kommune i Oppland"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "06",
+        "code": "0600",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Buskerud"
+            "value": "Ukjent kommune i Buskerud"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "07",
+        "code": "0700",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Vestfold"
+            "value": "Ukjent kommune i Vestfold"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "08",
+        "code": "0800",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Telemark"
+            "value": "Ukjent kommune i Telemark"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "09",
+        "code": "0900",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Aust-Agder"
+            "value": "Ukjent kommune i Aust-Agder"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "10",
+        "code": "1000",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Vest-Agder"
+            "value": "Ukjent kommune i Vest-Agder"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "11",
+        "code": "1100",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Rogaland"
+            "value": "Ukjent kommune i Rogaland"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": null
       },
       {
-        "code": "12",
+        "code": "1200",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Hordaland"
+            "value": "Ukjent kommune i Hordaland"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "14",
+        "code": "1400",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Sogn og Fjordane"
+            "value": "Ukjent kommune i Sogn og Fjordane"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "15",
+        "code": "1500",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Møre og Romsdal"
+            "value": "Ukjent kommune i Møre og Romsdal"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": null
       },
       {
-        "code": "16",
+        "code": "1600",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Sør-Trøndelag"
+            "value": "Ukjent kommune i Sør-Trøndelag"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "17",
+        "code": "1700",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Nord-Trøndelag"
+            "value": "Ukjent kommune i Nord-Trøndelag"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "18",
+        "code": "1800",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Nordland"
+            "value": "Ukjent kommune i Nordland"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": null
       },
       {
-        "code": "19",
+        "code": "1900",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Troms"
+            "value": "Ukjent kommune i Troms"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "20",
+        "code": "2000",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Finnmark"
+            "value": "Ukjent kommune i Finnmark"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-12-31"
       },
       {
-        "code": "21",
+        "code": "2100",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Svalbard"
+            "value": "Ukjent kommune i Svalbard"
           }
         ],
         "validFrom": "1919-01-01",
         "validUntil": "2019-01-01"
       },
       {
-        "code": "30",
+        "code": "3000",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Viken"
+            "value": "Ukjent kommune i Viken"
           }
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
       },
       {
-        "code": "34",
+        "code": "3400",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Innlandet"
+            "value": "Ukjent kommune i Innlandet"
           }
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
       },
       {
-        "code": "38",
+        "code": "3800",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Vestfold og Telemark"
+            "value": "Ukjent kommune i Vestfold og Telemark"
           }
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
       },
       {
-        "code": "42",
+        "code": "4200",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Agder"
+            "value": "Ukjent kommune i Agder"
           }
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
       },
       {
-        "code": "46",
+        "code": "4600",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Vestland"
+            "value": "Ukjent kommune i Vestland"
           }
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
       },
       {
-        "code": "50",
+        "code": "5000",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Trøndelag"
+            "value": "Ukjent kommune i Trøndelag"
           }
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
       },
       {
-        "code": "54",
+        "code": "5400",
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Troms og Finnmark"
+            "value": "Ukjent kommune i Troms og Finnmark"
           }
         ],
         "validFrom": "2020-01-01",
