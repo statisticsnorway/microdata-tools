@@ -67,9 +67,6 @@ def resolve_working_directory(
         return generated_working_directory, True
 
 
-logger.warning("This function will be deprecated in a future release")
-
-
 def clean_up_temporary_files(
     dataset_name: str,
     working_directory: Path,
