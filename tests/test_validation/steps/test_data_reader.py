@@ -39,6 +39,11 @@ def test_get_temporal_data():
         "start_epoch_days": [1, 2, 3, 4, 5],
         "stop_epoch_days": [1, 2, 3, 4, 5],
     }
+    empty_table = {
+        "start_epoch_days": [None, None, None, None, None],
+        "stop_epoch_days": [None, None, None, None, None],
+    }
+
     fixed_table = pyarrow.Table.from_pydict(fixed_dict, schema=table_schema)
     assert data_reader.get_temporal_data(fixed_table, "FIXED") == {
         "start": "1900-01-01",
@@ -68,6 +73,11 @@ def test_get_temporal_data():
             "1970-01-06",
         ],
     }
+    with pytest.raises(ValidationError) as e:
+        data_reader.get_temporal_data(empty_table, "EVENT")
+    assert e.value.errors == [
+        "Could not read data in third column (Start date). Is this column empty?"
+    ]
 
 
 def test_sanitize_long():
