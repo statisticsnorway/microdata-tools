@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Tuple, Union
 import uuid
 
+from microdata_tools.validation.exceptions import ValidationError
+
 
 logger = logging.getLogger()
 
@@ -22,6 +24,30 @@ def load_json(filepath: Path) -> dict:
 def write_json(filepath: Path, content: dict) -> None:
     with open(filepath, "w", encoding="utf-8") as json_file:
         json.dump(content, json_file, indent=4, ensure_ascii=False)
+
+
+def validate_dataset_dir(
+    input_dir: Path, dataset_name: str, require_csv: bool = True
+) -> None:
+    dataset_dir = input_dir / dataset_name
+    if not dataset_dir.exists():
+        raise ValidationError(
+            f"Dataset directory {dataset_dir} not found",
+            errors=[f"Dataset directory {dataset_dir} not found"],
+        )
+    if require_csv:
+        if not os.path.exists(dataset_dir / f"{dataset_name}.csv"):
+            raise ValidationError(
+                f"Could not find {dataset_name}.csv in working directory",
+                errors=[
+                    "Could not find {dataset_name}.csv in working directory"
+                ],
+            )
+    if not os.path.exists(dataset_dir / f"{dataset_name}.json"):
+        raise ValidationError(
+            f"Could not find {dataset_name}.json in working directory",
+            errors=["Could not find {dataset_name}.json in working directory"],
+        )
 
 
 def resolve_working_directory(
@@ -44,7 +70,7 @@ def resolve_working_directory(
 def clean_up_temporary_files(
     dataset_name: str,
     working_directory: Path,
-    delete_working_directory: Path = False,
+    delete_working_directory: bool = False,
 ):
     generated_files = [
         f"{dataset_name}.parquet",

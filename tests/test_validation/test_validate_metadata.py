@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from microdata_tools import validate_metadata
+from microdata_tools.validation.exceptions import ValidationError
 
 
 logger = logging.getLogger()
@@ -64,8 +65,9 @@ def test_invalid_dataset_name():
 
 
 def test_validate_metadata_does_not_exist():
-    with pytest.raises(FileNotFoundError):
-        validate_metadata(NO_SUCH_METADATA, INPUT_DIR)
+    data_errors = validate_metadata(NO_SUCH_METADATA, INPUT_DIR)
+    assert len(data_errors) == 1
+    assert "not found" in data_errors[0]
 
 
 def get_working_directory_files() -> list:

@@ -97,12 +97,13 @@ def test_validate_valid_dataset_delete_working_files():
 
 
 def test_dataset_does_not_exist():
-    with pytest.raises(FileNotFoundError):
-        validate_dataset(
-            NO_SUCH_DATASET_NAME,
-            working_directory=WORKING_DIR,
-            input_directory=INPUT_DIR,
-        )
+    data_errors = validate_dataset(
+        NO_SUCH_DATASET_NAME,
+        working_directory=WORKING_DIR,
+        input_directory=INPUT_DIR,
+    )
+    assert len(data_errors) == 1
+    assert "not found" in data_errors[0]
 
 
 def get_working_directory_files() -> list:
