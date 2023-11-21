@@ -161,6 +161,12 @@ def get_temporal_data(
     temporal_data = {}
     if temporality_type == "FIXED":
         stop_max = compute.max(table["stop_epoch_days"]).as_py()
+        if stop_max is None:
+            error_string = (
+                "Could not read data in fourth column (Stop date)."
+                " Is this column empty?"
+            )
+            raise ValidationError(error_string, errors=[error_string])
         temporal_data["start"] = "1900-01-01"
         temporal_data["latest"] = (
             datetime(1970, 1, 1) + timedelta(days=stop_max)
@@ -172,6 +178,18 @@ def get_temporal_data(
         stop_min, stop_max = (
             compute.min_max(table["stop_epoch_days"]).as_py().values()
         )
+        if start_min is None or stop_min is None:
+            error_string = (
+                "Could not read data in third column (Start date)."
+                " Is this column empty?"
+            )
+            raise ValidationError(error_string, errors=[error_string])
+        if stop_min is None or stop_max is None:
+            error_string = (
+                "Could not read data in fourth column (Stop date)."
+                " Is this column empty?"
+            )
+            raise ValidationError(error_string, errors=[error_string])
         min_date = min(
             [date for date in [start_min, stop_min] if date is not None]
         )
