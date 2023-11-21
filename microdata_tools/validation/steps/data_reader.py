@@ -178,7 +178,7 @@ def get_temporal_data(
         stop_min, stop_max = (
             compute.min_max(table["stop_epoch_days"]).as_py().values()
         )
-        if start_min is None or stop_min is None:
+        if start_min is None or start_max is None:
             error_string = (
                 "Could not read data in third column (Start date)."
                 " Is this column empty?"
