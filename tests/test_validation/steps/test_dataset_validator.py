@@ -243,3 +243,15 @@ def test_temporality_accumulated():
     assert e.value.errors == [
         'Invalid overlapping timespans for identifier "1"'
     ]
+
+
+def test_max_50_errors():
+    with pytest.raises(ValidationError) as e:
+        dataset_validator.validate_dataset(
+            test_data.TOO_MANY_ERRORS_DS,
+            "STRING",
+            test_data.TOO_MANY_ERRORS_CODELIST,
+            None,
+            "ACCUMULATED",
+        )
+    assert len(e.value.errors) == 50
