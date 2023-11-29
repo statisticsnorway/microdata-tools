@@ -11038,6 +11038,16 @@
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
+      },
+      {
+        "code": "0999",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Utenlandske enheter uten gyldig adresse i Norge"
+          }
+        ],
+        "validFrom": "1995-01-01"
       }
     ]
   }
