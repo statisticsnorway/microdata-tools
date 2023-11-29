@@ -7,7 +7,7 @@ from microdata_tools.validation.exceptions import ValidationError
 
 def _get_error_list(invalid_rows: Table, message: str):
     invalid_identifiers = (
-        invalid_rows.column("unit_id").slice(0, 5).to_pylist()
+        invalid_rows.column("unit_id").slice(0, 50).to_pylist()
     )
     return [
         f"{message} for row with identifier: {identifier}"
@@ -60,7 +60,7 @@ def _valid_value_column_check(
         )
         if len(invalid_rows) > 0:
             invalid_codes = (
-                invalid_rows.column("value").slice(0, 5).to_pylist()
+                invalid_rows.column("value").slice(0, 50).to_pylist()
             )
             raise ValidationError(
                 "#2 column",
