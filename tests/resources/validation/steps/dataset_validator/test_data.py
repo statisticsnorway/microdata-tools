@@ -236,3 +236,25 @@ ACCUMULATED_INVALID_TIMESPANS_DS = _dataset_from_dict(
         "start_epoch_days": [18626, 18627, 18626, 18626],
     },
 )
+
+# ----------------------
+# TOO MANY ERRORS
+# ----------------------
+TOO_MANY_ERRORS_CODELIST = [
+    {
+        "code": "1",
+        "categoryTitle": [{"languageCode": "no", "value": "Valid"}],
+        "validFrom": "1926-01-01",
+    },
+]
+
+_TOO_MANY_ERRORS_DICT = {
+    "unit_id": [str(i) for i in range(60)],
+    "value": [str(i) for i in range(60)],
+    "start_year": ["2020"] * 60,
+    "start_epoch_days": [18626] * 60,
+    "stop_epoch_days": [18670] * 60,
+}
+TOO_MANY_ERRORS_DS = _dataset_from_dict(
+    "TOO_MANY_ERRORS_DS", _TOO_MANY_ERRORS_DICT
+)
