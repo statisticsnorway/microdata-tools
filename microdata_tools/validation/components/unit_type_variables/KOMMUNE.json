@@ -3274,28 +3274,6 @@
         "validUntil": "2019-12-31"
       },
       {
-        "code": "1142",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Rennesøy"
-          }
-        ],
-        "validFrom": "2011-01-01",
-        "validUntil": "2019-12-31"
-      },
-      {
-        "code": "1142",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Rennesøy"
-          }
-        ],
-        "validFrom": "2014-01-01",
-        "validUntil": "2019-12-31"
-      },
-      {
         "code": "1143",
         "categoryTitle": [
           {
@@ -5727,28 +5705,6 @@
         "validUntil": "2017-12-31"
       },
       {
-        "code": "1742",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Grong"
-          }
-        ],
-        "validFrom": "2011-01-01",
-        "validUntil": "2017-12-31"
-      },
-      {
-        "code": "1742",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Grong"
-          }
-        ],
-        "validFrom": "2014-01-01",
-        "validUntil": "2017-12-31"
-      },
-      {
         "code": "1743",
         "categoryTitle": [
           {
@@ -7447,10 +7403,10 @@
         "categoryTitle": [
           {
             "languageCode": "no",
-            "value": "Svalbard"
+            "value": "Svalbard med Bjørnøya og Hopen"
           }
         ],
-        "validFrom": "1920-02-09",
+        "validFrom": "2019-01-01",
         "validUntil": null
       },
       {
@@ -10424,17 +10380,6 @@
         "validUntil": null
       },
       {
-        "code": "5412",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Tjeldsund"
-          }
-        ],
-        "validFrom": "2020-01-01",
-        "validUntil": null
-      },
-      {
         "code": "5413",
         "categoryTitle": [
           {
@@ -11018,17 +10963,6 @@
         "validUntil": "2019-12-31"
       },
       {
-        "code": "2100",
-        "categoryTitle": [
-          {
-            "languageCode": "no",
-            "value": "Ukjent kommune i Svalbard"
-          }
-        ],
-        "validFrom": "1919-01-01",
-        "validUntil": "2019-01-01"
-      },
-      {
         "code": "3000",
         "categoryTitle": [
           {
@@ -11104,6 +11038,16 @@
         ],
         "validFrom": "2020-01-01",
         "validUntil": null
+      },
+      {
+        "code": "0999",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Utenlandske enheter uten gyldig adresse i Norge"
+          }
+        ],
+        "validFrom": "1995-01-01"
       }
     ]
   }

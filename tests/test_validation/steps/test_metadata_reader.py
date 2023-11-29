@@ -11,6 +11,29 @@ from microdata_tools.validation.components import (
 )
 
 INPUT_DIR = Path("tests/resources/validation/steps/metadata_reader")
+VALID_CODE_LIST = [
+    {
+        "code": "a",
+        "description": "a",
+        "validFrom": "2020-01-01",
+        "validUntil": "2020-12-31",
+    },
+    {
+        "code": "b",
+        "description": "b",
+        "validFrom": "2020-01-01",
+        "validUntil": "2020-12-31",
+    },
+    {"code": "a", "description": "a", "validFrom": "2021-01-01"},
+]
+OVERLAP_CODE_LIST = [code for code in VALID_CODE_LIST] + [
+    {
+        "code": "a",
+        "description": "a",
+        "validFrom": "2020-09-01",
+        "validUntil": "2020-12-31",
+    },
+]
 
 
 def test_read_valid_dataset():
@@ -142,3 +165,11 @@ def test_read_missing_identifier():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == ["identifierVariables: field required"]
+
+
+def test_code_list_validation():
+    code_list_errors = metadata_reader._validate_code_list(VALID_CODE_LIST)
+    assert not code_list_errors
+
+    code_list_errors = metadata_reader._validate_code_list(OVERLAP_CODE_LIST)
+    assert code_list_errors == ["Duplicate codes for same time period: ['a']"]
