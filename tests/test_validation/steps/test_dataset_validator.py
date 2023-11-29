@@ -246,6 +246,7 @@ def test_temporality_accumulated():
 
 
 def test_max_50_errors():
+    # codelist error
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
             test_data.TOO_MANY_ERRORS_DS,
@@ -255,3 +256,14 @@ def test_max_50_errors():
             "ACCUMULATED",
         )
     assert len(e.value.errors) == 50
+
+    # temporal error
+    with pytest.raises(ValidationError) as e:
+        dataset_validator.validate_dataset(
+            test_data.TOO_MANY_ERRORS_DS,
+            "STRING",
+            None,
+            None,
+            "FIXED",
+        )
+        assert len(e.value.errors) == 50
