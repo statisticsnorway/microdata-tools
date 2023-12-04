@@ -207,8 +207,21 @@ def test_temporality_event():
             "EVENT",
         )
     assert e.value.errors == [
-        'Invalid overlapping timespans for identifier "1"'
+        (
+            'Invalid overlapping timespans for identifier "1": '
+            "timespan: (2020-12-30 - 2021-02-12) overlaps with "
+            "timespan: (2020-12-31 - 2021-02-22)"
+        )
     ]
+    with pytest.raises(ValidationError) as e:
+        dataset_validator.validate_dataset(
+            test_data.EVENT_TOO_MANY_ERRORS_DS,
+            "STRING",
+            None,
+            None,
+            "EVENT",
+        )
+    assert len(e.value.errors) == 50
 
 
 def test_temporality_accumulated():
@@ -240,8 +253,13 @@ def test_temporality_accumulated():
             None,
             "ACCUMULATED",
         )
+    print(e.value.errors)
     assert e.value.errors == [
-        'Invalid overlapping timespans for identifier "1"'
+        (
+            'Invalid overlapping timespans for identifier "1": '
+            "timespan: (2020-12-30 - 2021-02-12) overlaps with "
+            "timespan: (2020-12-31 - 2021-02-14)"
+        ),
     ]
 
 

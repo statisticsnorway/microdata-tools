@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 from pathlib import Path
-
+from itertools import chain
 from pyarrow import parquet, Table, dataset
 
 
@@ -206,6 +206,18 @@ EVENT_INVALID_START_DS = _dataset_from_dict(
 EVENT_INVALID_TIMESPANS_DS = _dataset_from_dict(
     "EVENT_INVALID_TIMESPANS_DS",
     {**_EVENT_VALID_DICT, "start_epoch_days": [18626, 18627, 18626, 18626]},
+)
+EVENT_TOO_MANY_ERRORS_DS = _dataset_from_dict(
+    "EVENT_TOO_MANY_ERRORS_DS",
+    {
+        "unit_id": list(
+            chain.from_iterable([str(i), str(i)] for i in range(100))
+        ),
+        "value": [str(i) for i in range(200)],
+        "start_year": ["2020"] * 200,
+        "start_epoch_days": [18626] * 200,
+        "stop_epoch_days": [None] * 200,
+    },
 )
 
 # -------------------------
