@@ -1,4 +1,6 @@
 from typing import List, Union
+from datetime import datetime
+
 from pyarrow import dataset, compute, Table
 from pyarrow.dataset import FileSystemDataset
 
@@ -255,7 +257,16 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
     timespans in the start_epoch_days and stop_epoch_days columns.
     """
 
-    def find_overlap(start_list, stop_list):
+    def from_epoch_days_to_date(epoch_days: Union[int, None]) -> str:
+        return (
+            ""
+            if epoch_days is None
+            else datetime.fromtimestamp(epoch_days * 24 * 60 * 60).strftime(
+                "%Y-%m-%d"
+            )
+        )
+
+    def find_overlap(start_list, stop_list) -> Union[str, None]:
         """
         Looks for overlapping timespans where each timespan
         is defined by a start_date at an index from the start_list,
@@ -263,10 +274,19 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
         """
         for i in range(len(start_list) - 1):
             if stop_list[i] is None:
-                return True
+                return (
+                    f"timespan: ({from_epoch_days_to_date(start_list[i])} - ) overlaps with "
+                    f"timespan: ({from_epoch_days_to_date(start_list[i + 1])} - "
+                    f"{from_epoch_days_to_date(stop_list[i + 1])})"
+                )
             if stop_list[i] > start_list[i + 1]:
-                return True
-        return False
+                return (
+                    f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
+                    f"{from_epoch_days_to_date(stop_list[i])}) overlaps with timespan: "
+                    f"({from_epoch_days_to_date(start_list[i+1])} - "
+                    f"{from_epoch_days_to_date(stop_list[i+1])})"
+                )
+        return None
 
     def batch(iterable, batch_size):
         for index in range(0, len(iterable), batch_size):
@@ -274,6 +294,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
 
     identifiers = data.to_table(columns=["unit_id"])
     unique_identifiers = compute.unique(identifiers["unit_id"])
+    error_list = []
     for identifier_batch in batch(unique_identifiers, 500_000):
         identifier_time_spans = data.to_table(
             filter=dataset.field("unit_id").isin(identifier_batch),
@@ -288,17 +309,27 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
             [("start_epoch_days", "list"), ("stop_epoch_days", "list")]
         )
         for i in range(len(identifier_time_spans)):
-            if find_overlap(
+            overlap_message = find_overlap(
                 identifier_time_spans["start_epoch_days_list"][i].as_py(),
                 identifier_time_spans["stop_epoch_days_list"][i].as_py(),
-            ):
+            )
+            if overlap_message is not None:
+                error_list.append(
+                    (
+                        "Invalid overlapping timespans for identifier"
+                        f' "{identifier_time_spans["unit_id"][i]}": {overlap_message}'
+                    )
+                )
+            if len(error_list) > 49:
                 raise ValidationError(
                     "#1, #3 and #4 columns",
-                    errors=[
-                        "Invalid overlapping timespans for identifier"
-                        f' "{identifier_time_spans["unit_id"][i]}"'
-                    ],
+                    errors=error_list,
                 )
+        if error_list:
+            raise ValidationError(
+                "#1, #3 and #4 columns",
+                errors=error_list,
+            )
 
 
 def validate_dataset(
