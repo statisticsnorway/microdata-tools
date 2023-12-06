@@ -54,8 +54,6 @@ def setup_function():
             identifier_amount = 2_000_000 if len(dates) == 7 else 14_000_000
             for date in dates:
                 for i in range(identifier_amount):
-                    if i == 0:
-                        print(f"{i};{i};{date[0]};{date[1]};")
                     f.write(f"{i};{i};{date[0]};{date[1]};\n")
 
 
