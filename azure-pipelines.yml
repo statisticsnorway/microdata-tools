@@ -51,7 +51,7 @@ stages:
       - script: python -m poetry install
         displayName: 'Install dependencies'
         
-      - script: python -m poetry run python -m pytest
+      - script: python -m poetry run python -m pytest --include-big-data
         displayName: 'Test with pytest'
 
 - stage: build
