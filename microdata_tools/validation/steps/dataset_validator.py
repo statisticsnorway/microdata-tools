@@ -304,7 +304,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
             [("start_epoch_days", "ascending")]
         )
         identifier_time_spans = identifier_time_spans.group_by(
-            "unit_id"
+            "unit_id", use_threads=False
         ).aggregate(
             [("start_epoch_days", "list"), ("stop_epoch_days", "list")]
         )
