@@ -1,0 +1,61 @@
+{
+  "shortName": "TRAFIKKULYKKE_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Trafikkulykkeidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Road traffic accident identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for trafikkulykker i microdata"
+    },
+    {
+      "languageCode": "no",
+      "value": "Identifier for road traffic accidents in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "requiresPseudonymization": true,
+    "shortName": "TRAFIKKULYKKE",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Trafikkulykke"
+      },
+      {
+        "languageCode": "en",
+        "value": "Road traffic accident"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Variablene omfatter dødsulykker og andre ulykker med personskade som er meldt til politiet. Trafikkulykkene som inngår i statistikken har skjedd på offentlig eller privat vei, gate eller plass som er åpen for alminnelig trafikk"
+      },
+      {
+        "languageCode": "en",
+        "value": "The variables cover accidents reported to the police and are limited to accidents that involve at least one vehicle, and that have taken place on public or private roads, streets or places open to general traffic."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert kombinasjon av internnr og saksnummer for trafikkulykker"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized combination of internal number and case number for traffic accidents"
+      }
+    ]
+  }
+}

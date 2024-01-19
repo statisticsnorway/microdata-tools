@@ -47,6 +47,7 @@ class UnitType(str, Enum):
     NPR_EPISODE = "NPR_EPISODE"
     HKDIR_STUDIESOKNAD = "HKDIR_STUDIESOKNAD"
     SOSTIL = "SOSTIL"
+    TRAFIKKULYKKE = "TRAFIKKULYKKE"
 
 
 class UnitIdType(str, Enum):
@@ -59,6 +60,7 @@ class UnitIdType(str, Enum):
     HKDIR_STUDIESOKNAD_ID = "HKDIR_STUDIESOKNAD_ID"
     NPR_EPISODE_ID = "NPR_EPISODE_ID"
     SOSTIL_ID = "SOSTIL_ID"
+    TRAFIKKULYKKE_ID = "TRAFIKKULYKKE_ID"
 
 
 class MultiLingualString(BaseModel):
