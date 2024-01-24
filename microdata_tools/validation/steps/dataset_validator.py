@@ -20,7 +20,7 @@ def _get_error_list(invalid_rows: Table, message: str):
 def _valid_value_column_check(
     data: FileSystemDataset,
     data_type: str,
-    code_list: Union[list, None],
+    code_list: Union[List, None],
     sentinel_list: Union[List, None],
 ):
     """
@@ -49,7 +49,7 @@ def _valid_value_column_check(
         unique_codes = list(
             set(code_list_item["code"] for code_list_item in code_list)
         )
-        if sentinel_list is not None:
+        if sentinel_list:
             unique_codes += list(
                 set(
                     sentinel_list_item["code"]
@@ -58,15 +58,23 @@ def _valid_value_column_check(
             )
         invalid_code_filter = ~dataset.field("value").isin(unique_codes)
         invalid_rows = data.to_table(
-            filter=invalid_code_filter, columns=["value"]
+            filter=invalid_code_filter, columns=["unit_id", "value"]
         )
         if len(invalid_rows) > 0:
             invalid_codes = (
                 invalid_rows.column("value").slice(0, 50).to_pylist()
             )
+            invalid_unit_ids = (
+                invalid_rows.column("unit_id").slice(0, 50).to_pylist()
+            )
+            invalid_code_rows = list(zip(invalid_unit_ids, invalid_codes))
+
             raise ValidationError(
                 "#2 column",
-                errors=[f"{code} not in code list" for code in invalid_codes],
+                errors=[
+                    f"Error for identifier {unit_id}: {code} is not in code list"
+                    for (unit_id, code) in invalid_code_rows
+                ],
             )
 
 
@@ -275,7 +283,8 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
         for i in range(len(start_list) - 1):
             if stop_list[i] is None:
                 return (
-                    f"timespan: ({from_epoch_days_to_date(start_list[i])} - ) overlaps with "
+                    f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
+                    ") overlaps with "
                     f"timespan: ({from_epoch_days_to_date(start_list[i + 1])} - "
                     f"{from_epoch_days_to_date(stop_list[i + 1])})"
                 )
