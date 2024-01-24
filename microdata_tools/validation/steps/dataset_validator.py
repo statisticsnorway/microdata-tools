@@ -20,7 +20,7 @@ def _get_error_list(invalid_rows: Table, message: str):
 def _valid_value_column_check(
     data: FileSystemDataset,
     data_type: str,
-    code_list: Union[list, None],
+    code_list: Union[List, None],
     sentinel_list: Union[List, None],
 ):
     """
@@ -49,7 +49,7 @@ def _valid_value_column_check(
         unique_codes = list(
             set(code_list_item["code"] for code_list_item in code_list)
         )
-        if sentinel_list is not None:
+        if sentinel_list:
             unique_codes += list(
                 set(
                     sentinel_list_item["code"]
