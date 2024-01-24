@@ -58,15 +58,23 @@ def _valid_value_column_check(
             )
         invalid_code_filter = ~dataset.field("value").isin(unique_codes)
         invalid_rows = data.to_table(
-            filter=invalid_code_filter, columns=["value"]
+            filter=invalid_code_filter, columns=["unit_id", "value"]
         )
         if len(invalid_rows) > 0:
             invalid_codes = (
                 invalid_rows.column("value").slice(0, 50).to_pylist()
             )
+            invalid_unit_ids = (
+                invalid_rows.column("unit_id").slice(0, 50).to_pylist()
+            )
+            invalid_code_rows = list(zip(invalid_unit_ids, invalid_codes))
+
             raise ValidationError(
                 "#2 column",
-                errors=[f"{code} not in code list" for code in invalid_codes],
+                errors=[
+                    f"Error for identifier {unit_id}: {code} is not in code list"
+                    for (unit_id, code) in invalid_code_rows
+                ],
             )
 
 

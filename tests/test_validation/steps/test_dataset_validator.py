@@ -27,7 +27,7 @@ def test_measure_code_list_validation():
             sentinel_list,
             "FIXED",
         )
-    assert e.value.errors == ["Error for identifier 4: 3 not in code list"]
+    assert e.value.errors == ["Error for identifier 4: 3 is not in code list"]
 
 
 def test_measure_data_type_string_validation():
