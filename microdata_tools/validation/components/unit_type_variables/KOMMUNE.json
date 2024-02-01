@@ -4415,6 +4415,17 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": "2023-12-31"
+      },
+      {
+        "code": "1508",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ålesund"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
@@ -4976,6 +4987,17 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "1580",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Haram"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
@@ -7605,6 +7627,18 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": "2023-12-31"
+
+      },
+      {
+        "code": "3101",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Halden"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
@@ -7616,6 +7650,17 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": "2023-12-31"
+      },
+      {
+        "code": "3103",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Moss"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
@@ -7627,6 +7672,17 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": "2023-12-31"
+      },
+      {
+        "code": "3105",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sarpsborg"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
@@ -7638,6 +7694,17 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": "2023-12-31"
+      },
+      {
+        "code": "3107",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Fredrikstad"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
@@ -7649,7 +7716,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3006",
@@ -7660,7 +7727,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3007",
@@ -7671,7 +7738,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3011",
@@ -7682,7 +7749,8 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
+
       },
       {
         "code": "3012",
@@ -7693,7 +7761,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3013",
@@ -7704,7 +7772,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3014",
@@ -7715,7 +7783,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3015",
@@ -7726,7 +7794,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3016",
@@ -7737,7 +7805,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3017",
@@ -7748,7 +7816,8 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
+
       },
       {
         "code": "3018",
@@ -7759,7 +7828,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3019",
@@ -7770,7 +7839,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3020",
@@ -7781,7 +7850,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3021",
@@ -7792,7 +7861,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3022",
@@ -7803,7 +7872,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3023",
@@ -7825,7 +7894,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3025",
@@ -7836,7 +7905,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3026",
@@ -7847,7 +7916,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3027",
@@ -7858,7 +7927,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3028",
@@ -7869,7 +7938,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3029",
@@ -7880,7 +7949,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3030",
@@ -7891,7 +7960,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3031",
@@ -7902,7 +7971,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3032",
@@ -7913,7 +7982,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3033",
@@ -7924,7 +7993,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3034",
@@ -7935,7 +8004,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3035",
@@ -7946,7 +8015,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3036",
@@ -7957,7 +8026,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3037",
@@ -7968,7 +8037,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3038",
@@ -7979,7 +8048,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3039",
@@ -7990,7 +8059,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3040",
@@ -8001,7 +8070,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3041",
@@ -8012,7 +8081,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3042",
@@ -8023,7 +8092,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3043",
@@ -8034,7 +8103,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3044",
@@ -8045,7 +8114,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3045",
@@ -8056,7 +8125,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3046",
@@ -8067,7 +8136,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3047",
@@ -8078,7 +8147,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3048",
@@ -8089,7 +8158,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3049",
@@ -8100,7 +8169,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3050",
@@ -8111,7 +8180,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3051",
@@ -8122,7 +8191,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3052",
@@ -8133,7 +8202,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3053",
@@ -8144,7 +8213,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3054",
@@ -8155,7 +8224,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3401",
@@ -8672,7 +8741,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3802",
@@ -8683,7 +8752,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3803",
@@ -8694,7 +8763,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3804",
@@ -8705,7 +8774,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3805",
@@ -8716,7 +8785,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3806",
@@ -8727,7 +8796,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3807",
@@ -8738,7 +8807,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3808",
@@ -8749,7 +8818,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3811",
@@ -8760,7 +8829,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3812",
@@ -8771,7 +8840,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3813",
@@ -8782,7 +8851,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3814",
@@ -8793,7 +8862,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3815",
@@ -8804,7 +8873,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3816",
@@ -8815,7 +8884,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3817",
@@ -8826,7 +8895,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3818",
@@ -8837,7 +8906,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3819",
@@ -8848,7 +8917,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3820",
@@ -8859,7 +8928,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3821",
@@ -8870,7 +8939,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3822",
@@ -8881,7 +8950,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3823",
@@ -8892,7 +8961,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3824",
@@ -8903,7 +8972,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "3825",
@@ -8914,7 +8983,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "4201",
@@ -10300,7 +10369,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5402",
@@ -10311,7 +10380,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5403",
@@ -10322,7 +10391,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5404",
@@ -10333,7 +10402,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5405",
@@ -10344,7 +10413,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5406",
@@ -10355,7 +10424,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5411",
@@ -10366,7 +10435,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5412",
@@ -10377,7 +10446,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5413",
@@ -10388,7 +10457,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5414",
@@ -10399,7 +10468,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5415",
@@ -10410,7 +10479,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5416",
@@ -10421,7 +10490,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5417",
@@ -10432,7 +10501,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5418",
@@ -10443,7 +10512,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5419",
@@ -10454,7 +10523,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5420",
@@ -10465,7 +10534,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5421",
@@ -10476,7 +10545,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5422",
@@ -10487,7 +10556,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5423",
@@ -10498,7 +10567,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5424",
@@ -10509,7 +10578,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5425",
@@ -10520,7 +10589,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5426",
@@ -10531,7 +10600,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5427",
@@ -10542,7 +10611,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5428",
@@ -10553,7 +10622,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5429",
@@ -10564,7 +10633,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5430",
@@ -10575,7 +10644,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5432",
@@ -10586,7 +10655,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5433",
@@ -10597,7 +10666,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5434",
@@ -10608,7 +10677,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5435",
@@ -10619,7 +10688,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5436",
@@ -10630,7 +10699,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5437",
@@ -10641,7 +10710,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5438",
@@ -10652,7 +10721,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5439",
@@ -10663,7 +10732,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5440",
@@ -10674,7 +10743,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5441",
@@ -10685,7 +10754,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5442",
@@ -10696,7 +10765,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5443",
@@ -10707,7 +10776,7 @@
           }
         ],
         "validFrom": "2020-01-01",
-        "validUntil": null
+        "validUntil": "2023-12-31"
       },
       {
         "code": "5444",
@@ -10718,6 +10787,1211 @@
           }
         ],
         "validFrom": "2020-01-01",
+        "validUntil": "2023-12-31"
+      },
+
+
+
+
+
+
+      {
+        "code": "3110",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hvaler"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3112",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Råde"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3114",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Våler (Østfold)"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3116",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Skiptvet"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3118",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Indre Østfold"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3120",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Rakkestad"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3122",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Marker"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3124",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Aremark"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3201",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Bærum"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3203",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Asker"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3205",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Lillestrøm"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3207",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nordre Follo"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3209",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ullensaker"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3212",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nesodden"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3214",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Frogn"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3216",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vestby"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3218",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ås"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3220",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Enebakk"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3222",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Lørenskog"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3224",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Rælingen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3226",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Aurskog-Høland"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3228",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nes"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3230",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Gjerdrum"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3232",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nittedal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3234",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Lunner"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3236",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Jevnaker"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3238",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nannestad"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3240",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Eidsvoll"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3242",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hurdal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3301",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Drammen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3303",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Kongsberg"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3305",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ringerike"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3310",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hole"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3312",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Lier"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3314",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Øvre Eiker"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3316",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Modum"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3318",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Krødsherad"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3320",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Flå"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3322",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nesbyen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3324",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Gol"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3326",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hemsedal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3328",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ål"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3330",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hol"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3332",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sigdal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3334",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Flesberg"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3336",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Rollag"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3338",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nore og Uvdal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3901",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Horten"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3903",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Holmestrand"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3905",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Tønsberg"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3907",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sandefjord"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3909",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Larvik"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3911",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Færder"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4001",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Porsgrunn"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4003",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Skien"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4005",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Notodden"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4010",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Siljan"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4012",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Bamble"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4014",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Kragerø"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4016",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Drangedal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4018",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nome"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4020",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Midt-Telemark"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4022",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Seljord"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4024",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hjartdal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4026",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Tinn"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4028",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Kviteseid"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4030",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nissedal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4032",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Fyresdal"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4034",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Tokke"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4036",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vinje"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5501",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Tromsø"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5503",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Harstad - Hárstták"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5510",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Kvæfjord"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5512",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Dielddanuorri - Tjeldsund"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5514",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ibestad"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5516",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Gratangen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5518",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Loabák - Lavangen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5520",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Bardu"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5522",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Salangen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5524",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Målselv"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5526",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sørreisa"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5528",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Dyrøy"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5530",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Senja"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5532",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Balsfjord"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5534",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Karlsøy"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5536",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Lyngen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5538",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Storfjord - Omasvuotna - Omasvuono"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5540",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Gáivuotna - Kåfjord - Kaivuono"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5542",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Skjervøy"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5544",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nordreisa - Ráisa - Raisi"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5546",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Kvænangen"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5601",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Alta"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5603",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hammerfest - Hámmerfeasta"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5605",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Sør-Varanger"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5607",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vadsø"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5610",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Kárášjohka - Karasjok"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5612",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Guovdageaidnu - Kautokeino"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5614",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Loppa"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5616",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Hasvik"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5618",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Måsøy"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5620",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Nordkapp"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5622",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Porsanger - Porsángu - Porsanki"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5624",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Lebesby"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5626",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Gamvik"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5628",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Deatnu - Tana"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5630",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Berlevåg"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5632",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Båtsfjord"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5634",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Vardø"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5636",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Unjárga - Nesseby"
+          }
+        ],
+        "validFrom": "2024-01-01",
         "validUntil": null
       },
       {
