@@ -21,6 +21,7 @@ VALID_METADATA = ["SYNT_BEFOLKNING_SIVSTAND", "SYNT_PERSON_INNTEKT"]
 
 NO_SUCH_METADATA = "NO_SUCH_METADATA"
 MISSING_IDENTIFIER_METADATA = "MISSING_IDENTIFIER_DATASET"
+EMPTY_STRING_METADATA = "EMPTY_STRING_METADATA"
 
 
 def test_validate_valid_metadata():
@@ -68,6 +69,15 @@ def test_validate_metadata_does_not_exist():
     data_errors = validate_metadata(NO_SUCH_METADATA, INPUT_DIR)
     assert len(data_errors) == 1
     assert "not found" in data_errors[0]
+
+
+def test_validate_metadata_empty_string():
+    data_errors = validate_metadata(EMPTY_STRING_METADATA, INPUT_DIR)
+    assert len(data_errors) == 1
+    assert (
+        "measureVariables->name->value: ensure this value has at least 1 characters"
+        in data_errors[0]
+    )
 
 
 def get_working_directory_files() -> list:
