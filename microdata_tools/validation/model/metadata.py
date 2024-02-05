@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import Optional, List, Union
 
-from pydantic import BaseModel, conlist, root_validator, Extra
+from pydantic import BaseModel, Field, conlist, root_validator, Extra
 
 
 class TemporalityType(str, Enum):
@@ -65,7 +65,7 @@ class UnitIdType(str, Enum):
 
 class MultiLingualString(BaseModel):
     languageCode: LanguageCode
-    value: str
+    value: str = Field(min_length=1)
 
 
 class DataRevision(BaseModel, extra=Extra.forbid):
