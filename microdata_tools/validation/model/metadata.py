@@ -78,9 +78,9 @@ class IdentifierVariable(BaseModel, extra=Extra.forbid):
 
 
 class CodeListItem(BaseModel, extra=Extra.forbid):
-    code: str
+    code: str = Field(min_length=1)
     categoryTitle: conlist(MultiLingualString, min_items=1)
-    validFrom: str
+    validFrom: str = Field(min_length=1)
     validUntil: Optional[Union[str, None]]
 
     @root_validator(skip_on_failure=True)
@@ -106,7 +106,7 @@ class CodeListItem(BaseModel, extra=Extra.forbid):
 
 
 class SentinelItem(BaseModel, extra=Extra.forbid):
-    code: str
+    code: str = Field(min_length=1)
     categoryTitle: conlist(MultiLingualString, min_items=1)
 
 
