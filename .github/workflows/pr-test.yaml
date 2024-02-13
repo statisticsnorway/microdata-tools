@@ -1,0 +1,33 @@
+name: Run Tests on PR
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, 3.10, 3.11]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        curl -sSL https://install.python-poetry.org | python -
+        poetry install
+
+    - name: Run tests
+      run: poetry run pytest --cov=microdata_tools
