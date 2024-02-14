@@ -31,3 +31,26 @@ jobs:
 
     - name: Run tests
       run: poetry run pytest --cov=microdata_tools
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    environment: PyPI 
+    needs: test
+    if: success()
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: |
+        curl -sSL https://install.python-poetry.org | python -
+        poetry install
+
+    - name: Build and publish
+      run: poetry publish --build
