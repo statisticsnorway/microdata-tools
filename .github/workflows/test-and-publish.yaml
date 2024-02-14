@@ -32,9 +32,6 @@ jobs:
       id: test
       run: poetry run pytest
 
-    - name: Check test results
-      run: exit ${{ steps.test.outcome }}
-
   publish:
     name: Publish
     runs-on: ubuntu-latest
