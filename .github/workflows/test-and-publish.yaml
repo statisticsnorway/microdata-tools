@@ -9,7 +9,6 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.event.pull_request.merged == true
 
     strategy:
       matrix:
