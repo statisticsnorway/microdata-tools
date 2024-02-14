@@ -53,4 +53,4 @@ jobs:
         poetry install
 
     - name: Build and publish
-      run: poetry publish --build
+      run: poetry publish --build --username ${{ secrets.PYPI_USER }} --password ${{ secrets.PYPI_TOKEN }}
