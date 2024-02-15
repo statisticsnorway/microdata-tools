@@ -32,9 +32,6 @@ jobs:
       id: test
       run: poetry run pytest
 
-    - name: Check test results
-      run: exit ${{ steps.test.outcome }}
-
   publish:
     name: Publish
     runs-on: ubuntu-latest
@@ -44,16 +41,16 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.11
-    
+
     - name: Install dependencies
       run: |
         curl -sSL https://install.python-poetry.org | python -
         poetry install
 
     - name: Build and publish
-      run: poetry publish --build
+      run: poetry publish --build --username ${{ secrets.PYPI_USER }} --password ${{ secrets.PYPI_TOKEN }}
