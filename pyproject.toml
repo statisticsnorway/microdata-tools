@@ -18,14 +18,14 @@ pydantic = "^1.10.9"
 pyarrow = "^15.0.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-ruff = "^0.0.272"
-pytest = "^7.3.2"
+ruff = "^0.2.0"
+pytest = "^8.0.0"
 pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length=79
+[tool.ruff]
+line-length = 79
+
