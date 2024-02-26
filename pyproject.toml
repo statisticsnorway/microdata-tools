@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "microdata-tools"
-version = "0.13.2"
+version = "0.13.3"
 description = "Tools for the microdata.no platform"
 authors = ["microdata-developers"]
 license = "MIT License"
@@ -8,20 +8,24 @@ readme = "README.md"
 packages = [{include = "microdata_tools"}]
 
 [tool.poetry.dependencies]
+numpy = [
+    {version = "1.24.4", python = "3.8"},
+    {version = "^1.26.0", python = ">=3.9"}
+]
 python = ">=3.8,<4.0"
 cryptography = ">=41.0.1,<43.0.0"
 pydantic = "^1.10.9"
-pyarrow = "^14.0.1"
+pyarrow = "^15.0.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
-ruff = "^0.0.272"
-pytest = "^7.3.2"
+ruff = "^0.2.0"
+pytest = "^8.0.0"
 pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length=79
+[tool.ruff]
+line-length = 79
+
