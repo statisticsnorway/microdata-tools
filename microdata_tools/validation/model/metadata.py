@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import Optional, List, Union
 
-from pydantic import BaseModel, Field, conlist, root_validator
+from pydantic import BaseModel, Field, conlist, model_validator
 
 
 class TemporalityType(str, Enum):
@@ -83,7 +83,7 @@ class CodeListItem(BaseModel, extra="forbid"):
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="before")
     @classmethod
     def validate_code_list_item(cls, values):
         def validate_date_string(field_name: str, date_string: str):
@@ -120,7 +120,7 @@ class ValueDomain(BaseModel, extra="forbid"):
     codeList: Optional[conlist(CodeListItem, min_length=1)] = None
     sentinelAndMissingValues: Optional[List[SentinelItem]] = None
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="before")
     @classmethod
     def validate_value_domain(cls, values: dict):
         def raise_invalid_with_code_list(field_name: str):
@@ -158,7 +158,7 @@ class MeasureVariable(BaseModel):
     format: Optional[str] = None
     valueDomain: Optional[ValueDomain] = None
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="before")
     @classmethod
     def validate_measure(cls, values: dict):
         def raise_invalid_with_unit_type(field_name: str):

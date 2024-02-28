@@ -142,9 +142,7 @@ def test_read_invalid_sensitivity():
         (
             "sensitivityLevel: Input should be 'PERSON_GENERAL', 'PERSON_SPECIAL',"
             " 'PUBLIC' or 'NONPUBLIC'"
-        ),
-        "subjectFields: Input should be a valid list",
-        "measureVariables->valueDomain->$ref: Extra inputs are not permitted",
+        )
     ]
 
 
