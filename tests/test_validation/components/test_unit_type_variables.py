@@ -20,17 +20,17 @@ INPUT_DIR = "tests/resources/validation/components/unit_type_variables"
 
 class UnitType(BaseModel):
     shortName: str
-    name: conlist(MultiLingualString, min_items=1)
+    name: conlist(MultiLingualString, min_length=1)
     requiresPseudonymization: bool
-    description: conlist(MultiLingualString, min_items=1)
+    description: conlist(MultiLingualString, min_length=1)
 
 
 class UnitTypeVariable(BaseModel):
     shortName: str
-    name: conlist(MultiLingualString, min_items=1)
-    description: conlist(MultiLingualString, min_items=1)
+    name: conlist(MultiLingualString, min_length=1)
+    description: conlist(MultiLingualString, min_length=1)
     dataType: DataType
-    format: Optional[str]
+    format: Optional[str] = None
     unitType: UnitType
     valueDomain: ValueDomain
 

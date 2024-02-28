@@ -100,8 +100,8 @@ def test_read_empty_codelist():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == [
-        "measureVariables->valueDomain->codeList: ensure this value has at "
-        "least 1 items"
+        "measureVariables->valueDomain->codeList: "
+        "List should have at least 1 item after validation, not 0"
     ]
 
 
@@ -112,11 +112,11 @@ def test_read_extra_fields():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == [
-        "dataRevision->newTypeOfField: extra fields not permitted",
-        "identifierVariables->invalidField: extra fields not permitted",
-        "measureVariables->valueDomain->codeList->validTo: extra fields not permitted",
-        "measureVariables->valueDomain->sentinelAndMissingValues->validFrom: extra "
-        "fields not permitted",
+        "dataRevision->newTypeOfField: Extra inputs are not permitted",
+        "identifierVariables->invalidField: Extra inputs are not permitted",
+        "measureVariables->valueDomain->codeList->validTo: Extra inputs are not permitted",
+        "measureVariables->valueDomain->sentinelAndMissingValues->validFrom: Extra "
+        "inputs are not permitted",
     ]
 
 
@@ -127,7 +127,7 @@ def test_read_extra_fields_unit_measure():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == [
-        "measureVariables: Can not set a dataType in a measure variable "
+        "measureVariables: Value error, Can not set a dataType in a measure variable "
         "together with a unitType"
     ]
 
@@ -139,10 +139,12 @@ def test_read_invalid_sensitivity():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == [
-        "sensitivityLevel: value is not a valid enumeration member; permitted: "
-        "'PERSON_GENERAL', 'PERSON_SPECIAL', 'PUBLIC', 'NONPUBLIC'",
-        "subjectFields: value is not a valid list",
-        "measureVariables->valueDomain->$ref: extra fields not permitted",
+        (
+            "sensitivityLevel: Input should be 'PERSON_GENERAL', 'PERSON_SPECIAL',"
+            " 'PUBLIC' or 'NONPUBLIC'"
+        ),
+        "subjectFields: Input should be a valid list",
+        "measureVariables->valueDomain->$ref: Extra inputs are not permitted",
     ]
 
 
@@ -153,8 +155,8 @@ def test_read_invalid_unit_type():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert (
-        "identifierVariables->unitType: value is not a valid enumeration member; "
-        "permitted: 'JOBB', 'KJORETOY', 'FAMILIE', 'FORETAK', 'HUSHOLDNING', "
+        "identifierVariables->unitType: Input should be 'JOBB', 'KJORETOY',"
+        " 'FAMILIE', 'FORETAK', 'HUSHOLDNING', 'KOMMUNE',"
     ) in e.value.errors[0]
 
 
@@ -164,7 +166,7 @@ def test_read_missing_identifier():
     with pytest.raises(ValidationError) as e:
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
-    assert e.value.errors == ["identifierVariables: field required"]
+    assert e.value.errors == ["identifierVariables: Field required"]
 
 
 def test_code_list_validation():
