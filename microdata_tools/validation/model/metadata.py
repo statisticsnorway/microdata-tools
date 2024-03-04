@@ -2,7 +2,7 @@ import datetime
 from enum import Enum
 from typing import Optional, List, Union
 
-from pydantic import BaseModel, Field, conlist, root_validator, Extra
+from pydantic import BaseModel, Field, conlist, model_validator
 
 
 class TemporalityType(str, Enum):
@@ -68,22 +68,22 @@ class MultiLingualString(BaseModel):
     value: str = Field(min_length=1)
 
 
-class DataRevision(BaseModel, extra=Extra.forbid):
-    description: conlist(MultiLingualString, min_items=1)
+class DataRevision(BaseModel, extra="forbid"):
+    description: conlist(MultiLingualString, min_length=1)
     temporalEndOfSeries: bool
 
 
-class IdentifierVariable(BaseModel, extra=Extra.forbid):
+class IdentifierVariable(BaseModel, extra="forbid"):
     unitType: UnitType
 
 
-class CodeListItem(BaseModel, extra=Extra.forbid):
+class CodeListItem(BaseModel, extra="forbid"):
     code: str = Field(min_length=1)
-    categoryTitle: conlist(MultiLingualString, min_items=1)
+    categoryTitle: conlist(MultiLingualString, min_length=1)
     validFrom: str = Field(min_length=1)
-    validUntil: Optional[Union[str, None]]
+    validUntil: Optional[str] = None
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="before")
     @classmethod
     def validate_code_list_item(cls, values):
         def validate_date_string(field_name: str, date_string: str):
@@ -105,22 +105,22 @@ class CodeListItem(BaseModel, extra=Extra.forbid):
         return values
 
 
-class SentinelItem(BaseModel, extra=Extra.forbid):
+class SentinelItem(BaseModel, extra="forbid"):
     code: str = Field(min_length=1)
-    categoryTitle: conlist(MultiLingualString, min_items=1)
+    categoryTitle: conlist(MultiLingualString, min_length=1)
 
 
-class ValueDomain(BaseModel, extra=Extra.forbid):
-    description: Optional[conlist(MultiLingualString, min_items=1)]
-    measurementType: Optional[str]
+class ValueDomain(BaseModel, extra="forbid"):
+    description: Optional[conlist(MultiLingualString, min_length=1)] = None
+    measurementType: Optional[str] = None
     measurementUnitDescription: Optional[
-        conlist(MultiLingualString, min_items=1)
-    ]
-    uriDefinition: Optional[List[Union[str, None]]]
-    codeList: Optional[conlist(CodeListItem, min_items=1)]
-    sentinelAndMissingValues: Optional[List[SentinelItem]]
+        conlist(MultiLingualString, min_length=1)
+    ] = None
+    uriDefinition: Optional[List[str]] = None
+    codeList: Optional[conlist(CodeListItem, min_length=1)] = None
+    sentinelAndMissingValues: Optional[List[SentinelItem]] = None
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="before")
     @classmethod
     def validate_value_domain(cls, values: dict):
         def raise_invalid_with_code_list(field_name: str):
@@ -150,15 +150,15 @@ class ValueDomain(BaseModel, extra=Extra.forbid):
 
 
 class MeasureVariable(BaseModel):
-    unitType: Optional[UnitType]
-    name: conlist(MultiLingualString, min_items=1)
-    description: conlist(MultiLingualString, min_items=1)
-    dataType: Optional[DataType]
-    uriDefinition: Optional[List[Union[str, None]]]
-    format: Optional[str]
-    valueDomain: Optional[ValueDomain]
+    unitType: Optional[UnitType] = None
+    name: conlist(MultiLingualString, min_length=1)
+    description: conlist(MultiLingualString, min_length=1)
+    dataType: Optional[DataType] = None
+    uriDefinition: Optional[List[str]] = None
+    format: Optional[str] = None
+    valueDomain: Optional[ValueDomain] = None
 
-    @root_validator(skip_on_failure=True)
+    @model_validator(mode="before")
     @classmethod
     def validate_measure(cls, values: dict):
         def raise_invalid_with_unit_type(field_name: str):
@@ -183,13 +183,15 @@ class MeasureVariable(BaseModel):
 class Metadata(BaseModel):
     temporalityType: TemporalityType
     sensitivityLevel: SensitivityLevel
-    populationDescription: conlist(MultiLingualString, min_items=1)
+    populationDescription: conlist(MultiLingualString, min_length=1)
     spatialCoverageDescription: Optional[
-        conlist(MultiLingualString, min_items=1)
-    ]
+        conlist(MultiLingualString, min_length=1)
+    ] = None
     subjectFields: conlist(
-        conlist(MultiLingualString, min_items=1), min_items=1
+        conlist(MultiLingualString, min_length=1), min_length=1
     )
     dataRevision: DataRevision
-    identifierVariables: conlist(IdentifierVariable, min_items=1, max_items=1)
-    measureVariables: conlist(MeasureVariable, min_items=1, max_items=1)
+    identifierVariables: conlist(
+        IdentifierVariable, min_length=1, max_length=1
+    )
+    measureVariables: conlist(MeasureVariable, min_length=1, max_length=1)
