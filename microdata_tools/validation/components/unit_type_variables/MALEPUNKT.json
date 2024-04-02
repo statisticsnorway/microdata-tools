@@ -1,0 +1,61 @@
+{
+    "shortName": "MALEPUNKT_ID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Målepunktsidentifikator"
+      },
+      {
+        "languageCode": "en",
+        "value": "Measuring point identifier"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Identifikator for målepunkt i microdata"
+      },
+      {
+        "languageCode": "no",
+        "value": "Identifier for measuring points in microdata"
+      }
+    ],
+    "dataType": "STRING",
+    "unitType": {
+      "requiresPseudonymization": true,
+      "shortName": "MALEPUNKT",
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Målepunkt"
+        },
+        {
+          "languageCode": "en",
+          "value": "Measuring point"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Målepunkt er en innretning for måling av strømforbruk."
+        },
+        {
+          "languageCode": "en",
+          "value": "Measuring point is a device for measuring electricity consumption."
+        }
+      ]
+    },
+    "format": "RandomUInt48",
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert kombinasjon av personnummer og målepunktsid nummer"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonymized combination of national identity number and measuring point id number"
+        }
+      ]
+    }
+  }
