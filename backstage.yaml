@@ -1,0 +1,21 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: microdata-tools
+  title: Microdata tools
+  description: |
+    Python package containing common functionality used by both system components
+    and external data providers for the microdata platform
+  tags:
+    - python
+    - pipeline
+    - pyarrow
+    - pydantic
+    - pypi
+  annotations:
+    github.com/project-slug: statisticsnorway/microdata-tools
+spec:
+  type: service
+  system: microdata
+  owner: microdata-developers
+  lifecycle: production
