@@ -23,7 +23,7 @@
   "dataType": "STRING",
   "unitType": {
     "requiresPseudonymization": true,
-    "shortName": "PERS_TRAFIKKULYKKE",
+    "shortName": "TRAFIKKULYKKE_PERSON",
     "name": [
       {
         "languageCode": "no",
