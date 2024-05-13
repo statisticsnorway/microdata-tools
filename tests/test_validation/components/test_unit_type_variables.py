@@ -41,9 +41,9 @@ def setup_module():
     for unit_type_name in UNIT_TYPE_VARIABLES.keys():
         os.mkdir(f"{INPUT_DIR}/TEST_{unit_type_name}")
         unit_type_metadata = copy.deepcopy(template)
-        unit_type_metadata["identifierVariables"][0][
-            "unitType"
-        ] = unit_type_name
+        unit_type_metadata["identifierVariables"][0]["unitType"] = (
+            unit_type_name
+        )
         with open(
             f"{INPUT_DIR}/TEST_{unit_type_name}/TEST_{unit_type_name}.json",
             "w",
