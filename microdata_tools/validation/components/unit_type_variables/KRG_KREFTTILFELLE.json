@@ -1,0 +1,61 @@
+{
+  "shortName": "KRG_TILFELLEID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Krefttilfelle-indentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Cancer case identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for krefttilfelle i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for cancer case in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "shortName": "KRG_KREFTTILFELLE",
+    "requiresPseudonymization": true,
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Krefttilfelle"
+      },
+      {
+        "languageCode": "en",
+        "value": "Cancer case"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "En enkelt kreftsykdom hos en pasient, inkludert spredning, tilbakefall og progresjon av den samme kreftsykdommen. En pasient kan ha flere krefttilfeller."
+      },
+      {
+        "languageCode": "en",
+        "value": "One single cancer in a patient, including metastases, recurrence and progression of the same cancer. A patient may have several cancer cases."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert løpenummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized serial number"
+      }
+    ]
+  }
+}
