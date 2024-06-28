@@ -22,7 +22,7 @@
   ],
   "dataType": "STRING",
   "unitType": {
-    "shortName": "KRG_KREFTTIFELLE",
+    "shortName": "KRG_KREFTTILFELLE",
     "requiresPseudonymization": true,
     "name": [
       {
