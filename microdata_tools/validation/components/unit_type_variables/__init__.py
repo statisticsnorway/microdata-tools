@@ -29,6 +29,9 @@ UNIT_TYPE_VARIABLES = {
     "TRAFIKKULYKKE_PERSON": load_json(
         UNIT_TYPE_VARIABLES_DIR / "TRAFIKKULYKKE_PERSON.json"
     ),
+    "KRG_KREFTTIFELLE": load_json(
+        UNIT_TYPE_VARIABLES_DIR / "KRG_KREFTTIFELLE.json"
+    ),
 }
 
 

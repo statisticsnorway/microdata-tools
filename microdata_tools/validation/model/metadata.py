@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Optional, List, Union
+from typing import Optional, List
 
 from pydantic import BaseModel, Field, conlist, model_validator
 
@@ -50,6 +50,7 @@ class UnitType(str, Enum):
     TRAFIKKULYKKE = "TRAFIKKULYKKE"
     TRAFIKKULYKKE_PERSON = "TRAFIKKULYKKE_PERSON"
     MALEPUNKT = "MALEPUNKT"
+    KRG_KREFTTILFELLE = "KRG_KREFTTILFELLE"
 
 
 class UnitIdType(str, Enum):
@@ -65,6 +66,7 @@ class UnitIdType(str, Enum):
     TRAFIKKULYKKE_ID = "TRAFIKKULYKKE_ID"
     TRAFIKKULYKKE_PERSON_ID = "TRAFIKKULYKKE_PERSON_ID"
     MALEPUNKT_ID = "MALEPUNKT_ID"
+    KRG_KREFTTILFELLEID = "KRG_KREFTTILFELLEID"
 
 
 class MultiLingualString(BaseModel):
