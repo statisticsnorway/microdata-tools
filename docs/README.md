@@ -13,7 +13,7 @@ These fields describe the dataset as a whole.
 ### DATAREVISION
 These fields describe the current version of the dataset.
 * **description**: Description of this version of the dataset.
-* **temporalEndOfSeries**: Is this the final update for this dataset? [True | False]
+* **temporalEnd (Optional)**: Description of why this dataset will not be updated anymore. Successor datasets can be optionally specified. 
 
 ### IDENTIFIER VARIABLES
 Description of the indentifier column of the dataset. It is represented as a list in the metadata model, but currently only one identifier is allowed per dataset. The identifiers are always based on a unit. A unit is centrally defined to make joining datasets across datastores easy.

@@ -5,8 +5,7 @@
     "spatialCoverageDescription": [{ "languageCode": "no", "value": "Norge" }],
     "subjectFields": [[{ "languageCode": "no", "value": "Samfunn" }]],
     "dataRevision": {
-      "description": [{ "languageCode": "no", "value": "Første publisering." }],
-      "temporalEndOfSeries": false
+      "description": [{ "languageCode": "no", "value": "Første publisering." }]
     },
     "identifierVariables": [
       { "unitType": "PERSON" }
