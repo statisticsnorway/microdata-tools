@@ -76,7 +76,7 @@ class MultiLingualString(BaseModel):
 
 class TemporalEnd(BaseModel):
     description: conlist(MultiLingualString, min_length=1)
-    successors: Optional[list[str]] = None
+    successors: Optional[List[str]] = None
 
 
 class DataRevision(BaseModel, extra="forbid"):
