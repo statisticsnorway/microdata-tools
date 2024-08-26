@@ -28,7 +28,14 @@
         "value": "F\u00f8rste publisering."
       }
     ],
-    "temporalEndOfSeries": false
+    "temporalEnd": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Variabelen blir ikke lenger oppdatert"
+        }
+      ]
+    }
   },
   "identifierVariables": [
     {

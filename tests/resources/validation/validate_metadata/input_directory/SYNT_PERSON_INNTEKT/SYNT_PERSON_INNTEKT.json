@@ -34,7 +34,18 @@
         "value": "Første publisering."
       }
     ],
-    "temporalEndOfSeries": false
+    "temporalEnd": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Variabelen blir ikke lenger oppdatert"
+        }
+      ],
+      "successors": [
+        "SYNT_PERSON_INNTEKT_FOR_SKATT",
+        "SYNT_PERSON_INNTEKT_ETTER_SKATT"
+      ]
+    }
   },
   "identifierVariables": [
     {

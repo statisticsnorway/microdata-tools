@@ -8,7 +8,9 @@
   ],
   "dataRevision": {
     "description": [{"languageCode": "no","value": "Første publisering."}],
-    "temporalEndOfSeries": false
+    "temporalEnd": {
+      "description": [{"languageCode": "no","value": "Variabelen blir ikke lenger oppdatert"}]
+    }
   },
   "identifierVariables": [{"unitType": "PERSON"}],
   "measureVariables": [

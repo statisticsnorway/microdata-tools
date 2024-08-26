@@ -74,9 +74,14 @@ class MultiLingualString(BaseModel):
     value: str = Field(min_length=1)
 
 
+class TemporalEnd(BaseModel):
+    description: conlist(MultiLingualString, min_length=1)
+    successors: Optional[conlist(str, min_length=1)] = None
+
+
 class DataRevision(BaseModel, extra="forbid"):
     description: conlist(MultiLingualString, min_length=1)
-    temporalEndOfSeries: bool
+    temporalEnd: Optional[TemporalEnd] = None
 
 
 class IdentifierVariable(BaseModel, extra="forbid"):

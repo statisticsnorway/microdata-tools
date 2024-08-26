@@ -9,7 +9,6 @@
     ],
     "dataRevision": {
       "description": [{"languageCode": "no","value": "Første publisering."}],
-      "temporalEndOfSeries": false,
       "newTypeOfField": "INVALID"
     },
     "identifierVariables": [{"unitType": "PERSON", "invalidField": "here"}],

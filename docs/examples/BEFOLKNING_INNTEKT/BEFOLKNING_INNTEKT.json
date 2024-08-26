@@ -8,8 +8,7 @@
 		[{"languageCode": "no", "value": "SAMFUNN"}]
 	],
 	"dataRevision": {
-		"description": [{"languageCode": "no","value": "Første publisering."}],
-		"temporalEndOfSeries": false
+		"description": [{"languageCode": "no","value": "Første publisering."}]
 	},
 	"identifierVariables": [{"unitType": "PERSON"}],
 	"measureVariables": [

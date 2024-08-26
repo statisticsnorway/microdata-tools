@@ -1,13 +1,9 @@
-import os
 import json
 import logging
+import os
 from pathlib import Path
 
-import pytest
-
 from microdata_tools import validate_metadata
-from microdata_tools.validation.exceptions import ValidationError
-
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
