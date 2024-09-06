@@ -5,7 +5,11 @@ In addition to the examples of metadata json files present in this repository, t
 ### ROOT LEVEL FIELDS
 These fields describe the dataset as a whole.
 * **temporalityType**: The temporality type of the dataset. Must be one of FIXED, ACCUMULATED, STATUS or EVENT.
-* **sensitivityLevel**: The sensitivity of the data in the dataset. Must be one of: PERSON_GENERAL, PERSON_SPECIAL, PUBLIC or NONPUBLIC
+* **sensitivityLevel**: The sensitivity of the data in the dataset. Must be one of: PERSON_GENERAL, PERSON_SPECIAL, PUBLIC or NONPUBLIC.
+  * PERSON_GENERAL: general personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
+  * PERSON_SPECIAL: special category of personal data, this is a category of data that is more sensitive. Health information is an example.
+  * PUBLIC: data that is publicly available
+  * NONPUBLIC: data that is not publicly available
 * **spatialCoverageDescription**: The geographic area relevant to the data.
 * **populationDescription**: Description of the dataset's population.
 

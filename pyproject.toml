@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "microdata-tools"
-version = "1.0.0"
+version = "1.0.1"
 description = "Tools for the microdata.no platform"
 authors = ["microdata-developers"]
 license = "MIT License"
@@ -13,7 +13,7 @@ numpy = [
     {version = "1.24.4", python = "3.8"},
     {version = "^1.26.0", python = ">=3.9"}
 ]
-cryptography = "^42.0.4"
+cryptography = "^43.0.1"
 pydantic = "^2.6.0"
 pyarrow = "^15.0.0"
 
