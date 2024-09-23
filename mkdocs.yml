@@ -1,0 +1,52 @@
+site_name: Microdata-tools
+site_url: https://statisticsnorway.github.io/microdata-tools/
+repo_url: https://github.com/statisticsnorway/microdata-tools
+
+theme:
+  name: material
+  palette:
+    - scheme: mdata
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Source Sans Pro
+    code: Source Code Pro
+  logo: assets/microdata.png
+  favicon: assets/favicon.ico
+  features:
+    - navigation.instant
+    - navigation.external
+    - content.code.copy
+    - content.code.select
+
+  pygments_style: default
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Getting Started: index.md
+  - The Metadata model: metadata-model.md
+  - Report an Issue:
+      - Issue template EN: issue_templates/issue_template_en.md
+      - Issue template NO: issue_templates/issue_template_no.md
+  - Releases: https://github.com/statisticsnorway/microdata-tools/releases
+
+docs_dir: docs
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
