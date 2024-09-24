@@ -32,6 +32,7 @@ extra_css:
 nav:
   - Getting Started: index.md
   - The Metadata model: metadata-model.md
+  - Usage: USAGE.md
   - Report an Issue:
       - Issue template EN: issue_templates/issue_template_en.md
       - Issue template NO: issue_templates/issue_template_no.md

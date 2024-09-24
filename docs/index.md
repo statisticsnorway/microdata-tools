@@ -90,7 +90,7 @@ else:
         print(error)
 ```
 
- For a more in-depth explanation of usage visit [the usage documentation](/docs/USAGE.md).
+ For a more in-depth explanation of usage visit [the usage documentation](/microdata-tools/USAGE).
 
 ### Data format description
 A dataset as defined in microdata consists of one data file, and one metadata file.
@@ -103,4 +103,4 @@ The data file is a csv file seperated by semicolons. A valid example would be:
 000000000000004;123;2020-01-01;2020-12-31;
 ```
 
-The metadata files should be in json format. The requirements for the metadata is best described through the [Pydantic model](/microdata_tools/validation/model/metadata.py) and  [the examples](/docs/examples)
+The metadata files should be in json format. The requirements for the metadata is best described through the [Pydantic model](https://github.com/statisticsnorway/microdata-tools/blob/main/microdata_tools/validation/model/metadata.py) and  [the examples](https://github.com/statisticsnorway/microdata-tools/tree/main/docs/examples)
