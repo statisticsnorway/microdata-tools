@@ -4,27 +4,33 @@ In addition to the examples of metadata json files present in this repository, t
 
 ### ROOT LEVEL FIELDS
 These fields describe the dataset as a whole.
+
 * **temporalityType**: The temporality type of the dataset. Must be one of FIXED, ACCUMULATED, STATUS or EVENT.
 * **sensitivityLevel**: The sensitivity of the data in the dataset. Must be one of: PERSON_GENERAL, PERSON_SPECIAL, PUBLIC or NONPUBLIC.
-  * PERSON_GENERAL: general personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
-  * PERSON_SPECIAL: special category of personal data, this is a category of data that is more sensitive. Health information is an example.
-  * PUBLIC: data that is publicly available
-  * NONPUBLIC: data that is not publicly available
+
+    * PERSON_GENERAL: general personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
+    * PERSON_SPECIAL: special category of personal data, this is a category of data that is more sensitive. Health information is an example.
+    * PUBLIC: data that is publicly available
+    * NONPUBLIC: data that is not publicly available
+    
 * **spatialCoverageDescription**: The geographic area relevant to the data.
 * **populationDescription**: Description of the dataset's population.
 
 
 ### DATAREVISION
 These fields describe the current version of the dataset.
+
 * **description**: Description of this version of the dataset.
 * **temporalEnd (Optional)**: Description of why this dataset will not be updated anymore. Successor datasets can be optionally specified. 
 
 ### IDENTIFIER VARIABLES
 Description of the indentifier column of the dataset. It is represented as a list in the metadata model, but currently only one identifier is allowed per dataset. The identifiers are always based on a unit. A unit is centrally defined to make joining datasets across datastores easy.
+
 * **unitType**: The unitType for this dataset identifier column. Must be one of: FAMILIE, FORETAK, HUSHOLDNING, JOBB, KJORETOY, KOMMUNE, KURS, PERSON or VIRKSOMHET.
 
 ### MEASURE VARIABLES
 Description of the measure column of the dataset. It is represented as a list in the metadata model, but currently only one measure is allowed per dataset.
+
 * **name**: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_INNTEKT.json: "Person inntekt".
 * **description**: Description of the column contents. Example: "Skattepliktig og skattefritt utbytte i... "
 * **dataType**: DataType for the values in the column. One of: ["STRING", "LONG", "DOUBLE", "DATE"]
@@ -35,13 +41,15 @@ Description of the measure column of the dataset. It is represented as a list in
 
 ### MEASURE VARIABLES (with unitType)
 You might find that some of your datasets contain a unitType in the measure column as well. Let's say you have a dataset PERSON_MOR where the identifier column is a population of unitType "PERSON", and the measure column is a population of unitType "PERSON". The measure here is representing the populations mothers. Then you may define it as such:
+
 * **unitType**: The unitType for this dataset measure column. Must be one of: FAMILIE, FORETAK, HUSHOLDNING, JOBB, KJORETOY, KOMMUNE, KURS, PERSON or VIRKSOMHET.
 * **name**: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_MOR.json: "Person mor".
-* **description**: Description of the column contents. Example: "Personens registrerte biologiske mor... "
+* **description**: Description of the column contents. Example: "Personens registrerte biologiske mor..."
 
 
 ### VALUE DOMAIN
 Describes the Value domain for the relevant variable. Either by codeList(enumerated value domain), or a description of expected values(described value domain).
+
 * **description**: A description of the domain. Example for the variable "BRUTTO_INNTEKT": "Alle positive tall".
 * **measurementUnitDescription**: A description of the unit measured. Example: "Norske Kroner"
 * **measurementType**: A machine readable definisjon of the unit measured. One of: [CURRENCY, WEIGHT, LENGTH, HEIGHT, GEOGRAPHICAL]
