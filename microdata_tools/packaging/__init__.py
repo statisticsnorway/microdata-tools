@@ -50,6 +50,7 @@ def package_dataset(
     try:
         # check if json exists
         check_exists(dataset_dir / f"{dataset_name}.json")
+        os.chmod(dataset_dir / f"{dataset_name}.json", 0o600)
 
         # Validate that there is only one csv file
         if len(csv_files) > 1:
@@ -68,6 +69,8 @@ def package_dataset(
             if not dataset_output_dir.exists():
                 os.makedirs(dataset_output_dir)
 
+        os.chmod(dataset_output_dir, 0o700)
+
         if Path(dataset_dir / f"{dataset_name}.md5").exists():
             shutil.move(
                 dataset_dir / f"{dataset_name}.md5",
@@ -78,6 +81,7 @@ def package_dataset(
             dataset_dir / f"{dataset_name}.json",
             dataset_output_dir / f"{dataset_name}.json",
         )
+
         _tar_encrypted_dataset(input_dir=output_dir, dataset_name=dataset_name)
 
     except Exception as exe:

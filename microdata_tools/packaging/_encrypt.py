@@ -46,7 +46,9 @@ def encrypt_dataset(
             key_file.read(), backend=default_backend()
         )
 
-    csv_files = [file for file in dataset_dir.iterdir() if file.suffix == ".csv"]
+    csv_files = [
+        file for file in dataset_dir.iterdir() if file.suffix == ".csv"
+    ]
 
     csv_file = csv_files[0]
     dataset_name = csv_file.stem
@@ -80,9 +82,13 @@ def encrypt_dataset(
             chunk_count += 1
             encrypted = fernet.encrypt(data)
 
-            chunk_file = dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
+            chunk_file = (
+                dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
+            )
             with open(chunk_file, "wb") as chunk_output:
                 chunk_output.write(encrypted)
+
+            os.chmod(chunk_file, 0o600)
 
     logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
@@ -102,7 +108,11 @@ def encrypt_dataset(
     with open(encrypted_symkey_file, "wb") as file:
         file.write(encrypted_sym_key)
 
-    logger.debug(f"Key file for {csv_file} encrypted into {encrypted_symkey_file}")
+    os.chmod(encrypted_symkey_file, 0o600)
+
+    logger.debug(
+        f"Key file for {csv_file} encrypted into {encrypted_symkey_file}"
+    )
 
 
 def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
@@ -137,7 +147,9 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
 
         md5_file = dataset_dir / f"{dataset_name}.md5"
         if not md5_file.exists():
-            raise ValidationException(f"The required file {md5_file} is missing")
+            raise ValidationException(
+                f"The required file {md5_file} is missing"
+            )
 
         files_to_tar.extend(
             [
@@ -151,6 +163,8 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
             tar.add(file, arcname=os.path.basename(file))
         if chunk_dir.exists():
             tar.add(chunk_dir, arcname=os.path.basename(chunk_dir))
+
+    os.chmod(full_tar_file_name, 0o600)
 
     shutil.rmtree(dataset_dir)
 
