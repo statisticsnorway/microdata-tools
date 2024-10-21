@@ -46,9 +46,7 @@ def encrypt_dataset(
             key_file.read(), backend=default_backend()
         )
 
-    csv_files = [
-        file for file in dataset_dir.iterdir() if file.suffix == ".csv"
-    ]
+    csv_files = [file for file in dataset_dir.iterdir() if file.suffix == ".csv"]
 
     csv_file = csv_files[0]
     dataset_name = csv_file.stem
@@ -82,9 +80,7 @@ def encrypt_dataset(
             chunk_count += 1
             encrypted = fernet.encrypt(data)
 
-            chunk_file = (
-                dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
-            )
+            chunk_file = dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
             with open(chunk_file, "wb") as chunk_output:
                 chunk_output.write(encrypted)
 
@@ -99,13 +95,14 @@ def encrypt_dataset(
         ),
     )
 
+    del symkey
+    del fernet
+
     # Store encrypted symkey to file
     with open(encrypted_symkey_file, "wb") as file:
         file.write(encrypted_sym_key)
 
-    logger.debug(
-        f"Key file for {csv_file} encrypted into {encrypted_symkey_file}"
-    )
+    logger.debug(f"Key file for {csv_file} encrypted into {encrypted_symkey_file}")
 
 
 def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
@@ -140,9 +137,7 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
 
         md5_file = dataset_dir / f"{dataset_name}.md5"
         if not md5_file.exists():
-            raise ValidationException(
-                f"The required file {md5_file} is missing"
-            )
+            raise ValidationException(f"The required file {md5_file} is missing")
 
         files_to_tar.extend(
             [
