@@ -88,6 +88,8 @@ def encrypt_dataset(
             with open(chunk_file, "wb") as chunk_output:
                 chunk_output.write(encrypted)
 
+            os.chmod(chunk_file, 0o600)
+
     logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
     encrypted_sym_key = public_key.encrypt(
@@ -99,9 +101,14 @@ def encrypt_dataset(
         ),
     )
 
+    del symkey
+    del fernet
+
     # Store encrypted symkey to file
     with open(encrypted_symkey_file, "wb") as file:
         file.write(encrypted_sym_key)
+
+    os.chmod(encrypted_symkey_file, 0o600)
 
     logger.debug(
         f"Key file for {csv_file} encrypted into {encrypted_symkey_file}"
@@ -156,6 +163,8 @@ def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
             tar.add(file, arcname=os.path.basename(file))
         if chunk_dir.exists():
             tar.add(chunk_dir, arcname=os.path.basename(chunk_dir))
+
+    os.chmod(full_tar_file_name, 0o600)
 
     shutil.rmtree(dataset_dir)
 
