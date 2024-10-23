@@ -50,7 +50,6 @@ def package_dataset(
     try:
         # check if json exists
         check_exists(dataset_dir / f"{dataset_name}.json")
-        os.chmod(dataset_dir / f"{dataset_name}.json", 0o600)
 
         # Validate that there is only one csv file
         if len(csv_files) > 1:
