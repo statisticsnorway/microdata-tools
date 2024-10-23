@@ -68,8 +68,6 @@ def package_dataset(
             if not dataset_output_dir.exists():
                 os.makedirs(dataset_output_dir)
 
-        os.chmod(dataset_output_dir, 0o700)
-
         if Path(dataset_dir / f"{dataset_name}.md5").exists():
             shutil.move(
                 dataset_dir / f"{dataset_name}.md5",

@@ -83,8 +83,6 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
                     with open(decrypted_dir / f"{csv_file}", "wb") as file:
                         file.write(decrypted_data)
 
-                    os.chmod(decrypted_dir / f"{csv_file}", 0o600)
-
                 except InvalidToken as exc:
                     raise InvalidKeyError(
                         f"Not able to decrypt {encrypted_file}, is symkey correct?"
