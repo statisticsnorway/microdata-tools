@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import hashlib
 from microdata_tools.packaging.exceptions import (
@@ -29,7 +28,6 @@ def write_checksum_to_file(csv_file: Path) -> None:
     hash_file = str(csv_file).replace(".csv", ".md5")
     with open(hash_file, "w") as file:
         file.write(calculate_checksum(csv_file))
-    os.chmod(hash_file, 0o600)
 
 
 def compare_checksum_with_file(
