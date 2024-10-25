@@ -1,0 +1,52 @@
+{
+	"temporalityType": "STATUS",
+	"sensitivityLevel": "PERSON_GENERAL",
+	"populationDescription": [{"languageCode": "no", "value": "Alle personer registrert bosatt i Norge"}],
+	"spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+	"subjectFields": [
+		[{"languageCode": "no", "value": "BEFOLKNING"}]
+	],
+	"dataRevision": {
+		"description": [{"languageCode": "no","value": "Første publisering."}]
+	},
+	"identifierVariables": [{"unitType": "PERSON"}],
+	"measureVariables": [
+		{
+			"name": [{"languageCode": "no", "value": "Bosted"}],
+			"description": [{"languageCode": "no", "value": "Registrert bosted"}],
+			"dataType": "STRING",
+			"valueDomain": {
+				"codeList": [
+					{
+						"code": "1",
+						"categoryTitle": [{"languageCode": "no", "value": "Hakkebakkeskogen"}],
+						"validFrom": "1926-01-01"
+					},
+					{
+						"code": "2",
+						"categoryTitle": [{"languageCode": "no", "value": "Narnia"}],
+						"validFrom": "1926-01-01"
+					},
+					{
+						"code": "3",
+						"categoryTitle": [{"languageCode": "no", "value": "Kardemommeby"}],
+						"validFrom": "1926-01-01"
+					},
+					{
+						"code": "4",
+						"categoryTitle": [{"languageCode": "no", "value": "Atlantis"}],
+						"validFrom": "1926-01-01"
+					}
+				],
+				"sentinelAndMissingValues" : [
+					{
+						"code": "0",
+						"categoryTitle": [
+								{"languageCode": "no", "value": "Bosted ukjent"}
+						]
+					}
+				]
+			}
+		}
+	]
+}
