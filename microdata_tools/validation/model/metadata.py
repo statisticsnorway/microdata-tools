@@ -89,7 +89,7 @@ class IdentifierVariable(BaseModel, extra="forbid"):
 
 
 class CodeListItem(BaseModel, extra="forbid"):
-    code: str = Field(min_length=1)
+    code: str | int
     categoryTitle: conlist(MultiLingualString, min_length=1)
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
@@ -113,12 +113,25 @@ class CodeListItem(BaseModel, extra="forbid"):
         validate_date_string("validFrom", values["validFrom"])
         if values.get("validUntil", None) is not None:
             validate_date_string("validUntil", values["validUntil"])
+
+        code = values.get("code", None)
+        if isinstance(code, str) and len(code) < 1:
+            raise ValueError("String should have at least 1 character")
         return values
 
 
 class SentinelItem(BaseModel, extra="forbid"):
-    code: str = Field(min_length=1)
+    code: str | int
     categoryTitle: conlist(MultiLingualString, min_length=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_sentinel_list_item(cls, values):
+        code = values.get("code", None)
+        if isinstance(code, str) and len(code) < 1:
+            raise ValueError("String should have at least 1 character")
+
+        return values
 
 
 class ValueDomain(BaseModel, extra="forbid"):
@@ -178,16 +191,54 @@ class MeasureVariable(BaseModel):
                 "together with a unitType"
             )
 
-        if values.get("unitType", None) is not None:
-            if values.get("dataType", None) is not None:
+        def raise_mismatch_between_datatypes(
+            datatype, list_datatype, list_name
+        ):
+            raise ValueError(
+                f"specified dataType for measure ({datatype}) does not match the datatype within the {list_name} ({list_datatype})."
+            )
+
+        def determine_datatype(value):
+            if isinstance(value, str):
+                return "STRING"
+            elif isinstance(value, int):
+                return "LONG"
+            else:
+                return None
+
+        valuedomain = values.get("valueDomain", None)
+        datatype = values.get("dataType", None)
+        unittype = values.get("unitType", None)
+        if unittype is not None:
+            if datatype is not None:
                 raise_invalid_with_unit_type("dataType")
-            if values.get("valueDomain", None) is not None:
+            if valuedomain is not None:
                 raise_invalid_with_unit_type("valueDomain")
         else:
-            if values.get("dataType", None) is None:
+            if datatype is None:
                 raise ValueError("Missing dataType in measure variable")
-            if values.get("valueDomain", None) is None:
+            if valuedomain is None:
                 raise ValueError("Missing valueDomain in measure variable")
+
+            code_list = valuedomain.get("codeList", [])
+            for item in code_list:
+                code = item.get("code")
+                code_datatype = determine_datatype(code)
+                if code_datatype != datatype:
+                    raise_mismatch_between_datatypes(
+                        datatype, code_datatype, "codelist"
+                    )
+            sentinel_list = valuedomain.get("sentinelAndMissingValues", [])
+            for item in sentinel_list:
+                code = item.get("code")
+                code_datatype = determine_datatype(code)
+                if code_datatype != datatype:
+                    raise_mismatch_between_datatypes(
+                        datatype,
+                        code_datatype,
+                        "sentinel- and missing values list",
+                    )
+
         return values
 
 
