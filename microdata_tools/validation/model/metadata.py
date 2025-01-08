@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from pydantic import BaseModel, Field, conlist, model_validator
 
@@ -89,7 +89,7 @@ class IdentifierVariable(BaseModel, extra="forbid"):
 
 
 class CodeListItem(BaseModel, extra="forbid"):
-    code: str | int
+    code: Union[str, int]
     categoryTitle: conlist(MultiLingualString, min_length=1)
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
@@ -121,7 +121,7 @@ class CodeListItem(BaseModel, extra="forbid"):
 
 
 class SentinelItem(BaseModel, extra="forbid"):
-    code: str | int
+    code: Union[str, int]
     categoryTitle: conlist(MultiLingualString, min_length=1)
 
     @model_validator(mode="before")
