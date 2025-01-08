@@ -17,15 +17,41 @@ def _days_since_epoch(date_string: str) -> int:
     return (date_obj - epoch).days
 
 
+def _determine_datatype(value):
+    if isinstance(value, str):
+        return "STRING"
+    elif isinstance(value, int):
+        return "LONG"
+
+
+def _validate_datatype_in_codelist_and_sentinels(
+    code_list, list_name, datatype
+):
+    invalid_codes = []
+    for item in code_list:
+        code = item.get("code")
+        list_datatype = _determine_datatype(code)
+        if list_datatype != datatype:
+            invalid_codes.append(code)
+    if invalid_codes:
+        error_message = (
+            f"Specified dataType for measure ({datatype}) does not match the "
+            f"datatype within the {list_name} ({list_datatype}). Codes with "
+            f"mismatching datatype are: {invalid_codes}"
+        )
+        return error_message
+    else:
+        return None
+
+
 def _validate_code_list(
-    code_list: List[Dict[str, str]],
+    code_list: List[Dict[str, str | int]], datatype
 ) -> List[str]:
     errors = []
     if not code_list:
         return ["Code list can not be empty"]
 
     ONE_DAY = 1
-
     has_ongoing_time_period = False
     valid_from_dates = []
     valid_until_dates = []
@@ -88,25 +114,41 @@ def _validate_code_list(
             errors.append(
                 f"Duplicate codes for same time period: {list(set(duplicate_codes))}"
             )
+    invalid_code_error = _validate_datatype_in_codelist_and_sentinels(
+        code_list, "codelist", datatype
+    )
+    if invalid_code_error:
+        errors.append(invalid_code_error)
     return errors
 
 
 def _validate_code_lists(metadata: Dict):
+    datatype: str = metadata.get("measureVariables", [{}])[0].get("dataType")
     measure_value_domain: Union[Dict, None] = metadata.get(
         "measureVariables", [{}]
     )[0].get("valueDomain")
     if measure_value_domain and measure_value_domain.get("codeList"):
         code_list_errors = _validate_code_list(
-            measure_value_domain["codeList"]
+            measure_value_domain["codeList"], datatype
         )
         if code_list_errors:
             return code_list_errors
+    if measure_value_domain and measure_value_domain.get(
+        "sentinelAndMissingValues"
+    ):
+        sentinel_list_error = _validate_datatype_in_codelist_and_sentinels(
+            measure_value_domain["sentinelAndMissingValues"],
+            "sentinel- and missing values list",
+            datatype,
+        )
+        if sentinel_list_error:
+            return [sentinel_list_error]
     identifier_value_domain: Union[Dict, None] = metadata.get(
         "identifierVariables", [{}]
     )[0].get("valueDomain")
     if identifier_value_domain and identifier_value_domain.get("codeList"):
         code_list_errors = _validate_code_list(
-            identifier_value_domain["codeList"]
+            identifier_value_domain["codeList"], datatype
         )
         if code_list_errors:
             return code_list_errors

@@ -191,21 +191,6 @@ class MeasureVariable(BaseModel):
                 "together with a unitType"
             )
 
-        def raise_mismatch_between_datatypes(
-            datatype, list_datatype, list_name
-        ):
-            raise ValueError(
-                f"specified dataType for measure ({datatype}) does not match the datatype within the {list_name} ({list_datatype})."
-            )
-
-        def determine_datatype(value):
-            if isinstance(value, str):
-                return "STRING"
-            elif isinstance(value, int):
-                return "LONG"
-            else:
-                return None
-
         valuedomain = values.get("valueDomain", None)
         datatype = values.get("dataType", None)
         unittype = values.get("unitType", None)
@@ -219,25 +204,6 @@ class MeasureVariable(BaseModel):
                 raise ValueError("Missing dataType in measure variable")
             if valuedomain is None:
                 raise ValueError("Missing valueDomain in measure variable")
-
-            code_list = valuedomain.get("codeList", [])
-            for item in code_list:
-                code = item.get("code")
-                code_datatype = determine_datatype(code)
-                if code_datatype != datatype:
-                    raise_mismatch_between_datatypes(
-                        datatype, code_datatype, "codelist"
-                    )
-            sentinel_list = valuedomain.get("sentinelAndMissingValues", [])
-            for item in sentinel_list:
-                code = item.get("code")
-                code_datatype = determine_datatype(code)
-                if code_datatype != datatype:
-                    raise_mismatch_between_datatypes(
-                        datatype,
-                        code_datatype,
-                        "sentinel- and missing values list",
-                    )
 
         return values
 

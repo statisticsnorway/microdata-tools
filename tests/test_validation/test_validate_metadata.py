@@ -18,10 +18,6 @@ VALID_METADATA = ["SYNT_BEFOLKNING_SIVSTAND", "SYNT_PERSON_INNTEKT"]
 NO_SUCH_METADATA = "NO_SUCH_METADATA"
 MISSING_IDENTIFIER_METADATA = "MISSING_IDENTIFIER_DATASET"
 EMPTY_STRING_METADATA = "EMPTY_STRING_METADATA"
-MISMATCHING_DATATYPE_WITH_CODELIST = "MISMATCHING_DATATYPE_WITH_CODELIST"
-MISMATCHING_DATATYPE_WITH_SENTINEL_LIST = (
-    "MISMATCHING_DATATYPE_WITH_SENTINEL_LIST"
-)
 
 
 def test_validate_valid_metadata():
@@ -62,26 +58,6 @@ def test_invalid_dataset_name():
     assert data_errors == [
         '"1_INVALID_DATASET_NAME" contains invalid characters. '
         'Please use only uppercase A-Z, numbers 0-9 or "_"'
-    ]
-
-
-def test_mismatch_between_specified_datatype_and_datatype_within_codelist():
-    data_errors = validate_metadata(
-        MISMATCHING_DATATYPE_WITH_CODELIST,
-        INPUT_DIR,
-    )
-    assert data_errors == [
-        "measureVariables: Value error, specified dataType for measure (LONG) does not match the datatype within the codelist (STRING)."
-    ]
-
-
-def test_mismatch_between_specified_datatype_and_datatype_within_sentinel_list():
-    data_errors = validate_metadata(
-        MISMATCHING_DATATYPE_WITH_SENTINEL_LIST,
-        INPUT_DIR,
-    )
-    assert data_errors == [
-        "measureVariables: Value error, specified dataType for measure (STRING) does not match the datatype within the sentinel- and missing values list (LONG)."
     ]
 
 
