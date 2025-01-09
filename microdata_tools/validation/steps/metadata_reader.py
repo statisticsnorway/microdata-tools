@@ -25,7 +25,7 @@ def _determine_datatype(value):
 
 
 def _validate_datatype_in_codelist_and_sentinels(
-    code_list, list_name, datatype
+    code_list, list_name, datatype: str
 ):
     invalid_codes = []
     for item in code_list:
