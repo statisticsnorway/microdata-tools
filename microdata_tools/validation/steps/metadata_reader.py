@@ -27,12 +27,10 @@ def _determine_datatype(value):
 def _validate_datatype_in_codelist_and_sentinels(
     code_list, list_name, datatype: str
 ):
-    invalid_codes = []
-    for item in code_list:
-        code = item.get("code")
-        list_datatype = _determine_datatype(code)
-        if list_datatype != datatype:
-            invalid_codes.append(code)
+    invalid_codes = [
+        item.get("code") for item in code_list
+        if _determine_datatype(item.get("code")) != datatype
+    ]
     if invalid_codes:
         error_message = (
             f"Specified dataType for measure ({datatype}) does not match the "
