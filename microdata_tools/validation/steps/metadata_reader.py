@@ -45,7 +45,7 @@ def _validate_datatype_in_codelist_and_sentinels(
 
 
 def _validate_code_list(
-    code_list: List[Dict[str, Union[str, int]]], datatype
+    code_list: List[Dict[str, Union[str, int]]], datatype: str
 ) -> List[str]:
     errors = []
     if not code_list:
