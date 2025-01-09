@@ -191,18 +191,18 @@ class MeasureVariable(BaseModel):
                 "together with a unitType"
             )
 
-        valuedomain = values.get("valueDomain", None)
-        datatype = values.get("dataType", None)
-        unittype = values.get("unitType", None)
-        if unittype is not None:
-            if datatype is not None:
+        value_domain = values.get("valueDomain", None)
+        data_type = values.get("dataType", None)
+        unit_type = values.get("unitType", None)
+        if unit_type is not None:
+            if data_type is not None:
                 raise_invalid_with_unit_type("dataType")
-            if valuedomain is not None:
+            if value_domain is not None:
                 raise_invalid_with_unit_type("valueDomain")
         else:
-            if datatype is None:
+            if data_type is None:
                 raise ValueError("Missing dataType in measure variable")
-            if valuedomain is None:
+            if value_domain is None:
                 raise ValueError("Missing valueDomain in measure variable")
 
         return values
