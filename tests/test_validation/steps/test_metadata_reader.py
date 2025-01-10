@@ -11,6 +11,7 @@ from microdata_tools.validation.components import (
 )
 
 INPUT_DIR = Path("tests/resources/validation/steps/metadata_reader")
+MEASURE_DATATYPE = "STRING"
 VALID_CODE_LIST = [
     {
         "code": "a",
@@ -168,8 +169,32 @@ def test_read_missing_identifier():
 
 
 def test_code_list_validation():
-    code_list_errors = metadata_reader._validate_code_list(VALID_CODE_LIST)
+    code_list_errors = metadata_reader._validate_code_list(
+        VALID_CODE_LIST, MEASURE_DATATYPE
+    )
     assert not code_list_errors
 
-    code_list_errors = metadata_reader._validate_code_list(OVERLAP_CODE_LIST)
+    code_list_errors = metadata_reader._validate_code_list(
+        OVERLAP_CODE_LIST, MEASURE_DATATYPE
+    )
     assert code_list_errors == ["Duplicate codes for same time period: ['a']"]
+
+
+def test_mismatch_between_specified_datatype_and_datatype_within_codelist():
+    DATASET_NAME = "MISMATCHING_DATATYPE_WITH_CODELIST"
+    METADATA_PATH = INPUT_DIR / f"{DATASET_NAME}.json"
+    with pytest.raises(ValidationError) as e:
+        metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
+    assert e.value.errors == [
+        "Specified data type for measure (LONG) does not match the data type within the codelist (STRING). Codes with mismatching data type are: ['1', '2', '3', '4', '5', '...']"
+    ]
+
+
+def test_mismatch_between_specified_datatype_and_datatype_within_sentinel_list():
+    DATASET_NAME = "MISMATCHING_DATATYPE_WITH_SENTINEL_LIST"
+    METADATA_PATH = INPUT_DIR / f"{DATASET_NAME}.json"
+    with pytest.raises(ValidationError) as e:
+        metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
+    assert e.value.errors == [
+        "Specified data type for measure (STRING) does not match the data type within the sentinel- and missing values list (LONG). Codes with mismatching data type are: [0]"
+    ]

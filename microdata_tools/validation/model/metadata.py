@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from pydantic import BaseModel, Field, conlist, model_validator
 
@@ -89,7 +89,7 @@ class IdentifierVariable(BaseModel, extra="forbid"):
 
 
 class CodeListItem(BaseModel, extra="forbid"):
-    code: str = Field(min_length=1)
+    code: Union[str, int]
     categoryTitle: conlist(MultiLingualString, min_length=1)
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
@@ -113,12 +113,25 @@ class CodeListItem(BaseModel, extra="forbid"):
         validate_date_string("validFrom", values["validFrom"])
         if values.get("validUntil", None) is not None:
             validate_date_string("validUntil", values["validUntil"])
+
+        code = values.get("code", None)
+        if isinstance(code, str) and len(code) < 1:
+            raise ValueError("String should have at least 1 character")
         return values
 
 
 class SentinelItem(BaseModel, extra="forbid"):
-    code: str = Field(min_length=1)
+    code: Union[str, int]
     categoryTitle: conlist(MultiLingualString, min_length=1)
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_sentinel_list_item(cls, values):
+        code = values.get("code", None)
+        if isinstance(code, str) and len(code) < 1:
+            raise ValueError("String should have at least 1 character")
+
+        return values
 
 
 class ValueDomain(BaseModel, extra="forbid"):
@@ -178,16 +191,20 @@ class MeasureVariable(BaseModel):
                 "together with a unitType"
             )
 
-        if values.get("unitType", None) is not None:
-            if values.get("dataType", None) is not None:
+        value_domain = values.get("valueDomain", None)
+        data_type = values.get("dataType", None)
+        unit_type = values.get("unitType", None)
+        if unit_type is not None:
+            if data_type is not None:
                 raise_invalid_with_unit_type("dataType")
-            if values.get("valueDomain", None) is not None:
+            if value_domain is not None:
                 raise_invalid_with_unit_type("valueDomain")
         else:
-            if values.get("dataType", None) is None:
+            if data_type is None:
                 raise ValueError("Missing dataType in measure variable")
-            if values.get("valueDomain", None) is None:
+            if value_domain is None:
                 raise ValueError("Missing valueDomain in measure variable")
+
         return values
 
 
