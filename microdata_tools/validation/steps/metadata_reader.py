@@ -28,7 +28,8 @@ def _validate_datatype_in_codelist_and_sentinels(
     code_list, list_name, data_type: str
 ):
     invalid_codes = [
-        item.get("code") for item in code_list
+        item.get("code")
+        for item in code_list
         if _determine_datatype(item.get("code")) != data_type
     ]
     if invalid_codes:
@@ -121,13 +122,16 @@ def _validate_code_list(
 
 
 def _validate_code_lists(metadata: Dict):
-    data_type: str = metadata.get("measureVariables", [{}])[0].get("dataType")
+    measure_data_type: str = metadata.get("measureVariables", [{}])[0].get(
+        "dataType"
+    )
+
     measure_value_domain: Union[Dict, None] = metadata.get(
         "measureVariables", [{}]
     )[0].get("valueDomain")
     if measure_value_domain and measure_value_domain.get("codeList"):
         code_list_errors = _validate_code_list(
-            measure_value_domain["codeList"], data_type
+            measure_value_domain["codeList"], measure_data_type
         )
         if code_list_errors:
             return code_list_errors
@@ -137,19 +141,32 @@ def _validate_code_lists(metadata: Dict):
         sentinel_list_error = _validate_datatype_in_codelist_and_sentinels(
             measure_value_domain["sentinelAndMissingValues"],
             "sentinel- and missing values list",
-            data_type,
+            measure_data_type,
         )
         if sentinel_list_error:
             return [sentinel_list_error]
     identifier_value_domain: Union[Dict, None] = metadata.get(
         "identifierVariables", [{}]
     )[0].get("valueDomain")
+    identifier_data_type: str = metadata.get("identifierVariables", [{}])[
+        0
+    ].get("dataType")
     if identifier_value_domain and identifier_value_domain.get("codeList"):
         code_list_errors = _validate_code_list(
-            identifier_value_domain["codeList"], data_type
+            identifier_value_domain["codeList"], identifier_data_type
         )
         if code_list_errors:
             return code_list_errors
+    if identifier_value_domain and identifier_value_domain.get(
+        "sentinelAndMissingValues"
+    ):
+        sentinel_list_error = _validate_datatype_in_codelist_and_sentinels(
+            identifier_value_domain["sentinelAndMissingValues"],
+            "sentinel- and missing values list",
+            identifier_data_type,
+        )
+        if sentinel_list_error:
+            return [sentinel_list_error]
     return []
 
 

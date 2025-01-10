@@ -8,14 +8,12 @@ metadata:
     and external data providers for the microdata platform
   tags:
     - python
-    - pipeline
     - pyarrow
     - pydantic
-    - pypi
   annotations:
     github.com/project-slug: statisticsnorway/microdata-tools
 spec:
-  type: service
+  type: library
   system: microdata
   owner: microdata-developers
   lifecycle: production
