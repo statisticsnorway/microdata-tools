@@ -1,0 +1,62 @@
+{
+    "shortName": "NPR_SYKEHUSOPPHOLDID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Sykehusoppholdidentifikator"
+      },
+      {
+        "languageCode": "en",
+        "value": "Hospital stay identifier"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Identifikator for NPR-sykehusopphold"
+      },
+      {
+        "languageCode": "en",
+        "value": "Identifier for NPR hospital stay"
+      }
+    ],
+    "dataType": "STRING",
+    "unitType": {
+      "shortName": "NPR_SYKEHUSOPPHOLD",
+      "requiresPseudonymization": true,
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Sykehusopphold NPR"
+        },
+        {
+          "languageCode": "en",
+          "value": "Hospital stay NPR"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Norsk pasientregister (NPR) mottar opplysninger om pasientkontakter i spesialisthelsetjenesten gjennom episoder, som kan inkludere avdelingsopphold, dagbehandlinger eller polikliniske kontakter. Flere sammenhengende episoder for en pasient kan aggregeres til et sykehusopphold for å danne grunnlag for ISF-refusjon, hvor opplysninger fra den dyreste episoden prioriteres. Episodedata gir en mer detaljert oversikt over behandlingsforløpet, mens sykehusopphold gir en oppsummering av de viktigste opplysningene knyttet til ressurser og finansiering. "
+        },
+        {
+          "languageCode": "en",
+          "value": "The Norwegian Patient Registry (NPR) receives information about patient contacts in specialized health services through episodes, which can include ward stays, day treatments, or outpatient contacts. Several consecutive episodes for a patient can be aggregated into a hospital stay to form the basis for reimbursement, where information from the most expensive episode is prioritized. Episode data provides a more detailed overview of the treatment process, while hospital stays summarize the most important information related to resources and financing."
+        }
+      ]
+    },
+    "format": "RandomUInt48",
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert sykehusoppholdidentifikator"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonomized hospital stay identifier"
+        }
+      ]
+    }
+  }
+ 
