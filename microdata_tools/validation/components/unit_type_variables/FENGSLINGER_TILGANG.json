@@ -1,5 +1,5 @@
 {
-  "shortName": "KRIMINALITET_FENGSLINGER_TILGANG_ID",
+  "shortName": "FENGSLINGER_TILGANG_ID",
   "name": [
     {
       "languageCode": "no",
@@ -23,7 +23,7 @@
   "dataType": "STRING",
   "unitType": {
     "requiresPseudonymization": true,
-    "shortName": "KRIMINALITET_FENGSLINGER_TILGANG",
+    "shortName": "FENGSLINGER_TILGANG",
     "name": [
       {
         "languageCode": "no",
