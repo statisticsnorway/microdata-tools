@@ -1,0 +1,61 @@
+{
+  "shortName": "FENGSLINGER_TILGANG_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Tilganger til fengslingsidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Entries to imprisonments identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for personer som har tilganger til fengslinger i microdata"
+    },
+    {
+      "languageCode": "no",
+      "value": "Identifier for persons with entries to imprisonments in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "requiresPseudonymization": true,
+    "shortName": "FENGSLINGER_TILGANG",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Tilganger til fengslinger"
+      },
+      {
+        "languageCode": "en",
+        "value": "Entries to imprisonments"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Variabelen omfatter alle nyinnsettelser til varetekt, forvaring og soning av dom på ubetinget fengsel (både i fengselsanstalter og med elektronisk kontroll) i statistikkåret, som er registrert i SSP innen mars året etter. I tillegg inneholder populasjonen andre typer tilganger, som gjeninnsettelse etter rømning, uteblivelse, mm. En person som fengsles flere ganger i løpet av et år, vil være med i dataene for hver tilgang som definert over. \n \n Populasjonen inneholder ikke informasjon om ordinær permisjon under soning, samt overføringer mellom ulike fengsler, eller mellom fengsel og elektronisk kontroll under soning."
+      },
+      {
+        "languageCode": "en",
+        "value": "The variable includes all new incarcerations for pretrial detention, preventive detention, and serving a sentence of unconditional imprisonment (both in prison facilities and under electronic monitoring) within the statistical year, as registered in the SSP by March of the following year. Additionally, the population includes other types of entries, such as re-incarceration after escape, failure to appear, etc. A person who is incarcerated multiple times within a year will be included in the data for each admission as defined above. \n \n The population does not contain information on regular leave during sentencing, as well as transfers between different prisons or between prison and electronic monitoring during sentencing"
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert kombinasjon av fødselsnummer, tilgangsdato og tilgangstype"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized combination of national identity number, date of imprisonment and type of imprisonment"
+      }
+    ]
+  }
+}
