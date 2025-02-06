@@ -35,6 +35,9 @@ UNIT_TYPE_VARIABLES = {
     "KRG_KREFTTILFELLE": load_json(
         UNIT_TYPE_VARIABLES_DIR / "KRG_KREFTTILFELLE.json"
     ),
+    "FENGSLINGER_TILGANG": load_json(
+        UNIT_TYPE_VARIABLES_DIR / "FENGSLINGER_TILGANG.json"
+    ),
 }
 
 
