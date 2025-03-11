@@ -23,7 +23,7 @@
     "dataType": "LONG",
     "unitType": {
       "shortName": "HKDIR_HYU_OPPMELDING",
-      "requiresPseudonymization": false,
+      "requiresPseudonymization": true,
       "name": [
         {
           "languageCode": "no",
@@ -37,11 +37,11 @@
       "description": [
         {
           "languageCode": "no",
-          "value": "En helsestasjonskonsultasjon er en enkeltkonsultasjon på helsestasjon."
+          "value": "Identifikator for oppmelding til høyere yrkesfaglig utdanning."
         },
         {
           "languageCode": "en",
-          "value": "A health center visit is a distinct visit to a health center."
+          "value": "Identifier for admission in tertiary vocational education."
         }
       ]
     },
