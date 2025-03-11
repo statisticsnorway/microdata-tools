@@ -1,0 +1,61 @@
+{
+    "shortName": "HKDIR_HYU_OPPMELDING_ID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Identifikator for oppmelding til høyere yrkesfaglig utdanning"
+      },
+      {
+        "languageCode": "en",
+        "value": "Identifier for admission in tertiary vocational education"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Angir den enkelte studentens opptaksgrunnlag"
+      },
+      {
+        "languageCode": "en",
+        "value": "Specifies the individual student's admission criteria"
+      }
+    ],
+    "dataType": "LONG",
+    "unitType": {
+      "shortName": "HKDIR_HYU_OPPMELDING",
+      "requiresPseudonymization": true,
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Oppmelding til høyere yrkesfaglig utdanning"
+        },
+        {
+          "languageCode": "en",
+          "value": "Admission for Higher Vocational College"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Identifikator for oppmelding til høyere yrkesfaglig utdanning."
+        },
+        {
+          "languageCode": "en",
+          "value": "Identifier for admission in tertiary vocational education."
+        }
+      ]
+    },
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert identifikator for oppmelding til høyere yrkesfaglig utdanning"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonymized identifier for admission in tertiary vocational education"
+        }
+      ]
+    }
+  }
+ 
