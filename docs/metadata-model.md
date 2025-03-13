@@ -105,7 +105,7 @@ If the measure column in your dataset is in fact a unit type (PERSON (FNR), VIRK
             }
         ],
         "dataType": "DOUBLE",
-        "valueDomain": {.............}
+        "valueDomain": {...}
     }
 ]
 ```
