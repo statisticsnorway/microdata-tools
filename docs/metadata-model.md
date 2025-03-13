@@ -2,60 +2,129 @@
 _______
 In addition to the examples of metadata json files present in this repository, this document briefly describes the fields in the metadata model.
 
-### ROOT LEVEL FIELDS
+## Root level fields
 These fields describe the dataset as a whole.
 
-* **temporalityType**: The temporality type of the dataset. Must be one of FIXED, ACCUMULATED, STATUS or EVENT.
-* **sensitivityLevel**: The sensitivity of the data in the dataset. Must be one of: PERSON_GENERAL, PERSON_SPECIAL, PUBLIC or NONPUBLIC.
+**temporalityType** <span class ="mdata-red-text">(required)</span>: The temporality type of the dataset. Must be *one* of:  
 
-    * PERSON_GENERAL: general personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
-    * PERSON_SPECIAL: special category of personal data, this is a category of data that is more sensitive. Health information is an example.
-    * PUBLIC: data that is publicly available
-    * NONPUBLIC: data that is not publicly available
-    
-* **spatialCoverageDescription**: The geographic area relevant to the data.
-* **populationDescription**: Description of the dataset's population.
+```json
+"temporalityType": "FIXED" | "ACCUMULATED" | "STATUS" | "EVENT",
+```
+**sensitivityLevel** <span class ="mdata-red-text">(required)</span>: The sensitivity of the data in the dataset. Must be *one* of:
+
+```json
+"sensitivityLevel": "PERSON_GENERAL" | "PERSON_SPECIAL" | "PUBLIC" | "NONPUBLIC",
+```
+
+* PERSON_GENERAL: General personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
+* PERSON_SPECIAL: Special category of personal data, this is a category of data that is more sensitive. Health information is an example.
+* PUBLIC: Data that is publicly available
+* NONPUBLIC: Data that is not publicly available
+
+**populationDescription**<span class ="mdata-red-text"> (required)</span>: Description of the dataset's population.
+```json
+"populationDescription": [
+    {
+        "languageCode": "no",
+        "value": "Alle personer registrert bosatt i Norge"
+    }
+],
+```
+
+**spatialCoverageDescription**<span class ="mdata-blue-2-text"> (optional)</span>: The geographic area relevant to the data.
+```json
+"spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+```
+
+**subjectFields**<span class ="mdata-red-text"> (required)</span>: Tag(s).
+```json
+"subjectFields": [
+	[{"languageCode": "no", "value": "BEFOLKNING"}],
+    [{"languageCode": "no", "value": "SAMFUNN"}]
+],
+```
 
 
-### DATAREVISION
+## Datarevision
 These fields describe the current version of the dataset.
 
-* **description**: Description of this version of the dataset.
-* **temporalEnd (Optional)**: Description of why this dataset will not be updated anymore. Successor datasets can be optionally specified. 
+* **description** <span class ="mdata-red-text">(required)</span>: Description of this version of the dataset.  
+* **temporalEnd**<span class ="mdata-blue-2-text"> (optional)</span>: Description of why this dataset will not be updated anymore. Successor datasets can be optionally specified. 
 
-### IDENTIFIER VARIABLES
+```json
+"dataRevision": {
+    "description": [{"languageCode": "no", "value": "Nye årganger."}],
+    "temporalEnd": {
+        "description": [
+            {
+                "languageCode": "no",
+                "value": "Videre oppdateringer utgår pga..."
+            }
+        ],
+        "successors": "Navn på erstatter",
+    }
+},
+```
+
+## Identifier variables
 Description of the indentifier column of the dataset. It is represented as a list in the metadata model, but currently only one identifier is allowed per dataset. The identifiers are always based on a unit. A unit is centrally defined to make joining datasets across datastores easy.
 
-* **unitType**: The unitType for this dataset identifier column. Must be one of: FAMILIE, FORETAK, HUSHOLDNING, JOBB, KJORETOY, KOMMUNE, KURS, PERSON or VIRKSOMHET.
+* **unitType**<span class ="mdata-red-text"> (required)</span>: The unitType for this dataset identifier column. Must be *one* of: 
 
-### MEASURE VARIABLES
+```json
+"identifierVariables": [
+    {
+        "unitType": "FAMILIE" | "FORETAK" | "HUSHOLDNING" | "JOBB" |
+                    "KJORETOY" | "KOMMUNE" | "KURS" | "PERSON" | "VIRKSOMHET"
+    }
+],
+```
+
+
+## Measure variables
 Description of the measure column of the dataset. It is represented as a list in the metadata model, but currently only one measure is allowed per dataset.
 
-* **name**: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_INNTEKT.json: "Person inntekt".
-* **description**: Description of the column contents. Example: "Skattepliktig og skattefritt utbytte i... "
-* **dataType**: DataType for the values in the column. One of: ["STRING", "LONG", "DOUBLE", "DATE"]
-* **format (Optional)**: More detailed description of the values. For example a regular expression.
-* **uriDefinition (Optional)**: Link to external resource describing the measure.
-* **valueDomain**: See definition below.
+If the measure column in your dataset is in fact a unit type (PERSON (FNR), VIRKSOMHET (ORGNR) etc.), the metadatamodel for the measure variable is different than described below. You should skip to the section [Measure variables (with unitType)](#measure-variables-with-unittype). 
 
 
-### MEASURE VARIABLES (with unitType)
-You might find that some of your datasets contain a unitType in the measure column as well. Let's say you have a dataset PERSON_MOR where the identifier column is a population of unitType "PERSON", and the measure column is a population of unitType "PERSON". The measure here is representing the populations mothers. Then you may define it as such:
+* **name**<span class ="mdata-red-text"> (required)</span>: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_INNTEKT.json: "Person inntekt".
+* **description**<span class ="mdata-red-text"> (required)</span>: Description of the column contents. Example: "Skattepliktig og skattefritt utbytte i... "
+* **dataType** <span class ="mdata-red-text"> (required)</span>: DataType for the values in the column. One of: ["STRING", "LONG", "DOUBLE", "DATE"]
+* **format** <span class ="mdata-blue-2-text"> (optional)</span>: More detailed description of the values. For example if dataType for the measure is DATE, you can specify YYYYMM, YYYYMMDD etc.
+* **uriDefinition** <span class ="mdata-blue-2-text"> (optional)</span>: Link to external resource describing the measure.
+* **valueDomain**<span class ="mdata-red-text"> (required)</span>: See definition below.
 
-* **unitType**: The unitType for this dataset measure column. Must be one of: FAMILIE, FORETAK, HUSHOLDNING, JOBB, KJORETOY, KOMMUNE, KURS, PERSON or VIRKSOMHET.
-* **name**: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_MOR.json: "Person mor".
-* **description**: Description of the column contents. Example: "Personens registrerte biologiske mor..."
+```json
+"measureVariables": [
+    {
+        "name": [{"languageCode": "no", "value": "Person inntekt"}],
+        "description": [
+            {
+                "languageCode": "no",
+                "value": "Personens rapporterte inntekt"
+            }
+        ],
+        "dataType": "DOUBLE",
+        "valueDomain": {...}
+    }
+]
+```
+### Value domain
+Describes the Value domain for the relevant variable. Either by codeList (enumerated value domain), or a description of expected values (described value domain).
 
+* **description**<span class ="mdata-red-text"> (required in described value domain)</span>: A description of the domain. Example for the variable "BRUTTO_INNTEKT": "Alle positive tall".
+* **measurementUnitDescription**<span class ="mdata-red-text"> (required in described value domain)</span>: A description of the unit measured. Example: "Norske Kroner"
+* **measurementType**<span class ="mdata-red-text"> (required in described value domain)</span>: A machine readable definisjon of the unit measured. One of: [CURRENCY, WEIGHT, LENGTH, HEIGHT, GEOGRAPHICAL]
+* **uriDefinition** <span class ="mdata-blue-2-text"> (optional)</span>: Link to external resource describing the domain.
+* **codeList**<span class ="mdata-red-text"> (required in enumerated value domain)</span>: A code list of valid codes for the domain, description, and their validity period. The metadata fields for each item in the codelist are: 
+    * code <span class ="mdata-red-text"> (required)</span>: The code itself. Example: "0301"
+    * categoryTitle <span class ="mdata-red-text"> (required)</span>: The category name of the code. Example: "Oslo"
+    * validFrom <span class ="mdata-red-text"> (required)</span>: The code is valid from date YYYY-MM-DD  
+    * validUntil <span class ="mdata-blue-2-text"> (optional)</span>: The code is valid until date YYYY-MM-DD
+* **sentinelAndMissingValues**<span class ="mdata-blue-2-text"> (optional in enumerted value domain)</span>: A code list where the codes represent missing or sentinel values that, while not entirely valid, are still expected to appear in the dataset.
+    * code <span class ="mdata-red-text"> (required)</span>: The code itself. Example: 0
+    * categoryTitle <span class ="mdata-red-text"> (required)</span>: The category name of the code. Example: "Unknown value"
 
-### VALUE DOMAIN
-Describes the Value domain for the relevant variable. Either by codeList(enumerated value domain), or a description of expected values(described value domain).
-
-* **description**: A description of the domain. Example for the variable "BRUTTO_INNTEKT": "Alle positive tall".
-* **measurementUnitDescription**: A description of the unit measured. Example: "Norske Kroner"
-* **measurementType**: A machine readable definisjon of the unit measured. One of: [CURRENCY, WEIGHT, LENGTH, HEIGHT, GEOGRAPHICAL]
-* **uriDefinition**: Link to external resource describing the domain.
-* **codeList**: A code list of valid codes for the domain, description, and their validity period.
-* **sentinelAndMissingValues**: A code list where the codes represent missing or sentinel values that, while not entirely valid, are still expected to appear in the dataset. Example: Code 0 for "Unknown value".
 
 
 Here is an example of two different value domains.
@@ -65,7 +134,7 @@ The first value domain belongs to a measure for dataset where the measure is a p
     "uriDefinition": [],
     "description": [{"languageCode": "no", "value": "Norske Kroner"}],
     "measurementType": "CURRENCY",
-    "measurementUnitDescription": [{"languageCode": "no", "value": "Norske Kroner"}]
+    "measurementUnitDescription": [{"languageCode": "no", "value": "Norske Kroner"}],
 }
 ```
 This example is what we would call a __described value domain__.
@@ -89,16 +158,33 @@ The second example belongs to the measure variable of a dataset where the measur
     "sentinelAndMissingValues": [
         {
             "code": "0",
-            "categoryTitle": [{"languageCode": "no", "value": "Ukjent"}],
-            "validFrom": "1900-01-01"
+            "categoryTitle": [{"languageCode": "no", "value": "Ukjent"}]
         }
     ]
 }
 ```
-We expect all values in this dataset to be either "1" or "2", as this dataset only considers "Male" or "Female". But we also expect a code "0" to be present in the dataset, where it represents "Unknown". A row with "0" as measure is therefore not considered invalid. A value domain with a code list like this is what we would call an __enumerated value domain.
+We expect all values in this dataset to be either "1" or "2", as this dataset only considers "Male" or "Female". But we also expect a code "0" to be present in the dataset, where it represents "Unknown". A row with "0" as measure is therefore not considered invalid. A value domain with a code list like this is what we would call an __enumerated value domain__.
 
+### Measure variables (with unitType)
+You might find that some of your datasets contain a unitType in the measure column as well. Let's say you have a dataset PERSON_MOR where the identifier column is a population of unitType "PERSON", and the measure column is a population of unitType "PERSON". The measure here is representing the populations mothers. Then you may define it as such:
 
-### UNIT TYPES
+* **unitType** <span class ="mdata-red-text"> (required)</span>: The unitType for this dataset measure column. Must be one of the [predefined unit types](#unit-types).
+* **name**<span class ="mdata-red-text"> (required)</span>: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_MOR.json: "Person mor".
+* **description**<span class ="mdata-red-text"> (required)</span>: Description of the column contents. Example: "Personens registrerte biologiske mor..."
+
+```json
+"measureVariables": [
+    {
+        "unitType": "PERSON",
+        "name": [{"languageCode": "no", "value": "Person mor"}],
+        "description": [
+            {"languageCode": "no", "value": "Personens registrerte biologiske mor"}
+        ]
+    }
+]
+```
+
+## Unit types
 * **PERSON**: Representation of a person in the microdata.no platform. Columns with this unit type should contain FNR.
 * **FAMILIE**: Representation of a family in the microdata.no platform. Columns with this unit type should contain FNR.
 * **FORETAK**: Representation of a foretak in the microdata.no platform. Columns with this unit type should contain ORGNR.
@@ -109,9 +195,9 @@ We expect all values in this dataset to be either "1" or "2", as this dataset on
 * **KURS**: Representation of a course in the microdata.no platform. Columns with this unit type should contain FNR_KURSID. Where FNR belongs to the participant and KURSID is the NUDB course id.
 * **KJORETOY**: Representation of a vehicle in the microdata.no platform. Columns with this unit type should contain FNR_REGNR. Where FNR is the owner of the vehicle, and REGNR is the registration number for the vehicle.
 
-## VALIDATION
+## Validation
 
-### CREATING A DATAFILE
+### Creating a datafile
 A data file must be supplied as a csv file with semicolon as the column seperator. There must always be 5 columns present in this order:
 1. identifier
 2. measure
@@ -134,7 +220,7 @@ This dataset describes a group of persons gross income accumulated yearly. The c
 * Stop: end of time period
 * Empty column (This column is reserved for an extra attribute variable if that is considered necessary. As there is no need here, it remains empty.)
 
-### GENERAL VALIDATION RULES FOR DATA
+### General validation rules for data
 * There can be no empty rows in the dataset
 * There can be no more than 5 elements in a row
 * Every row must have a non-empty identifier
@@ -142,7 +228,7 @@ This dataset describes a group of persons gross income accumulated yearly. The c
 * Values in the stop- and start-columns must be formatted correctly: "YYYY-MM-DD". Example "2020-12-31".
 * The data file must be utf-8 encoded
 
-### VALIDATION RULES BY TEMPORALITY TYPE
+### Validation rules by temporality type
 * **FIXED** (Constant value, ex.: place of birth)
     - All rows must have an unique identifier. (No repeating identifiers within a dataset)
     - All rows must have a stop date
