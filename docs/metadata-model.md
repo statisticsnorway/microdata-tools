@@ -16,10 +16,10 @@ These fields describe the dataset as a whole.
 "sensitivityLevel": "PERSON_GENERAL" | "PERSON_SPECIAL" | "PUBLIC" | "NONPUBLIC",
 ```
 
-* PERSON_GENERAL: general personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
-* PERSON_SPECIAL: special category of personal data, this is a category of data that is more sensitive. Health information is an example.
-* PUBLIC: data that is publicly available
-* NONPUBLIC: data that is not publicly available
+* PERSON_GENERAL: General personal data, this category applies to information that is generally handled without further notification and is not especially sensitive. Email address is an example.
+* PERSON_SPECIAL: Special category of personal data, this is a category of data that is more sensitive. Health information is an example.
+* PUBLIC: Data that is publicly available
+* NONPUBLIC: Data that is not publicly available
 
 **populationDescription**<span class ="mdata-red-text"> (required)</span>: Description of the dataset's population.
 ```json
