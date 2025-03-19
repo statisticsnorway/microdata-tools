@@ -1,8 +1,6 @@
 import json
 import os
 
-import pytest
-
 from microdata_tools import validate_dataset
 
 
