@@ -112,7 +112,7 @@ class CodeListItem(BaseModel, extra="forbid"):
                 )
             except ValueError as e:
                 raise ValueError(
-                    f'Invalid {field_name} date for {values["code"]}. '
+                    f"Invalid {field_name} date for {values['code']}. "
                     "Date format: YYYY-MM-DD"
                 ) from e
 
@@ -173,8 +173,7 @@ class ValueDomain(BaseModel, extra="forbid"):
                 )
         else:
             raise ValueError(
-                "A valueDomain must contain either a codeList "
-                "or a description"
+                "A valueDomain must contain either a codeList or a description"
             )
         return values
 
