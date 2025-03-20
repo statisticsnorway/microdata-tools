@@ -51,7 +51,7 @@ def validate_dataset_dir(
 
 
 def resolve_working_directory(
-    working_directory: Union[str, None]
+    working_directory: Union[str, None],
 ) -> Tuple[Path, bool]:
     """
     Generates a working directory if a working directory is not supplied.

@@ -17,7 +17,7 @@ def _format_pydantic_error(error: dict) -> str:
         for loc in error["loc"]
         if loc != "__root__" and not isinstance(loc, int)
     )
-    return f'{location}: {error["msg"]}'
+    return f"{location}: {error['msg']}"
 
 
 def validate_metadata_model(metadata_json: Dict) -> Metadata:
