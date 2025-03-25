@@ -9,13 +9,16 @@ packages = [{include = "microdata_tools"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
-numpy = "^1.26.0"
+numpy = [
+    { version = "^1.0", python = "<=3.10" },
+    { version = "^2.2.0", python = ">3.10" }
+]
 cryptography = [
     { version = "^43.0.0", python = "<=3.10" },
     { version = "^44.0.0", python = ">3.10" }
 ]
 pydantic = "^2.10"
-pyarrow = "^15.0.0"
+pyarrow = "^19.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.11.0"
