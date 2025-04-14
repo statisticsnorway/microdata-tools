@@ -54,6 +54,7 @@ class UnitType(str, Enum):
     MALEPUNKT = "MALEPUNKT"
     KRG_KREFTTILFELLE = "KRG_KREFTTILFELLE"
     FENGSLINGER_TILGANG = "FENGSLINGER_TILGANG"
+    SOESKEN = "SOESKEN"
 
 
 class UnitIdType(str, Enum):
