@@ -1,0 +1,61 @@
+{
+  "shortName": "SOESKEN_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Søskenidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Siblings identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for søsken i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for siblings in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "shortName": "SOESKEN",
+    "requiresPseudonymization": true,
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Søsken"
+      },
+      {
+        "languageCode": "en",
+        "value": "Siblings"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Søsken defineres som personer som i folkeregisteret er registrert med felles mor og far, eller med felles mor eller far der enten mor eller far er ukjent."
+      },
+      {
+        "languageCode": "en",
+        "value": "Siblings is defined as persons who are registered in the National Population Registry with a common mother and father, or with a common mother or father where either the mother or father is unknown."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert personnummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized national identity number"
+      }
+    ]
+  }
+}

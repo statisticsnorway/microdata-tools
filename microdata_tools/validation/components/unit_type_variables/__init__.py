@@ -41,6 +41,7 @@ UNIT_TYPE_VARIABLES = {
     "FENGSLINGER_TILGANG": load_json(
         UNIT_TYPE_VARIABLES_DIR / "FENGSLINGER_TILGANG.json"
     ),
+    "SOESKEN": load_json(UNIT_TYPE_VARIABLES_DIR / "SOESKEN.json"),
 }
 
 
