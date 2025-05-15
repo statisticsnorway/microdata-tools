@@ -1,0 +1,61 @@
+{
+  "shortName": "BEDRIFT_ID",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Bedriftsidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Establishment identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for bedrift i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for establishment in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "requiresPseudonymization": true,
+    "shortName": "BEDRIFT",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Bedrift"
+      },
+      {
+        "languageCode": "en",
+        "value": "Establishment"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Bedrift er definert som en lokalt avgrenset funksjonell enhet som hovedsakelig driver aktivitet innenfor en bestemt næringsgruppe (Standard for næringsgruppering)."
+      },
+      {
+        "languageCode": "en",
+        "value": "Defined as a locally delimited functional unit that mainly carries out business within a specific industry group (Standard Industrial Classification)."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert organisasjonsnummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized organisation number"
+      }
+    ]
+  }
+}
