@@ -74,7 +74,7 @@ Description of the indentifier column of the dataset. It is represented as a lis
 ```json
 "identifierVariables": [
     {
-        "unitType": "FAMILIE" | "FORETAK" | "HUSHOLDNING" | "JOBB" |
+        "unitType": "FAMILIE" | "BEDRIFT" | "HUSHOLDNING" | "JOBB" |
                     "KJORETOY" | "KOMMUNE" | "KURS" | "PERSON" | "VIRKSOMHET"
     }
 ],
@@ -187,7 +187,7 @@ You might find that some of your datasets contain a unitType in the measure colu
 ## Unit types
 * **PERSON**: Representation of a person in the microdata.no platform. Columns with this unit type should contain FNR.
 * **FAMILIE**: Representation of a family in the microdata.no platform. Columns with this unit type should contain FNR.
-* **FORETAK**: Representation of a foretak in the microdata.no platform. Columns with this unit type should contain ORGNR.
+* **BEDRIFT**: Representation of a bedrift in the microdata.no platform. Columns with this unit type should contain ORGNR.
 * **VIRKSOMHET**: Representation of a virksomhet in the microdata.no platform. Columns with this unit type should contain ORGNR.
 * **HUSHOLDNING**: Representation of a husholdning in the microdata.no platform. Columns with this unit type should contain FNR.
 * **JOBB**: Representation of a job in the microdata.no platform. Columns with this unit type should contain FNR_ORGNR. FNR belongs to the employee and ORGNR belongs to the employer.
