@@ -75,7 +75,7 @@ Description of the indentifier column of the dataset. It is represented as a lis
 "identifierVariables": [
     {
         "unitType": "FAMILIE" | "FORETAK" | "HUSHOLDNING" | "JOBB" |
-                    "KJORETOY" | "KOMMUNE" | "KURS" | "PERSON" | "VIRKSOMHET"
+                    "KJORETOY" | "KOMMUNE" | "KURS" | "PERSON" | "BEDRIFT"
     }
 ],
 ```
@@ -84,7 +84,7 @@ Description of the indentifier column of the dataset. It is represented as a lis
 ## Measure variables
 Description of the measure column of the dataset. It is represented as a list in the metadata model, but currently only one measure is allowed per dataset.
 
-If the measure column in your dataset is in fact a unit type (PERSON (FNR), VIRKSOMHET (ORGNR) etc.), the metadatamodel for the measure variable is different than described below. You should skip to the section [Measure variables (with unitType)](#measure-variables-with-unittype). 
+If the measure column in your dataset is in fact a unit type (PERSON (FNR), BEDRIFT (ORGNR) etc.), the metadatamodel for the measure variable is different than described below. You should skip to the section [Measure variables (with unitType)](#measure-variables-with-unittype). 
 
 
 * **name**<span class ="mdata-red-text"> (required)</span>: Human readable name(Label) of the measure column. This should be similar to your dataset name. Example for PERSON_INNTEKT.json: "Person inntekt".
@@ -188,7 +188,7 @@ You might find that some of your datasets contain a unitType in the measure colu
 * **PERSON**: Representation of a person in the microdata.no platform. Columns with this unit type should contain FNR.
 * **FAMILIE**: Representation of a family in the microdata.no platform. Columns with this unit type should contain FNR.
 * **FORETAK**: Representation of a foretak in the microdata.no platform. Columns with this unit type should contain ORGNR.
-* **VIRKSOMHET**: Representation of a virksomhet in the microdata.no platform. Columns with this unit type should contain ORGNR.
+* **BEDRIFT**: Representation of a bedrift in the microdata.no platform. Columns with this unit type should contain ORGNR.
 * **HUSHOLDNING**: Representation of a husholdning in the microdata.no platform. Columns with this unit type should contain FNR.
 * **JOBB**: Representation of a job in the microdata.no platform. Columns with this unit type should contain FNR_ORGNR. FNR belongs to the employee and ORGNR belongs to the employer.
 * **KOMMUNE**: Representation of a kommune in the microdata.no platform. Columns with this unit type should contain a valid kommune number.

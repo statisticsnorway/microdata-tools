@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "microdata-tools"
-version = "1.8.0"
+version = "1.9.0"
 description = "Tools for the microdata.no platform"
 authors = ["microdata-developers"]
 license = "MIT License"
