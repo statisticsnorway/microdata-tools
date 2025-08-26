@@ -1,13 +1,11 @@
 import os
-from typing import Dict
-from pathlib import Path
 from itertools import chain
-from pyarrow import parquet, Table, dataset
+from pathlib import Path
+from typing import Dict
 
+from pyarrow import Table, dataset, parquet
 
-PARQUET_DIR = Path(
-    "tests/resources/validation/steps/dataset_validator/parquet"
-)
+PARQUET_DIR = Path("tests/resources/validation/steps/dataset_validator/parquet")
 
 
 def _dataset_from_dict(name: str, table_dict: Dict):
@@ -43,9 +41,7 @@ FIXED_STRING_CODELIST = [
 FIXED_STRING_CODELIST_SENTINEL = [
     {
         "code": "0",
-        "categoryTitle": [
-            {"languageCode": "no", "value": "Sivilstand ukjent"}
-        ],
+        "categoryTitle": [{"languageCode": "no", "value": "Sivilstand ukjent"}],
     }
 ]
 FIXED_STRING_CODELIST_DS = _dataset_from_dict(

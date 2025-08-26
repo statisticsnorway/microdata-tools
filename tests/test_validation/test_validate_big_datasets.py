@@ -4,7 +4,6 @@ import pytest
 
 from microdata_tools import validate_dataset
 
-
 RESOURCE_DIR = "tests/resources/validation/validate_dataset/big_datasets"
 
 VALID_DATASET_NAMES = [

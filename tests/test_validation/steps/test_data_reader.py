@@ -1,11 +1,10 @@
-import pyarrow
 from pathlib import Path
 
+import pyarrow
 import pytest
 
-from microdata_tools.validation.steps import data_reader
 from microdata_tools.validation.exceptions import ValidationError
-
+from microdata_tools.validation.steps import data_reader
 
 INPUT_DIR = Path("tests/resources/validation/steps/data_reader")
 

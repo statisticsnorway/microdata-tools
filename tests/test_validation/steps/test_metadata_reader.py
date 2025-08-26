@@ -1,14 +1,13 @@
 from pathlib import Path
 
 import pytest
-from microdata_tools.validation.exceptions import ValidationError
 
-
-from microdata_tools.validation.steps import metadata_reader
 from microdata_tools.validation.components import (
     temporal_attributes,
     unit_type_variables,
 )
+from microdata_tools.validation.exceptions import ValidationError
+from microdata_tools.validation.steps import metadata_reader
 
 INPUT_DIR = Path("tests/resources/validation/steps/metadata_reader")
 MEASURE_DATATYPE = "STRING"

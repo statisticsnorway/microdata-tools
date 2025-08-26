@@ -2,7 +2,6 @@ from copy import deepcopy
 
 from microdata_tools.validation.exceptions import InvalidTemporalityType
 
-
 DESCRIPTIONS = {
     "FIXED": {
         "START": {

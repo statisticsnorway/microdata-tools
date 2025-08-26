@@ -1,18 +1,19 @@
+import copy
+import json
 import os
 import shutil
-import json
-import copy
 from typing import Optional
+
 from pydantic import BaseModel, conlist
 
 from microdata_tools import validate_metadata
-from microdata_tools.validation.model.metadata import (
-    MultiLingualString,
-    DataType,
-    ValueDomain,
-)
 from microdata_tools.validation.components.unit_type_variables import (
     UNIT_TYPE_VARIABLES,
+)
+from microdata_tools.validation.model.metadata import (
+    DataType,
+    MultiLingualString,
+    ValueDomain,
 )
 
 INPUT_DIR = "tests/resources/validation/components/unit_type_variables"

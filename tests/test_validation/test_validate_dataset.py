@@ -3,7 +3,6 @@ import os
 
 from microdata_tools import validate_dataset
 
-
 RESOURCE_DIR = "tests/resources/validation/validate_dataset"
 INPUT_DIR = f"{RESOURCE_DIR}/input_directory"
 WORKING_DIR = f"{RESOURCE_DIR}/working_directory"

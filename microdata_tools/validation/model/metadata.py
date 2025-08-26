@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Optional, List, Union
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, Field, conlist, model_validator
 
@@ -226,7 +226,5 @@ class Metadata(BaseModel):
         conlist(MultiLingualString, min_length=1), min_length=1
     )
     dataRevision: DataRevision
-    identifierVariables: conlist(
-        IdentifierVariable, min_length=1, max_length=1
-    )
+    identifierVariables: conlist(IdentifierVariable, min_length=1, max_length=1)
     measureVariables: conlist(MeasureVariable, min_length=1, max_length=1)

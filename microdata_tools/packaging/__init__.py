@@ -3,22 +3,21 @@ import os
 import shutil
 from pathlib import Path
 
+from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._encrypt import (
     _tar_encrypted_dataset,
     encrypt_dataset,
+)
+from microdata_tools.packaging._utils import (
+    calculate_checksum,
+    check_exists,
+    compare_checksum_with_file,
+    write_checksum_to_file,
 )
 from microdata_tools.packaging.exceptions import (
     UnpackagingError,
     ValidationException,
 )
-from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
-from microdata_tools.packaging._utils import (
-    check_exists,
-    write_checksum_to_file,
-    compare_checksum_with_file,
-    calculate_checksum,
-)
-
 
 logger = logging.getLogger()
 

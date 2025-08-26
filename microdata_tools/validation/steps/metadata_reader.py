@@ -1,14 +1,14 @@
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Union, List
+from pathlib import Path
+from typing import Dict, List, Union
 
-from microdata_tools.validation.model import validate_metadata_model
 from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.components import (
     temporal_attributes,
     unit_type_variables,
 )
 from microdata_tools.validation.exceptions import ValidationError
+from microdata_tools.validation.model import validate_metadata_model
 
 
 def _days_since_epoch(date_string: str) -> int:

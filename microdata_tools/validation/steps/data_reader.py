@@ -1,16 +1,13 @@
 # pylint: disable=no-member
 import logging
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict
-from datetime import datetime
-from datetime import timedelta
 
 import pyarrow
-from pyarrow import csv
-from pyarrow import compute, ArrowInvalid
+from pyarrow import ArrowInvalid, compute, csv
 
 from microdata_tools.validation.exceptions import ValidationError
-
 
 logger = logging.getLogger()
 
@@ -39,9 +36,7 @@ def _get_csv_read_options():
     )
 
 
-def _get_csv_convert_options(
-    identifier_data_type: str, measure_data_type: str
-):
+def _get_csv_convert_options(identifier_data_type: str, measure_data_type: str):
     identifier_pyarrow_type = _microdata_data_type_to_pyarrow(
         identifier_data_type
     )

@@ -1,8 +1,9 @@
-from pathlib import Path
 import hashlib
+from pathlib import Path
+
 from microdata_tools.packaging.exceptions import (
-    ValidationException,
     CsvConsistencyException,
+    ValidationException,
 )
 
 

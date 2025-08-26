@@ -1,17 +1,19 @@
-from pathlib import Path
 import string
-from pyarrow import parquet, dataset
+from pathlib import Path
 from typing import List, Union
+
+from pyarrow import dataset, parquet
+
+from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.components import unit_id_types
 from microdata_tools.validation.exceptions import ValidationError
-from microdata_tools.validation.adapter import local_storage
+from microdata_tools.validation.model.metadata import UnitIdType, UnitType
 from microdata_tools.validation.steps import (
-    metadata_reader,
-    dataset_validator,
     data_reader,
+    dataset_validator,
     metadata_enricher,
+    metadata_reader,
 )
-from microdata_tools.validation.model.metadata import UnitType, UnitIdType
 
 
 def _validate_dataset_name(dataset_name: str) -> None:
@@ -80,9 +82,9 @@ def validate_dataset(
         code_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
             "codeList"
         )
-        sentinel_list = metadata_dict["measureVariables"][0][
-            "valueDomain"
-        ].get("sentinelAndMissingValues")
+        sentinel_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
+            "sentinelAndMissingValues"
+        )
 
         # Read data
         table = data_reader.read_and_sanitize_csv(

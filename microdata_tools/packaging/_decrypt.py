@@ -1,8 +1,8 @@
 import logging
 import os
-from pathlib import Path
 import shutil
 import tarfile
+from pathlib import Path
 from typing import List, Tuple
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -10,11 +10,11 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
+from microdata_tools.packaging._utils import check_exists
 from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
 )
-from microdata_tools.packaging._utils import check_exists
 
 logger = logging.getLogger()
 

@@ -1,17 +1,16 @@
 import logging
 import os
-from pathlib import Path
-import tarfile
 import shutil
+import tarfile
+from pathlib import Path
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from microdata_tools.packaging.exceptions import ValidationException
 from microdata_tools.packaging._utils import check_exists
+from microdata_tools.packaging.exceptions import ValidationException
 
 logger = logging.getLogger()
 

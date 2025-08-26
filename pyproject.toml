@@ -28,3 +28,14 @@ package = true
 [tool.ruff]
 line-length = 80
 target-version = "py313"
+lint.select = [
+    "F",   # Pyflakes errors (including unused imports, undefined names)
+    "T",   # flake8-type-checking (imports used only for typing)
+    "E",   # pycodestyle errors (style errors)
+    "W",   # pycodestyle warnings
+    "I",   # isort import ordering
+    "ANN", # type annotation related rules
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["ANN"]

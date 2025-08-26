@@ -2,7 +2,7 @@ import pytest
 
 from microdata_tools import get_unit_id_type_for_unit_type
 from microdata_tools.validation.exceptions import UnregisteredUnitTypeError
-from microdata_tools.validation.model.metadata import UnitType, UnitIdType
+from microdata_tools.validation.model.metadata import UnitIdType, UnitType
 
 
 def test_get_unit_id_type_for_unit_type():

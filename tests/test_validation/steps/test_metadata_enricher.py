@@ -5,7 +5,6 @@ import pytest
 
 from microdata_tools.validation.steps import metadata_enricher
 
-
 INPUT_DIR = Path("tests/resources/validation/steps/metadata_enricher")
 
 

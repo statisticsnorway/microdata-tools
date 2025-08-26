@@ -1,7 +1,7 @@
-from typing import List, Union
 from datetime import datetime
+from typing import List, Union
 
-from pyarrow import dataset, compute, Table
+from pyarrow import Table, compute, dataset
 from pyarrow.dataset import FileSystemDataset
 
 from microdata_tools.validation.exceptions import ValidationError
@@ -314,9 +314,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
         )
         identifier_time_spans = identifier_time_spans.group_by(
             "unit_id", use_threads=False
-        ).aggregate(
-            [("start_epoch_days", "list"), ("stop_epoch_days", "list")]
-        )
+        ).aggregate([("start_epoch_days", "list"), ("stop_epoch_days", "list")])
         for i in range(len(identifier_time_spans)):
             overlap_message = find_overlap(
                 identifier_time_spans["start_epoch_days_list"][i].as_py(),
@@ -349,9 +347,7 @@ def validate_dataset(
     temporality_type: str,
 ) -> None:
     _valid_unit_id_check(data)
-    _valid_value_column_check(
-        data, measure_data_type, code_list, sentinel_list
-    )
+    _valid_value_column_check(data, measure_data_type, code_list, sentinel_list)
     if temporality_type == "FIXED":
         _fixed_temporal_variables_check(data)
         _only_unique_identifiers_check(data)
