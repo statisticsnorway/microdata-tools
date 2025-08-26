@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
     - name: Checkout code
@@ -24,16 +24,17 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        curl -sSL https://install.python-poetry.org | python -
-        poetry install
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v6
+    
+    - name: Sync dependencies
+      run: uv sync
 
     - name: Run tests
-      run: poetry run pytest --cov=microdata_tools
+      run: uv run -m pytest --cov=microdata_tools
 
     - name: Run Ruff check
-      run: poetry run ruff check --output-format=github
+      run: uv run ruff check --output-format=github
 
     - name: Run Ruff format
-      run: poetry run ruff format --diff
+      run: uv run ruff format --diff
