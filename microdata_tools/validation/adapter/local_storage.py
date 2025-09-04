@@ -70,7 +70,7 @@ def clean_up_temporary_files(
     dataset_name: str,
     working_directory: Path,
     delete_working_directory: bool = False,
-):
+) -> None:
     generated_files = [
         f"{dataset_name}.parquet",
         f"{dataset_name}.json",

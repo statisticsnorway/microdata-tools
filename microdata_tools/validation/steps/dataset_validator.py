@@ -1,5 +1,6 @@
+# pyright: reportAttributeAccessIssue=false
 from datetime import datetime
-from typing import List, Union
+from typing import Iterator, List, Sequence, TypeVar, Union
 
 from pyarrow import Table, compute, dataset
 from pyarrow.dataset import FileSystemDataset
@@ -7,7 +8,7 @@ from pyarrow.dataset import FileSystemDataset
 from microdata_tools.validation.exceptions import ValidationError
 
 
-def _get_error_list(invalid_rows: Table, message: str):
+def _get_error_list(invalid_rows: Table, message: str) -> list[str]:
     invalid_identifiers = (
         invalid_rows.column("unit_id").slice(0, 50).to_pylist()
     )
@@ -22,7 +23,7 @@ def _valid_value_column_check(
     data_type: str,
     code_list: Union[List, None],
     sentinel_list: Union[List, None],
-):
+) -> None:
     """
     Any given cell in the value column is valid only if:
     * The cell contains a a valid non-null value
@@ -72,13 +73,14 @@ def _valid_value_column_check(
             raise ValidationError(
                 "#2 column",
                 errors=[
-                    f"Error for identifier {unit_id}: {code} is not in code list"
+                    f"Error for identifier {unit_id}: {code} is not in "
+                    f"code list"
                     for (unit_id, code) in invalid_code_rows
                 ],
             )
 
 
-def _valid_unit_id_check(data: FileSystemDataset):
+def _valid_unit_id_check(data: FileSystemDataset) -> None:
     """
     Any given cell in the unit_id column is valid only if:
     * The cell contains a a valid non-null value
@@ -99,7 +101,7 @@ def _valid_unit_id_check(data: FileSystemDataset):
         )
 
 
-def _fixed_temporal_variables_check(data: FileSystemDataset):
+def _fixed_temporal_variables_check(data: FileSystemDataset) -> None:
     """
     Any given row in a table with temporalityType=FIXED is valid only if:
     * The start_epoch_days column contains null (empty)
@@ -120,7 +122,7 @@ def _fixed_temporal_variables_check(data: FileSystemDataset):
         )
 
 
-def _status_temporal_variables_check(data: FileSystemDataset):
+def _status_temporal_variables_check(data: FileSystemDataset) -> None:
     """
     Any given row in a table with temporalityType=STATUS is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -156,7 +158,7 @@ def _status_temporal_variables_check(data: FileSystemDataset):
         )
 
 
-def _event_temporal_variables_check(data: FileSystemDataset):
+def _event_temporal_variables_check(data: FileSystemDataset) -> None:
     """
     Any given row in a table with temporalityType=EVENT is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -180,7 +182,7 @@ def _event_temporal_variables_check(data: FileSystemDataset):
         )
 
 
-def _accumulated_temporal_variables_check(data: FileSystemDataset):
+def _accumulated_temporal_variables_check(data: FileSystemDataset) -> None:
     """
     Any given row in a table with temporalityType=ACCUMULATED is valid only if:
     * The start_epoch_days column contains a non-null value (int32)
@@ -206,7 +208,7 @@ def _accumulated_temporal_variables_check(data: FileSystemDataset):
         )
 
 
-def _only_unique_identifiers_check(data: FileSystemDataset):
+def _only_unique_identifiers_check(data: FileSystemDataset) -> None:
     """
     A table with temporalityType=FIXED is only valid if all
     cells in the unit_id column are unique.
@@ -235,7 +237,7 @@ def _only_unique_identifiers_check(data: FileSystemDataset):
             )
 
 
-def _status_uniquesness_check(data: FileSystemDataset):
+def _status_uniquesness_check(data: FileSystemDataset) -> None:
     """
     A table with temporalityType=STATUS is valid only if all
     cells in the unit_id column are unique per status date.
@@ -258,7 +260,7 @@ def _status_uniquesness_check(data: FileSystemDataset):
             )
 
 
-def _no_overlapping_timespans_check(data: FileSystemDataset):
+def _no_overlapping_timespans_check(data: FileSystemDataset) -> None:
     """
     A table with temporalityType=(EVENT|ACCUMULATED) is valid
     only if all rows for a given identifier contains no overlapping
@@ -274,7 +276,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
             )
         )
 
-    def find_overlap(start_list, stop_list) -> Union[str, None]:
+    def find_overlap(start_list: list, stop_list: list) -> Union[str, None]:
         """
         Looks for overlapping timespans where each timespan
         is defined by a start_date at an index from the start_list,
@@ -285,13 +287,15 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
                 return (
                     f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
                     ") overlaps with "
-                    f"timespan: ({from_epoch_days_to_date(start_list[i + 1])} - "
+                    f"timespan: "
+                    f"({from_epoch_days_to_date(start_list[i + 1])} - "
                     f"{from_epoch_days_to_date(stop_list[i + 1])})"
                 )
             if stop_list[i] > start_list[i + 1]:
                 return (
                     f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
-                    f"{from_epoch_days_to_date(stop_list[i])}) overlaps with timespan: "
+                    f"{from_epoch_days_to_date(stop_list[i])}) "
+                    f"overlaps with timespan: "
                     f"({from_epoch_days_to_date(start_list[i + 1])} - "
                     f"{from_epoch_days_to_date(stop_list[i + 1])})"
                 )
@@ -324,7 +328,8 @@ def _no_overlapping_timespans_check(data: FileSystemDataset):
                 error_list.append(
                     (
                         "Invalid overlapping timespans for identifier"
-                        f' "{identifier_time_spans["unit_id"][i]}": {overlap_message}'
+                        f' "{identifier_time_spans["unit_id"][i]}":'
+                        f" {overlap_message}"
                     )
                 )
             if len(error_list) > 49:

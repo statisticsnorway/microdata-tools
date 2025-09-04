@@ -1,5 +1,6 @@
 from copy import deepcopy
 from pathlib import Path
+from typing import Any
 
 from microdata_tools.validation.adapter.local_storage import load_json
 from microdata_tools.validation.exceptions import InvalidIdentifierType
@@ -45,7 +46,7 @@ UNIT_TYPE_VARIABLES = {
 }
 
 
-def get(unit_type: str):
+def get(unit_type: str) -> dict[str, Any]:
     try:
         return deepcopy(UNIT_TYPE_VARIABLES[unit_type])
     except KeyError as e:

@@ -75,7 +75,8 @@ def test_get_temporal_data():
     with pytest.raises(ValidationError) as e:
         data_reader.get_temporal_data(empty_table, "EVENT")
     assert e.value.errors == [
-        "Could not read data in third column (Start date). Is this column empty?"
+        "Could not read data in third column (Start date). Is this column empty"
+        "?"
     ]
 
 
@@ -93,7 +94,8 @@ def test_sanitize_long():
             invalid_data_path, "STRING", "LONG", "FIXED"
         )
     assert e.value.errors == [
-        "In CSV column #1: CSV conversion error to int64: invalid value 'abc123'"
+        "In CSV column #1: CSV conversion error to int64: invalid value "
+        "'abc123'"
     ]
 
 

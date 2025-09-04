@@ -136,7 +136,7 @@ def validate_metadata(
     input_directory: str = "",
     working_directory: str = "",
     keep_temporary_files: bool = False,
-) -> List[dict]:
+) -> list[str]:
     """
     Validate metadata and return a list of errors.
     If the metadata is valid, the list will be empty.

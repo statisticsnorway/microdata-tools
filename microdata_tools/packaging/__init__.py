@@ -131,7 +131,9 @@ def unpackage_dataset(
         raise UnpackagingError("Failed to unpackage dataset") from exc
 
 
-def _validate_csv_consistency(dataset_name, dataset_dir, output_dir):
+def _validate_csv_consistency(
+    dataset_name: str, dataset_dir: Path, output_dir: Path
+) -> None:
     if Path(output_dir / dataset_name / f"{dataset_name}.csv").exists():
         calculated_checksum = calculate_checksum(
             output_dir / dataset_name / f"{dataset_name}.csv"

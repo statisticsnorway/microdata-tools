@@ -7,7 +7,7 @@ from microdata_tools.packaging.exceptions import (
 )
 
 
-def check_exists(path: Path):
+def check_exists(path: Path) -> None:
     if not path.exists():
         raise ValidationException(f"The path {path} does not exist")
 
