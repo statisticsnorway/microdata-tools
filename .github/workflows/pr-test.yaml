@@ -31,7 +31,7 @@ jobs:
       run: uv sync
 
     - name: Run tests
-      run: uv run -m pytest --cov=microdata_tools
+      run: uv run pytest --cov=microdata_tools
 
     - name: Run Ruff check
       run: uv run ruff check --output-format=github

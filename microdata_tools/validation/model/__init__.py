@@ -1,6 +1,6 @@
 # pylint: disable=raise-missing-from
 import logging
-from typing import Dict
+from typing import Any, Dict, Mapping
 
 import pydantic
 
@@ -10,7 +10,7 @@ from microdata_tools.validation.model.metadata import Metadata
 logger = logging.getLogger()
 
 
-def _format_pydantic_error(error: dict) -> str:
+def _format_pydantic_error(error: Mapping[str, Any]) -> str:
     location = "->".join(
         loc
         for loc in error["loc"]

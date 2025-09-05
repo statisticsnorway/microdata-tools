@@ -8,7 +8,7 @@ from typing import List, Tuple
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from microdata_tools.packaging._utils import check_exists
 from microdata_tools.packaging.exceptions import (
@@ -54,6 +54,9 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
 
         encrypted_symkey = Path(dataset_dir / f"{dataset_name}.symkey.encr")
         check_exists(encrypted_symkey)
+
+        if not isinstance(private_key, rsa.RSAPrivateKey):
+            raise TypeError("Privatkey is not RSA. Cannot use .decrypt().")
 
         with open(encrypted_symkey, "rb") as f:
             symkey = f.read()

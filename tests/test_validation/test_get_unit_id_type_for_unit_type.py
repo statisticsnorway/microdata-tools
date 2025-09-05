@@ -18,5 +18,5 @@ def test_get_unit_id_type_for_unit_type():
     )
 
     with pytest.raises(UnregisteredUnitTypeError) as e:
-        get_unit_id_type_for_unit_type("NOT A UNIT TYPE")
+        get_unit_id_type_for_unit_type("NOT A UNIT TYPE")  # pyright: ignore[reportArgumentType]
     assert "No such unit type" in str(e)

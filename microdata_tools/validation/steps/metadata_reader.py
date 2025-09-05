@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -12,12 +12,12 @@ from microdata_tools.validation.model import validate_metadata_model
 
 
 def _days_since_epoch(date_string: str) -> int:
-    epoch = datetime.utcfromtimestamp(0)
-    date_obj = datetime.strptime(date_string, "%Y-%m-%d")
+    epoch = datetime.fromtimestamp(0, tz=timezone.utc)
+    date_obj = datetime.fromisoformat(date_string).replace(tzinfo=timezone.utc)
     return (date_obj - epoch).days
 
 
-def _determine_datatype(value):
+def _determine_datatype(value: object) -> str | None:
     if isinstance(value, str):
         return "STRING"
     elif isinstance(value, int):
@@ -25,8 +25,8 @@ def _determine_datatype(value):
 
 
 def _validate_datatype_in_codelist_and_sentinels(
-    code_list, list_name, data_type: str
-):
+    code_list: list, list_name: str, data_type: str
+) -> str | None:
     invalid_codes = [
         item.get("code")
         for item in code_list
@@ -35,8 +35,14 @@ def _validate_datatype_in_codelist_and_sentinels(
     if invalid_codes:
         error_message = (
             f"Specified data type for measure ({data_type}) does not match the "
-            f"data type within the {list_name} ({_determine_datatype(invalid_codes[0])}). Codes with mismatching data type "
-            f"are: {invalid_codes[:5] + ['...'] if len(invalid_codes) > 5 else invalid_codes}"
+            f"data type within the {list_name} ({
+                _determine_datatype(invalid_codes[0])
+            }). Codes with mismatching data type "
+            f"are: {
+                invalid_codes[:5] + ['...']
+                if len(invalid_codes) > 5
+                else invalid_codes
+            }"
         )
         return error_message
     else:
@@ -52,8 +58,8 @@ def _validate_code_list(
 
     ONE_DAY = 1
     has_ongoing_time_period = False
-    valid_from_dates = []
-    valid_until_dates = []
+    valid_from_dates: list[int] = []
+    valid_until_dates: list[int] = []
     for code in code_list:
         valid_from_dates.append(_days_since_epoch(code.get("validFrom")))
         if code.get("validUntil") is not None:
@@ -111,7 +117,8 @@ def _validate_code_list(
         ]
         if duplicate_codes:
             errors.append(
-                f"Duplicate codes for same time period: {list(set(duplicate_codes))}"
+                f"Duplicate codes for same time period: "
+                f"{list(set(duplicate_codes))}"
             )
     invalid_code_error = _validate_datatype_in_codelist_and_sentinels(
         code_list, "codelist", data_type
@@ -121,7 +128,7 @@ def _validate_code_list(
     return errors
 
 
-def _validate_code_lists(metadata: Dict):
+def _validate_code_lists(metadata: Dict) -> list[str]:
     measure_data_type: str = metadata.get("measureVariables", [{}])[0].get(
         "dataType"
     )
@@ -170,7 +177,7 @@ def _validate_code_lists(metadata: Dict):
     return []
 
 
-def _insert_centralized_variable_definitions(metadata: Dict):
+def _insert_centralized_variable_definitions(metadata: Dict) -> None:
     metadata["identifierVariables"] = [
         unit_type_variables.get(metadata["identifierVariables"][0]["unitType"])
     ]

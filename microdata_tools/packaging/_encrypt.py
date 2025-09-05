@@ -7,7 +7,7 @@ from pathlib import Path
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
 from microdata_tools.packaging._utils import check_exists
 from microdata_tools.packaging.exceptions import ValidationException
@@ -89,6 +89,9 @@ def encrypt_dataset(
 
     logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
+    if not isinstance(public_key, rsa.RSAPublicKey):
+        raise TypeError("Public key is not RSA. Cannot use .encrypt().")
+
     encrypted_sym_key = public_key.encrypt(
         symkey,
         padding.OAEP(
@@ -110,7 +113,7 @@ def encrypt_dataset(
     )
 
 
-def _tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
+def tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
     """
     Creates a tar file from encrypted dataset files.
     Removes the input directory after successful completion.

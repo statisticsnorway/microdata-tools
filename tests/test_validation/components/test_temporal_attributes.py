@@ -25,5 +25,5 @@ def test_generate_temporal_attributes_invalid_type():
     assert "OCCASIONAL" in str(e)
 
     with pytest.raises(InvalidTemporalityType) as e:
-        temporal_attributes.generate_stop_time_attribute(None)
+        temporal_attributes.generate_stop_time_attribute(None)  # pyright: ignore[reportArgumentType]
     assert "None" in str(e)

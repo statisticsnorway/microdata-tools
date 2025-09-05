@@ -5,8 +5,8 @@ from pathlib import Path
 
 from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._encrypt import (
-    _tar_encrypted_dataset,
     encrypt_dataset,
+    tar_encrypted_dataset,
 )
 from microdata_tools.packaging._utils import (
     calculate_checksum,
@@ -78,7 +78,7 @@ def package_dataset(
             dataset_output_dir / f"{dataset_name}.json",
         )
 
-        _tar_encrypted_dataset(input_dir=output_dir, dataset_name=dataset_name)
+        tar_encrypted_dataset(input_dir=output_dir, dataset_name=dataset_name)
 
     except Exception as exe:
         logger.error(f"Failed to package dataset {dataset_name}: {exe}")

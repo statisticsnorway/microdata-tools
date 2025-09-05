@@ -1,6 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 from datetime import datetime
-from typing import Iterator, List, Sequence, TypeVar, Union
+from typing import Iterator, List, Sequence, Union
 
 from pyarrow import Table, compute, dataset
 from pyarrow.dataset import FileSystemDataset
@@ -301,7 +301,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset) -> None:
                 )
         return None
 
-    def batch(iterable, batch_size):
+    def batch(iterable: Sequence, batch_size: int) -> Iterator:
         for index in range(0, len(iterable), batch_size):
             yield iterable[index : index + batch_size]
 
