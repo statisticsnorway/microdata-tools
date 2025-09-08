@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Annotated, List, Never, Optional, Union
+from typing import Annotated, List, NoReturn, Optional, Union
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -89,7 +89,7 @@ NonEmptyMultiLingualStrings = Annotated[
 
 class TemporalEnd(BaseModel):
     description: NonEmptyMultiLingualStrings
-    successors: list[str] | None = Field(default=None, min_length=1)
+    successors: Optional[list[str]] = Field(default=None, min_length=1)
 
 
 class DataRevision(BaseModel, extra="forbid"):
@@ -148,17 +148,17 @@ class SentinelItem(BaseModel, extra="forbid"):
 
 
 class ValueDomain(BaseModel, extra="forbid"):
-    description: NonEmptyMultiLingualStrings | None = None
+    description: Optional[NonEmptyMultiLingualStrings] = None
     measurementType: Optional[str] = None
-    measurementUnitDescription: NonEmptyMultiLingualStrings | None = None
+    measurementUnitDescription: Optional[NonEmptyMultiLingualStrings] = None
     uriDefinition: Optional[List[str]] = None
-    codeList: list[CodeListItem] | None = Field(default=None, min_length=1)
+    codeList: Optional[list[CodeListItem]] = Field(default=None, min_length=1)
     sentinelAndMissingValues: Optional[List[SentinelItem]] = None
 
     @model_validator(mode="before")
     @classmethod
     def validate_value_domain(cls, values: dict) -> dict:
-        def raise_invalid_with_code_list(field_name: str) -> Never:
+        def raise_invalid_with_code_list(field_name: str) -> NoReturn:
             raise ValueError(
                 f"Can not add a {field_name} in a valuedomain with a codeList"
             )
@@ -195,7 +195,7 @@ class MeasureVariable(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_measure(cls, values: dict) -> dict:
-        def raise_invalid_with_unit_type(field_name: str) -> Never:
+        def raise_invalid_with_unit_type(field_name: str) -> NoReturn:
             raise ValueError(
                 f"Can not set a {field_name} in a measure variable "
                 "together with a unitType"
@@ -222,7 +222,7 @@ class Metadata(BaseModel):
     temporalityType: TemporalityType
     sensitivityLevel: SensitivityLevel
     populationDescription: NonEmptyMultiLingualStrings
-    spatialCoverageDescription: NonEmptyMultiLingualStrings | None = None
+    spatialCoverageDescription: Optional[NonEmptyMultiLingualStrings] = None
     subjectFields: Annotated[
         list[NonEmptyMultiLingualStrings],
         Field(min_length=1),

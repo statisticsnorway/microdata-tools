@@ -17,7 +17,7 @@ def _days_since_epoch(date_string: str) -> int:
     return (date_obj - epoch).days
 
 
-def _determine_datatype(value: object) -> str | None:
+def _determine_datatype(value: object) -> Union[str, None]:
     if isinstance(value, str):
         return "STRING"
     elif isinstance(value, int):
@@ -26,7 +26,7 @@ def _determine_datatype(value: object) -> str | None:
 
 def _validate_datatype_in_codelist_and_sentinels(
     code_list: list, list_name: str, data_type: str
-) -> str | None:
+) -> Union[str, None]:
     invalid_codes = [
         item.get("code")
         for item in code_list
@@ -35,14 +35,10 @@ def _validate_datatype_in_codelist_and_sentinels(
     if invalid_codes:
         error_message = (
             f"Specified data type for measure ({data_type}) does not match the "
-            f"data type within the {list_name} ({
-                _determine_datatype(invalid_codes[0])
-            }). Codes with mismatching data type "
-            f"are: {
-                invalid_codes[:5] + ['...']
-                if len(invalid_codes) > 5
-                else invalid_codes
-            }"
+            f"data type within the "
+            f"{list_name} ({_determine_datatype(invalid_codes[0])}). "
+            f"Codes with mismatching data type are: "
+            f"{invalid_codes[:5] + ['...'] if len(invalid_codes) > 5 else invalid_codes}"  # noqa
         )
         return error_message
     else:
