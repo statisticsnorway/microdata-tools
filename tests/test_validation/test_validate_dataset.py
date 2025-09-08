@@ -74,7 +74,10 @@ def test_validate_valid_dataset_delete_generated_dir():
             valid_dataset_name, input_directory=INPUT_DIR
         )
         temp_files = [
-            dir for dir in os.listdir() if os.path.isdir(dir) and dir[0] != "."
+            dir
+            for dir in os.listdir()
+            if os.path.isdir(dir)
+            and not (dir.startswith(".") or dir.endswith(".egg-info"))
         ]
         assert not data_errors
         for file in temp_files:
