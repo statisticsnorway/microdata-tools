@@ -91,7 +91,7 @@ jobs:
         uses: salsify/action-detect-and-tag-new-version@v2.0.3
         with:
           version-command: |
-            bash -o pipefail -c "uv version | cut -f 2 -d' '"
+            bash -o pipefail -c "uv version --short"
 
       - name: Build package
         run: |

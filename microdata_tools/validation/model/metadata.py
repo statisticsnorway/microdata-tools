@@ -82,13 +82,18 @@ class MultiLingualString(BaseModel):
     value: str = Field(min_length=1)
 
 
+NonEmptyMultiLingualStrings = Annotated[
+    list[MultiLingualString], Field(min_length=1)
+]
+
+
 class TemporalEnd(BaseModel):
-    description: Annotated[list[MultiLingualString], Field(min_length=1)]
+    description: NonEmptyMultiLingualStrings
     successors: list[str] | None = Field(default=None, min_length=1)
 
 
 class DataRevision(BaseModel, extra="forbid"):
-    description: Annotated[list[MultiLingualString], Field(min_length=1)]
+    description: NonEmptyMultiLingualStrings
     temporalEnd: Optional[TemporalEnd] = None
 
 
@@ -98,7 +103,7 @@ class IdentifierVariable(BaseModel, extra="forbid"):
 
 class CodeListItem(BaseModel, extra="forbid"):
     code: Union[str, int]
-    categoryTitle: Annotated[list[MultiLingualString], Field(min_length=1)]
+    categoryTitle: NonEmptyMultiLingualStrings
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
 
@@ -130,7 +135,7 @@ class CodeListItem(BaseModel, extra="forbid"):
 
 class SentinelItem(BaseModel, extra="forbid"):
     code: Union[str, int]
-    categoryTitle: Annotated[list[MultiLingualString], Field(min_length=1)]
+    categoryTitle: NonEmptyMultiLingualStrings
 
     @model_validator(mode="before")
     @classmethod
@@ -143,17 +148,11 @@ class SentinelItem(BaseModel, extra="forbid"):
 
 
 class ValueDomain(BaseModel, extra="forbid"):
-    description: Annotated[
-        list[MultiLingualString] | None, Field(default=None, min_length=1)
-    ]
+    description: NonEmptyMultiLingualStrings | None = None
     measurementType: Optional[str] = None
-    measurementUnitDescription: Annotated[
-        list[MultiLingualString] | None, Field(default=None, min_length=1)
-    ]
+    measurementUnitDescription: NonEmptyMultiLingualStrings | None = None
     uriDefinition: Optional[List[str]] = None
-    codeList: Annotated[
-        list[CodeListItem] | None, Field(default=None, min_length=1)
-    ]
+    codeList: list[CodeListItem] | None = Field(default=None, min_length=1)
     sentinelAndMissingValues: Optional[List[SentinelItem]] = None
 
     @model_validator(mode="before")
@@ -186,8 +185,8 @@ class ValueDomain(BaseModel, extra="forbid"):
 
 class MeasureVariable(BaseModel):
     unitType: Optional[UnitType] = None
-    name: Annotated[list[MultiLingualString], Field(min_length=1)]
-    description: Annotated[list[MultiLingualString], Field(min_length=1)]
+    name: NonEmptyMultiLingualStrings
+    description: NonEmptyMultiLingualStrings
     dataType: Optional[DataType] = None
     uriDefinition: Optional[List[str]] = None
     format: Optional[str] = None
@@ -222,14 +221,10 @@ class MeasureVariable(BaseModel):
 class Metadata(BaseModel):
     temporalityType: TemporalityType
     sensitivityLevel: SensitivityLevel
-    populationDescription: Annotated[
-        list[MultiLingualString], Field(min_length=1)
-    ]
-    spatialCoverageDescription: Annotated[
-        list[MultiLingualString] | None, Field(default=None, min_length=1)
-    ]
+    populationDescription: NonEmptyMultiLingualStrings
+    spatialCoverageDescription: NonEmptyMultiLingualStrings | None = None
     subjectFields: Annotated[
-        list[Annotated[list[MultiLingualString], Field(min_length=1)]],
+        list[NonEmptyMultiLingualStrings],
         Field(min_length=1),
     ]
     dataRevision: DataRevision
