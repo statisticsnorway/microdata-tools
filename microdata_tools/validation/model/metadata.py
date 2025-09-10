@@ -77,23 +77,21 @@ class UnitIdType(str, Enum):
     FENGSLINGER_TILGANG_ID = "FENGSLINGER_TILGANG_ID"
 
 
-class MultiLingualString(BaseModel):
+class LocalizedString(BaseModel):
     languageCode: LanguageCode
     value: str = Field(min_length=1)
 
 
-NonEmptyMultiLingualStrings = Annotated[
-    list[MultiLingualString], Field(min_length=1)
-]
+MultiLingualString = Annotated[list[LocalizedString], Field(min_length=1)]
 
 
 class TemporalEnd(BaseModel):
-    description: NonEmptyMultiLingualStrings
+    description: MultiLingualString
     successors: Optional[list[str]] = Field(default=None, min_length=1)
 
 
 class DataRevision(BaseModel, extra="forbid"):
-    description: NonEmptyMultiLingualStrings
+    description: MultiLingualString
     temporalEnd: Optional[TemporalEnd] = None
 
 
@@ -103,7 +101,7 @@ class IdentifierVariable(BaseModel, extra="forbid"):
 
 class CodeListItem(BaseModel, extra="forbid"):
     code: Union[str, int]
-    categoryTitle: NonEmptyMultiLingualStrings
+    categoryTitle: MultiLingualString
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
 
@@ -135,7 +133,7 @@ class CodeListItem(BaseModel, extra="forbid"):
 
 class SentinelItem(BaseModel, extra="forbid"):
     code: Union[str, int]
-    categoryTitle: NonEmptyMultiLingualStrings
+    categoryTitle: MultiLingualString
 
     @model_validator(mode="before")
     @classmethod
@@ -148,9 +146,9 @@ class SentinelItem(BaseModel, extra="forbid"):
 
 
 class ValueDomain(BaseModel, extra="forbid"):
-    description: Optional[NonEmptyMultiLingualStrings] = None
+    description: Optional[MultiLingualString] = None
     measurementType: Optional[str] = None
-    measurementUnitDescription: Optional[NonEmptyMultiLingualStrings] = None
+    measurementUnitDescription: Optional[MultiLingualString] = None
     uriDefinition: Optional[List[str]] = None
     codeList: Optional[list[CodeListItem]] = Field(default=None, min_length=1)
     sentinelAndMissingValues: Optional[List[SentinelItem]] = None
@@ -185,8 +183,8 @@ class ValueDomain(BaseModel, extra="forbid"):
 
 class MeasureVariable(BaseModel):
     unitType: Optional[UnitType] = None
-    name: NonEmptyMultiLingualStrings
-    description: NonEmptyMultiLingualStrings
+    name: MultiLingualString
+    description: MultiLingualString
     dataType: Optional[DataType] = None
     uriDefinition: Optional[List[str]] = None
     format: Optional[str] = None
@@ -221,10 +219,10 @@ class MeasureVariable(BaseModel):
 class Metadata(BaseModel):
     temporalityType: TemporalityType
     sensitivityLevel: SensitivityLevel
-    populationDescription: NonEmptyMultiLingualStrings
-    spatialCoverageDescription: Optional[NonEmptyMultiLingualStrings] = None
+    populationDescription: MultiLingualString
+    spatialCoverageDescription: Optional[MultiLingualString] = None
     subjectFields: Annotated[
-        list[NonEmptyMultiLingualStrings],
+        list[MultiLingualString],
         Field(min_length=1),
     ]
     dataRevision: DataRevision

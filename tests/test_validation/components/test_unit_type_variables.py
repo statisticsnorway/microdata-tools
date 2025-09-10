@@ -2,9 +2,9 @@ import copy
 import json
 import os
 import shutil
-from typing import Annotated, Optional
+from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from microdata_tools import validate_metadata
 from microdata_tools.validation.components.unit_type_variables import (
@@ -21,15 +21,15 @@ INPUT_DIR = "tests/resources/validation/components/unit_type_variables"
 
 class UnitType(BaseModel):
     shortName: str
-    name: Annotated[list[MultiLingualString], Field(min_length=1)]
+    name: MultiLingualString
     requiresPseudonymization: bool
-    description: Annotated[list[MultiLingualString], Field(min_length=1)]
+    description: MultiLingualString
 
 
 class UnitTypeVariable(BaseModel):
     shortName: str
-    name: Annotated[list[MultiLingualString], Field(min_length=1)]
-    description: Annotated[list[MultiLingualString], Field(min_length=1)]
+    name: MultiLingualString
+    description: MultiLingualString
     dataType: DataType
     format: Optional[str] = None
     unitType: UnitType
