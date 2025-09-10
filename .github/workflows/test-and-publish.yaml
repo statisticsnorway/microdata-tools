@@ -53,11 +53,14 @@ jobs:
     - name: Sync dependencies
       run: uv sync
 
-    - name: Build and publish
+    - name: Build
+      run: uv build
+
+    - name: Publish
       env: 
         USER: ${{ secrets.PYPI_USER }}
         TOKEN: ${{ secrets.PYPI_TOKEN }}
-      run: uv publish --build --username "$USER" --password "$TOKEN"
+      run: uv publish --username "$USER" --password "$TOKEN"
 
   github-release:
     name: Release pushed tag
