@@ -1,6 +1,5 @@
 from microdata_tools import validate_dataset
 
-
 INPUT_DIRECTORY = "docs/examples"
 EXAMPLE_DATASETS = [
     "BEFOLKNING_KJOENN",

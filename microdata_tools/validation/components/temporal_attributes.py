@@ -1,7 +1,7 @@
 from copy import deepcopy
+from typing import Any
 
 from microdata_tools.validation.exceptions import InvalidTemporalityType
-
 
 DESCRIPTIONS = {
     "FIXED": {
@@ -170,7 +170,7 @@ STOP_VARIABLE_DEFINITION = {
 }
 
 
-def generate_start_time_attribute(temporality_type: str):
+def generate_start_time_attribute(temporality_type: str) -> dict[str, Any]:
     try:
         start_attribute = deepcopy(START_VARIABLE_DEFINITION)
         start_attribute.update(DESCRIPTIONS[temporality_type]["START"])
@@ -179,7 +179,7 @@ def generate_start_time_attribute(temporality_type: str):
         raise InvalidTemporalityType(temporality_type) from e
 
 
-def generate_stop_time_attribute(temporality_type: str):
+def generate_stop_time_attribute(temporality_type: str) -> dict[str, Any]:
     try:
         stop_attribute = deepcopy(STOP_VARIABLE_DEFINITION)
         stop_attribute.update(DESCRIPTIONS[temporality_type]["STOP"])

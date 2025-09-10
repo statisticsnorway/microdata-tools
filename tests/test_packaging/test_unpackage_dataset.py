@@ -15,7 +15,6 @@ from microdata_tools.packaging.exceptions import (
 )
 from tests.test_packaging.test_package_dataset import _create_rsa_public_key
 
-
 RSA_KEYS_DIRECTORY = Path("tests/resources/packaging/rsa_test_key")
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_unpackage")
 OUTPUT_DIRECTORY = Path("tests/resources/packaging/output")
@@ -94,9 +93,7 @@ def test_unpackage_dataset():
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
     assert Path(output_dataset_dir / f"{dataset_name}.csv").exists()
     assert not Path(output_dataset_dir / "chunks/1.csv.encr").exists()
-    assert not Path(
-        output_dataset_dir / f"{dataset_name}.symkey.encr"
-    ).exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
 
@@ -138,9 +135,7 @@ def test_unpackage_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     assert not Path(output_dataset_dir / "chunks/1.csv.encr").exists()
     assert not Path(output_dataset_dir / "chunks/2.csv.encr").exists()
     assert not Path(output_dataset_dir / "chunks/3.csv.encr").exists()
-    assert not Path(
-        output_dataset_dir / f"{dataset_name}.symkey.encr"
-    ).exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
 
@@ -161,9 +156,7 @@ def test_unpackage_dataset_just_json():
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
     assert not Path(output_dataset_dir / f"{dataset_name}.csv").exists()
     assert not Path(output_dataset_dir / f"{dataset_name}.csv.encr").exists()
-    assert not Path(
-        output_dataset_dir / f"{dataset_name}.symkey.encr"
-    ).exists()
+    assert not Path(output_dataset_dir / f"{dataset_name}.symkey.encr").exists()
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
 

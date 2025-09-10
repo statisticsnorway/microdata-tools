@@ -1,8 +1,8 @@
 import pytest
 
-from tests.resources.validation.steps.dataset_validator import test_data
 from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.steps import dataset_validator
+from tests.resources.validation.steps.dataset_validator import test_data
 
 
 def teardown_module():

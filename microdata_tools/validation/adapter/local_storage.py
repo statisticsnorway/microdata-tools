@@ -2,12 +2,11 @@ import json
 import logging
 import os
 import shutil
+import uuid
 from pathlib import Path
 from typing import Tuple, Union
-import uuid
 
 from microdata_tools.validation.exceptions import ValidationError
-
 
 logger = logging.getLogger()
 
@@ -71,7 +70,7 @@ def clean_up_temporary_files(
     dataset_name: str,
     working_directory: Path,
     delete_working_directory: bool = False,
-):
+) -> None:
     generated_files = [
         f"{dataset_name}.parquet",
         f"{dataset_name}.json",

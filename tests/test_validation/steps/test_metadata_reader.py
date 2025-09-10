@@ -1,14 +1,13 @@
 from pathlib import Path
 
 import pytest
-from microdata_tools.validation.exceptions import ValidationError
 
-
-from microdata_tools.validation.steps import metadata_reader
 from microdata_tools.validation.components import (
     temporal_attributes,
     unit_type_variables,
 )
+from microdata_tools.validation.exceptions import ValidationError
+from microdata_tools.validation.steps import metadata_reader
 
 INPUT_DIR = Path("tests/resources/validation/steps/metadata_reader")
 MEASURE_DATATYPE = "STRING"
@@ -115,9 +114,10 @@ def test_read_extra_fields():
     assert e.value.errors == [
         "dataRevision->newTypeOfField: Extra inputs are not permitted",
         "identifierVariables->invalidField: Extra inputs are not permitted",
-        "measureVariables->valueDomain->codeList->validTo: Extra inputs are not permitted",
-        "measureVariables->valueDomain->sentinelAndMissingValues->validFrom: Extra "
-        "inputs are not permitted",
+        "measureVariables->valueDomain->codeList->validTo: Extra inputs are "
+        "not permitted",
+        "measureVariables->valueDomain->sentinelAndMissingValues->validFrom: "
+        "Extra inputs are not permitted",
     ]
 
 
@@ -128,8 +128,8 @@ def test_read_extra_fields_unit_measure():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == [
-        "measureVariables: Value error, Can not set a dataType in a measure variable "
-        "together with a unitType"
+        "measureVariables: Value error, Can not set a dataType in a measure "
+        "variable together with a unitType"
     ]
 
 
@@ -141,8 +141,8 @@ def test_read_invalid_sensitivity():
     assert "Errors found while validating metadata file" in str(e)
     assert e.value.errors == [
         (
-            "sensitivityLevel: Input should be 'PERSON_GENERAL', 'PERSON_SPECIAL',"
-            " 'PUBLIC' or 'NONPUBLIC'"
+            "sensitivityLevel: Input should be 'PERSON_GENERAL', "
+            "'PERSON_SPECIAL', 'PUBLIC' or 'NONPUBLIC'"
         )
     ]
 
@@ -186,15 +186,19 @@ def test_mismatch_between_specified_datatype_and_datatype_within_codelist():
     with pytest.raises(ValidationError) as e:
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert e.value.errors == [
-        "Specified data type for measure (LONG) does not match the data type within the codelist (STRING). Codes with mismatching data type are: ['1', '2', '3', '4', '5', '...']"
+        "Specified data type for measure (LONG) does not match the data type "
+        "within the codelist (STRING). Codes with mismatching data type are: "
+        "['1', '2', '3', '4', '5', '...']"
     ]
 
 
-def test_mismatch_between_specified_datatype_and_datatype_within_sentinel_list():
+def test_mismatch_between_specified_datatype_and_datatype_within_sentinel_list():  # noqa
     DATASET_NAME = "MISMATCHING_DATATYPE_WITH_SENTINEL_LIST"
     METADATA_PATH = INPUT_DIR / f"{DATASET_NAME}.json"
     with pytest.raises(ValidationError) as e:
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert e.value.errors == [
-        "Specified data type for measure (STRING) does not match the data type within the sentinel- and missing values list (LONG). Codes with mismatching data type are: [0]"
+        "Specified data type for measure (STRING) does not match the data type "
+        "within the sentinel- and missing values list (LONG). Codes with "
+        "mismatching data type are: [0]"
     ]

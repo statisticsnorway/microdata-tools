@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
     - name: Checkout code
@@ -23,14 +23,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        curl -sSL https://install.python-poetry.org | python -
-        poetry install
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v6
+    
+    - name: Sync dependencies
+      run: uv sync
 
     - name: Run tests
-      id: test
-      run: poetry run pytest
+      run: uv run pytest
 
   publish:
     name: Publish
@@ -45,15 +45,19 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.12
+        python-version: 3.13
 
-    - name: Install dependencies
-      run: |
-        curl -sSL https://install.python-poetry.org | python -
-        poetry install
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v6
+    
+    - name: Sync dependencies
+      run: uv sync
 
     - name: Build and publish
-      run: poetry publish --build --username ${{ secrets.PYPI_USER }} --password ${{ secrets.PYPI_TOKEN }}
+      env: 
+        USER: ${{ secrets.PYPI_USER }}
+        TOKEN: ${{ secrets.PYPI_TOKEN }}
+      run: uv publish --build --username "$USER" --password "$TOKEN"
 
   github-release:
     name: Release pushed tag
@@ -71,12 +75,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"   
+          python-version: "3.13"   
 
-      - name: Install dependencies
-        run: |
-          curl -sSL https://install.python-poetry.org | python -
-          poetry install
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v6
+    
+      - name: Sync dependencies
+        run: uv sync
 
       - name: Check if there is a parent commit
         id: check-parent-commit
@@ -89,11 +94,11 @@ jobs:
         uses: salsify/action-detect-and-tag-new-version@v2.0.3
         with:
           version-command: |
-            bash -o pipefail -c "poetry version | cut -f 2 -d' '"
+            bash -o pipefail -c "uv version --short"
 
       - name: Build package
         run: |
-          poetry build
+          uv build
 
       - name: Publish the release notes
         uses: release-drafter/release-drafter@v6.0.0

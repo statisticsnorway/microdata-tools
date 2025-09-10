@@ -1,7 +1,7 @@
 from typing import Union
 
 from microdata_tools.validation.exceptions import UnregisteredUnitTypeError
-from microdata_tools.validation.model.metadata import UnitType, UnitIdType
+from microdata_tools.validation.model.metadata import UnitIdType, UnitType
 
 # When updating this dictionary remember to also
 # update the Metadata model with the

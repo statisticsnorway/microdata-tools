@@ -1,15 +1,14 @@
 import os
-from pathlib import Path
 import shutil
 import tarfile
+from pathlib import Path
+
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend
 from pytest import MonkeyPatch
 
-
 from microdata_tools import package_dataset
-
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/packaging/rsa_keys")
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_package")

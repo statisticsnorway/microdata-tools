@@ -1,12 +1,13 @@
-from pathlib import Path
 import hashlib
+from pathlib import Path
+
 from microdata_tools.packaging.exceptions import (
-    ValidationException,
     CsvConsistencyException,
+    ValidationException,
 )
 
 
-def check_exists(path: Path):
+def check_exists(path: Path) -> None:
     if not path.exists():
         raise ValidationException(f"The path {path} does not exist")
 

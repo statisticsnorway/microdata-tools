@@ -3,22 +3,21 @@ import os
 import shutil
 from pathlib import Path
 
+from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
 from microdata_tools.packaging._encrypt import (
-    _tar_encrypted_dataset,
     encrypt_dataset,
+    tar_encrypted_dataset,
+)
+from microdata_tools.packaging._utils import (
+    calculate_checksum,
+    check_exists,
+    compare_checksum_with_file,
+    write_checksum_to_file,
 )
 from microdata_tools.packaging.exceptions import (
     UnpackagingError,
     ValidationException,
 )
-from microdata_tools.packaging._decrypt import decrypt, untar_encrypted_dataset
-from microdata_tools.packaging._utils import (
-    check_exists,
-    write_checksum_to_file,
-    compare_checksum_with_file,
-    calculate_checksum,
-)
-
 
 logger = logging.getLogger()
 
@@ -79,7 +78,7 @@ def package_dataset(
             dataset_output_dir / f"{dataset_name}.json",
         )
 
-        _tar_encrypted_dataset(input_dir=output_dir, dataset_name=dataset_name)
+        tar_encrypted_dataset(input_dir=output_dir, dataset_name=dataset_name)
 
     except Exception as exe:
         logger.error(f"Failed to package dataset {dataset_name}: {exe}")
@@ -132,7 +131,9 @@ def unpackage_dataset(
         raise UnpackagingError("Failed to unpackage dataset") from exc
 
 
-def _validate_csv_consistency(dataset_name, dataset_dir, output_dir):
+def _validate_csv_consistency(
+    dataset_name: str, dataset_dir: Path, output_dir: Path
+) -> None:
     if Path(output_dir / dataset_name / f"{dataset_name}.csv").exists():
         calculated_checksum = calculate_checksum(
             output_dir / dataset_name / f"{dataset_name}.csv"

@@ -1,8 +1,8 @@
 import datetime
 from enum import Enum
-from typing import Optional, List, Union
+from typing import Annotated, List, NoReturn, Optional, Union
 
-from pydantic import BaseModel, Field, conlist, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class TemporalityType(str, Enum):
@@ -77,18 +77,21 @@ class UnitIdType(str, Enum):
     FENGSLINGER_TILGANG_ID = "FENGSLINGER_TILGANG_ID"
 
 
-class MultiLingualString(BaseModel):
+class LocalizedString(BaseModel):
     languageCode: LanguageCode
     value: str = Field(min_length=1)
 
 
+MultiLingualString = Annotated[list[LocalizedString], Field(min_length=1)]
+
+
 class TemporalEnd(BaseModel):
-    description: conlist(MultiLingualString, min_length=1)
-    successors: Optional[conlist(str, min_length=1)] = None
+    description: MultiLingualString
+    successors: Optional[list[str]] = Field(default=None, min_length=1)
 
 
 class DataRevision(BaseModel, extra="forbid"):
-    description: conlist(MultiLingualString, min_length=1)
+    description: MultiLingualString
     temporalEnd: Optional[TemporalEnd] = None
 
 
@@ -98,14 +101,14 @@ class IdentifierVariable(BaseModel, extra="forbid"):
 
 class CodeListItem(BaseModel, extra="forbid"):
     code: Union[str, int]
-    categoryTitle: conlist(MultiLingualString, min_length=1)
+    categoryTitle: MultiLingualString
     validFrom: str = Field(min_length=1)
     validUntil: Optional[str] = None
 
     @model_validator(mode="before")
     @classmethod
-    def validate_code_list_item(cls, values):
-        def validate_date_string(field_name: str, date_string: str):
+    def validate_code_list_item(cls, values: dict) -> dict:
+        def validate_date_string(field_name: str, date_string: str) -> None:
             try:
                 datetime.datetime(
                     int(date_string[:4]),
@@ -130,11 +133,11 @@ class CodeListItem(BaseModel, extra="forbid"):
 
 class SentinelItem(BaseModel, extra="forbid"):
     code: Union[str, int]
-    categoryTitle: conlist(MultiLingualString, min_length=1)
+    categoryTitle: MultiLingualString
 
     @model_validator(mode="before")
     @classmethod
-    def validate_sentinel_list_item(cls, values):
+    def validate_sentinel_list_item(cls, values: dict) -> dict:
         code = values.get("code", None)
         if isinstance(code, str) and len(code) < 1:
             raise ValueError("String should have at least 1 character")
@@ -143,19 +146,17 @@ class SentinelItem(BaseModel, extra="forbid"):
 
 
 class ValueDomain(BaseModel, extra="forbid"):
-    description: Optional[conlist(MultiLingualString, min_length=1)] = None
+    description: Optional[MultiLingualString] = None
     measurementType: Optional[str] = None
-    measurementUnitDescription: Optional[
-        conlist(MultiLingualString, min_length=1)
-    ] = None
+    measurementUnitDescription: Optional[MultiLingualString] = None
     uriDefinition: Optional[List[str]] = None
-    codeList: Optional[conlist(CodeListItem, min_length=1)] = None
+    codeList: Optional[list[CodeListItem]] = Field(default=None, min_length=1)
     sentinelAndMissingValues: Optional[List[SentinelItem]] = None
 
     @model_validator(mode="before")
     @classmethod
-    def validate_value_domain(cls, values: dict):
-        def raise_invalid_with_code_list(field_name: str):
+    def validate_value_domain(cls, values: dict) -> dict:
+        def raise_invalid_with_code_list(field_name: str) -> NoReturn:
             raise ValueError(
                 f"Can not add a {field_name} in a valuedomain with a codeList"
             )
@@ -182,8 +183,8 @@ class ValueDomain(BaseModel, extra="forbid"):
 
 class MeasureVariable(BaseModel):
     unitType: Optional[UnitType] = None
-    name: conlist(MultiLingualString, min_length=1)
-    description: conlist(MultiLingualString, min_length=1)
+    name: MultiLingualString
+    description: MultiLingualString
     dataType: Optional[DataType] = None
     uriDefinition: Optional[List[str]] = None
     format: Optional[str] = None
@@ -191,8 +192,8 @@ class MeasureVariable(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_measure(cls, values: dict):
-        def raise_invalid_with_unit_type(field_name: str):
+    def validate_measure(cls, values: dict) -> dict:
+        def raise_invalid_with_unit_type(field_name: str) -> NoReturn:
             raise ValueError(
                 f"Can not set a {field_name} in a measure variable "
                 "together with a unitType"
@@ -218,15 +219,16 @@ class MeasureVariable(BaseModel):
 class Metadata(BaseModel):
     temporalityType: TemporalityType
     sensitivityLevel: SensitivityLevel
-    populationDescription: conlist(MultiLingualString, min_length=1)
-    spatialCoverageDescription: Optional[
-        conlist(MultiLingualString, min_length=1)
-    ] = None
-    subjectFields: conlist(
-        conlist(MultiLingualString, min_length=1), min_length=1
-    )
+    populationDescription: MultiLingualString
+    spatialCoverageDescription: Optional[MultiLingualString] = None
+    subjectFields: Annotated[
+        list[MultiLingualString],
+        Field(min_length=1),
+    ]
     dataRevision: DataRevision
-    identifierVariables: conlist(
-        IdentifierVariable, min_length=1, max_length=1
-    )
-    measureVariables: conlist(MeasureVariable, min_length=1, max_length=1)
+    identifierVariables: Annotated[
+        list[IdentifierVariable], Field(min_length=1, max_length=1)
+    ]
+    measureVariables: Annotated[
+        list[MeasureVariable], Field(min_length=1, max_length=1)
+    ]

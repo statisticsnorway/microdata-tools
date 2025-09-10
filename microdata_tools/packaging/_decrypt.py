@@ -1,25 +1,25 @@
 import logging
 import os
-from pathlib import Path
 import shutil
 import tarfile
+from pathlib import Path
 from typing import List, Tuple
 
 from cryptography.fernet import Fernet, InvalidToken
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
+from microdata_tools.packaging._utils import check_exists
 from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
 )
-from microdata_tools.packaging._utils import check_exists
 
 logger = logging.getLogger()
 
 
-def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
+def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
     """
     Decrypts a dataset as follows:
         1. Decrypts the symmetric key using the RSA private key.
@@ -55,9 +55,11 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
         encrypted_symkey = Path(dataset_dir / f"{dataset_name}.symkey.encr")
         check_exists(encrypted_symkey)
 
+        if not isinstance(private_key, rsa.RSAPrivateKey):
+            raise TypeError("Privatkey is not RSA. Cannot use .decrypt().")
+
         with open(encrypted_symkey, "rb") as f:
             symkey = f.read()
-
         decrypted_symkey = private_key.decrypt(
             symkey,
             padding.OAEP(
@@ -85,7 +87,8 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
 
                 except InvalidToken as exc:
                     raise InvalidKeyError(
-                        f"Not able to decrypt {encrypted_file}, is symkey correct?"
+                        f"Not able to decrypt {encrypted_file}, "
+                        f"is symkey correct?"
                     ) from exc
 
                 logger.debug(f"Decrypted {encrypted_file}")
@@ -107,8 +110,8 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path):
 
 
 def _copy_decrypted_data_to_output_dir(
-    dataset_dir, dataset_name, output_dataset_dir
-):
+    dataset_dir: Path, dataset_name: str, output_dataset_dir: Path
+) -> None:
     data_file_path = dataset_dir / f"{dataset_name}.csv"
     shutil.copy(
         data_file_path,
@@ -117,7 +120,9 @@ def _copy_decrypted_data_to_output_dir(
     os.remove(data_file_path)
 
 
-def _copy_metadata_file(dataset_dir, dataset_name, output_dataset_dir):
+def _copy_metadata_file(
+    dataset_dir: Path, dataset_name: str, output_dataset_dir: Path
+) -> None:
     metadata_file_path = dataset_dir / f"{dataset_name}.json"
     shutil.copy(
         metadata_file_path,
@@ -128,7 +133,7 @@ def _copy_metadata_file(dataset_dir, dataset_name, output_dataset_dir):
 
 def untar_encrypted_dataset(
     input_file: Path, dataset_name: str, untar_dir: Path
-):
+) -> None:
     with tarfile.open(input_file) as tar:
         _validate_tar_contents(tar.getnames(), dataset_name)
         tar.extractall(path=untar_dir)
@@ -174,7 +179,7 @@ def _combine_csv_files(input_dir: Path, output_file: Path) -> None:
 
 # Turn files_names in input dir into a dictionary with the chunk number as key
 # Then return the sorted dictionary
-def _get_sorted_file_names(directory: Path) -> List[Tuple]:
+def _get_sorted_file_names(directory: Path) -> List[Tuple[int, Path]]:
     try:
         return sorted(
             [(int(f.stem), f) for f in directory.iterdir() if f.is_file()]
