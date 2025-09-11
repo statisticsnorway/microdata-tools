@@ -308,7 +308,7 @@ wheels = [
 
 [[package]]
 name = "microdata-tools"
-version = "1.10.1"
+version = "1.10.2"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography", version = "43.0.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },

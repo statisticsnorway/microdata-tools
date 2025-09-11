@@ -26,11 +26,21 @@ dev = [
 package = true
 required-version = ">=0.7.0"
 
+[build-system]
+build-backend  = 'hatchling.build'
+requires       = ['hatchling']
+
 [tool.hatch.build.targets.sdist]
 packages = ["microdata_tools"]
+include = [
+  "microdata_tools/validation/components/unit_type_variables/*.json"
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["microdata_tools"]
+include = [
+  "microdata_tools/validation/components/unit_type_variables/*.json"
+]
 
 [tool.ruff]
 line-length = 80
