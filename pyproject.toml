@@ -1,6 +1,6 @@
 [project]
 name = "microdata-tools"
-version = "1.10.1"
+version = "1.10.2"
 description = "Tools for the microdata.no platform"
 authors = [{ name = "microdata-developers" }]
 license = { text = "MIT" }   
@@ -27,8 +27,20 @@ package = true
 required-version = ">=0.7.0"
 
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+build-backend  = 'hatchling.build'
+requires       = ['hatchling']
+
+[tool.hatch.build.targets.sdist]
+packages = ["microdata_tools"]
+include = [
+  "microdata_tools/validation/components/unit_type_variables/*.json"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["microdata_tools"]
+include = [
+  "microdata_tools/validation/components/unit_type_variables/*.json"
+]
 
 [tool.ruff]
 line-length = 80
@@ -44,6 +56,3 @@ lint.select = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["ANN", "T201"]
-
-[tool.setuptools.packages.find]
-include = ["microdata_tools", "tests"]
