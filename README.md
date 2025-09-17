@@ -105,3 +105,53 @@ The data file is a csv file seperated by semicolons. A valid example would be:
 Read more about the data format and columns in [the documentation](https://statisticsnorway.github.io/microdata-tools/).
 
 The metadata files should be in json format. The requirements for the metadata is best described through the [Pydantic model](/microdata_tools/validation/model/metadata.py), [the examples](/docs/examples), and [the metadata model](https://statisticsnorway.github.io/microdata-tools/metadata-model/).
+
+
+## Contribute
+
+### Set up
+To work on this repository you need to install [uv](https://docs.astral.sh/uv/):
+```
+# macOS / linux / BashOnWindows
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+Then install the virtual environment from the root directory:
+```
+uv sync
+```
+
+### Running unit tests
+Open terminal and go to root directory of the project and run:
+````
+uv run pytest
+````
+
+### Pre-commit
+There are currently 3 active rules: Ruff-format, Ruff-lint and sync lock file.
+Install pre-commit 
+```sh
+pip install pre-commit
+```
+If you've made changes to the pre-commit-config.yaml or its a new project install the hooks with:
+```sh
+pre-commit install
+```
+Now it should run when you do:
+```sh
+git commit
+```
+
+By default it only runs against changed files. To force the hooks to run against all files:
+```sh
+pre-commit run --all-files
+```
+if you dont have it installed on your system you can use: 
+(but then it won't run when you use the git-cli)
+```sh
+uv run pre-commit
+```
+Read more about [pre-commit](https://pre-commit.com/#intro)
+
