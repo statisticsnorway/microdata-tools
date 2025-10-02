@@ -12316,6 +12316,83 @@
           }
         ],
         "validFrom": "1995-01-01"
+      },
+      {
+        "code": "3100",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Østfold"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3200",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Akershus"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },      
+      {
+        "code": "3300",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Buskerud"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "3900",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Vestfold"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "4000",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Telemark"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+      {
+        "code": "5500",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Troms Romsa Tromssa"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
+      },
+            {
+        "code": "5600",
+        "categoryTitle": [
+          {
+            "languageCode": "no",
+            "value": "Ukjent kommune i Finnmark Finnmárku Finnmarkku"
+          }
+        ],
+        "validFrom": "2024-01-01",
+        "validUntil": null
       }
     ]
   }
