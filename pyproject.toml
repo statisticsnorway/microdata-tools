@@ -1,6 +1,6 @@
 [project]
 name = "microdata-tools"
-version = "1.10.2"
+version = "1.10.3"
 description = "Tools for the microdata.no platform"
 authors = [{ name = "microdata-developers" }]
 license = { text = "MIT" }   
