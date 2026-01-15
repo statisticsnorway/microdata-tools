@@ -35,7 +35,11 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
-    environment: PyPI 
+    environment: 
+      name: pypi
+      url: https://pypi.org/p/microdata-tools
+    permissions:
+      id-token: write
     needs: test
     if: success()
     steps:
@@ -57,10 +61,8 @@ jobs:
       run: uv build
 
     - name: Publish
-      env: 
-        USER: ${{ secrets.PYPI_USER }}
-        TOKEN: ${{ secrets.PYPI_TOKEN }}
-      run: uv publish --username "$USER" --password "$TOKEN"
+      uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # 1.13.0
+
 
   github-release:
     name: Release pushed tag
