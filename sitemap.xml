@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://statisticsnorway.github.io/microdata-tools/</loc>
+         <lastmod>2026-01-15</lastmod>
+    </url>
+    <url>
+         <loc>https://statisticsnorway.github.io/microdata-tools/USAGE/</loc>
+         <lastmod>2026-01-15</lastmod>
+    </url>
+    <url>
+         <loc>https://statisticsnorway.github.io/microdata-tools/metadata-model/</loc>
+         <lastmod>2026-01-15</lastmod>
+    </url>
+    <url>
+         <loc>https://statisticsnorway.github.io/microdata-tools/issue_templates/issue_template_en/</loc>
+         <lastmod>2026-01-15</lastmod>
+    </url>
+    <url>
+         <loc>https://statisticsnorway.github.io/microdata-tools/issue_templates/issue_template_no/</loc>
+         <lastmod>2026-01-15</lastmod>
+    </url>
+</urlset>
