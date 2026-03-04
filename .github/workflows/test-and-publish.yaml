@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
     - name: Checkout code
@@ -24,7 +24,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
     
     - name: Sync dependencies
       run: uv sync
@@ -49,10 +49,10 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.13
+        python-version: '3.14'
 
     - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
+      uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
     
     - name: Sync dependencies
       run: uv sync
@@ -80,10 +80,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"   
+          python-version: '3.14'
 
       - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
+        uses: astral-sh/setup-uv@5a095e7a2014a4212f075830d4f7277575a9d098 # v7.3.1
     
       - name: Sync dependencies
         run: uv sync
@@ -106,7 +106,7 @@ jobs:
           uv build
 
       - name: Publish the release notes
-        uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 #v6.1.0
+        uses: release-drafter/release-drafter@6db134d15f3909ccc9eefd369f02bd1e9cffdf97 #v6.2.0
         with:
           publish: ${{ steps.check-version.outputs.tag != '' }}
           tag: ${{ steps.check-version.outputs.tag }}
