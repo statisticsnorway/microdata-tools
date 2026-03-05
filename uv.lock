@@ -1,6 +1,6 @@
 version = 1
 revision = 3
-requires-python = ">=3.9, <4.0"
+requires-python = ">=3.9"
 resolution-markers = [
     "python_full_version >= '3.11'",
     "python_full_version == '3.10.*'",
@@ -8,7 +8,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-02-14T07:32:44.375464Z"
+exclude-newer = "2026-03-01T08:43:50.293932Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -548,7 +548,7 @@ wheels = [
 
 [[package]]
 name = "microdata-tools"
-version = "1.10.5"
+version = "1.10.7"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
