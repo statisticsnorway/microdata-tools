@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-03-02T13:58:51.518071Z"
+exclude-newer = "2026-03-02T14:01:41.829978Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -347,7 +347,7 @@ wheels = [
 
 [[package]]
 name = "microdata-tools"
-version = "1.10.7"
+version = "1.10.8"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
