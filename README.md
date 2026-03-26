@@ -133,7 +133,7 @@ uv run pytest
 There are currently 3 active rules: Ruff-format, Ruff-lint and sync lock file.
 Install pre-commit 
 ```sh
-pip install pre-commit
+uv pip install pre-commit
 ```
 If you've made changes to the pre-commit-config.yaml or its a new project install the hooks with:
 ```sh

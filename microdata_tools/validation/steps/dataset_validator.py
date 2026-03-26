@@ -1,4 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
+import logging
+import time
 from datetime import datetime
 from typing import Iterator, List, Sequence, Union
 
@@ -6,6 +8,12 @@ from pyarrow import Table, compute, dataset
 from pyarrow.dataset import FileSystemDataset
 
 from microdata_tools.validation.exceptions import ValidationError
+
+logger = logging.getLogger()
+
+
+def current_milli_time() -> int:
+    return time.time_ns() // 1_000_000
 
 
 def _get_error_list(invalid_rows: Table, message: str) -> list[str]:
@@ -360,8 +368,29 @@ def validate_dataset(
         _status_temporal_variables_check(data)
         _status_uniquesness_check(data)
     elif temporality_type == "ACCUMULATED":
+        start_ms = current_milli_time()
         _accumulated_temporal_variables_check(data)
+        spent_ms = current_milli_time() - start_ms
+        logger.debug(
+            f"_accumulated_temporal_variables_check spent: {spent_ms:_} ms"
+        )
+
+        start_ms_ = current_milli_time()
         _no_overlapping_timespans_check(data)
+        spent_ms_ = current_milli_time() - start_ms_
+        logger.debug(f"_no_overlapping_timespans_check spent: {spent_ms_:_} ms")
+
     elif temporality_type == "EVENT":
+        start_ms__ = current_milli_time()
         _event_temporal_variables_check(data)
+        spent_ms__ = current_milli_time() - start_ms__
+        logger.debug(
+            f"_event_temporal_variables_check spent: {spent_ms__:_} ms"
+        )
+
+        start_ms___ = current_milli_time()
         _no_overlapping_timespans_check(data)
+        spent_ms___ = current_milli_time() - start_ms___
+        logger.debug(
+            f"_no_overlapping_timespans_check spent: {spent_ms___:_} ms"
+        )

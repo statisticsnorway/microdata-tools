@@ -1,5 +1,6 @@
 # pyright: reportAttributeAccessIssue=false
 import logging
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict
@@ -10,6 +11,10 @@ from pyarrow import ArrowInvalid, compute, csv
 from microdata_tools.validation.exceptions import ValidationError
 
 logger = logging.getLogger()
+
+
+def current_milli_time() -> int:
+    return time.time_ns() // 1_000_000
 
 
 def _microdata_data_type_to_pyarrow(
@@ -132,6 +137,7 @@ def read_and_sanitize_csv(
     ensures the input csv data follows the requirements for the
     microdata data model.
     """
+    start_time = current_milli_time()
     table = _csv_to_table(
         input_data_path, identifier_data_type, measure_data_type
     )
@@ -144,7 +150,11 @@ def read_and_sanitize_csv(
     if temporality_type in ["STATUS", "ACCUMULATED"]:
         columns.append(_generate_start_year(table))
         column_names.append("start_year")
-    return pyarrow.Table.from_arrays(columns, column_names)
+    # print(f'number of rows: {len(unit_id):_}')
+    tbl = pyarrow.Table.from_arrays(columns, column_names)
+    spent_ms = current_milli_time() - start_time
+    logger.debug(f"read_and_sanitize_csv spent: {spent_ms:_} ms")
+    return tbl
 
 
 def get_temporal_data(

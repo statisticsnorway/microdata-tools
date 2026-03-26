@@ -1,4 +1,6 @@
+import logging
 import string
+import time
 from pathlib import Path
 from typing import List, Union
 
@@ -14,6 +16,12 @@ from microdata_tools.validation.steps import (
     metadata_enricher,
     metadata_reader,
 )
+
+logger = logging.getLogger()
+
+
+def current_milli_time() -> int:
+    return time.time_ns() // 1_000_000
 
 
 def _validate_dataset_name(dataset_name: str) -> None:
@@ -108,12 +116,17 @@ def validate_dataset(
         )
 
         # Validate data
+        start_ms_validate = current_milli_time()
         dataset_validator.validate_dataset(
             dataset.dataset(parquet_path),
             measure_data_type,
             code_list,
             sentinel_list,
             temporality_type,
+        )
+        spent_ms = current_milli_time() - start_ms_validate
+        logger.info(
+            f"dataset_validator.validate_dataset spent: {spent_ms:_} ms"
         )
     except ValidationError as e:
         data_errors = e.errors

@@ -1,8 +1,17 @@
 import os
+import shutil
+import time
+import uuid
+from pathlib import Path
 
 import pytest
 
 from microdata_tools import validate_dataset
+
+
+def current_milli_time():
+    return time.time_ns() // 1_000_000
+
 
 RESOURCE_DIR = "tests/resources/validation/validate_dataset/big_datasets"
 
@@ -48,26 +57,66 @@ def setup_function():
     }
     for dataset_name in VALID_DATASET_NAMES:
         file_path = f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv"
-        with open(file_path, "w", encoding="utf-8") as f:
-            dates = identifier_dates[dataset_name]
-            identifier_amount = 2_000_000 if len(dates) == 7 else 14_000_000
-            for date in dates:
-                for i in range(identifier_amount):
-                    f.write(f"{i};{i};{date[0]};{date[1]};\n")
+        if os.path.exists(file_path) and "true" == os.environ.get(
+            "MICRODATA_TOOLS_WATCH_MODE"
+        ):
+            # print(f'Skipping generating dataset {dataset_name}')
+            pass
+        else:
+            with open(file_path, "w", encoding="utf-8") as f:
+                dates = identifier_dates[dataset_name]
+                identifier_amount = 2_000_000 if len(dates) == 7 else 14_000_000
+                for date in dates:
+                    for i in range(identifier_amount):
+                        f.write(f"{i};{i};{date[0]};{date[1]};\n")
 
 
 def teardown_function():
     for dataset_name in VALID_DATASET_NAMES:
-        os.remove(f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv")
+        if os.environ.get("MICRODATA_TOOLS_WATCH_MODE"):
+            # print(f'Skipping removing dataset {dataset_name}')
+            pass
+        else:
+            os.remove(f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv")
 
 
-@pytest.mark.skipif("not config.getoption('include-big-data')")
-def test_validate_big_dataset():
-    for dataset_name in VALID_DATASET_NAMES:
-        print(f"Validating {dataset_name}")
-        data_errors = validate_dataset(
-            dataset_name,
-            keep_temporary_files=False,
-            input_directory=RESOURCE_DIR,
-        )
-        assert not data_errors
+# @pytest.mark.skipif("not config.getoption('include-big-data')")
+# def test_validate_big_dataset():
+#     for dataset_name in VALID_DATASET_NAMES:
+#         print(f"Validating {dataset_name}")
+#         data_errors = validate_dataset(
+#             dataset_name,
+#             keep_temporary_files=False,
+#             input_directory=RESOURCE_DIR,
+#         )
+#         assert not data_errors
+
+
+@pytest.mark.focus
+def test_validate_big_dataset_perf():
+    working_directory = Path("workdir/" + str(uuid.uuid4()))
+    os.makedirs(working_directory)
+
+    try:
+        for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
+            start_time = current_milli_time()
+            if idx != 0:
+                print("")
+            print(f"Begin {dataset_name} ...")
+            data_errors = validate_dataset(
+                dataset_name,
+                working_directory=working_directory,
+                keep_temporary_files=False,
+                input_directory=RESOURCE_DIR,
+            )
+            spent_ms = current_milli_time() - start_time
+            assert not data_errors
+            print(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
+    finally:
+        try:
+            shutil.rmtree(working_directory)
+        except Exception:
+            pass
+
+
+# Sample output original code in validate_dataset:

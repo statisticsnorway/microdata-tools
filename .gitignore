@@ -57,6 +57,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+workdir/
 
 # Translations
 *.mo
@@ -158,6 +159,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+tests/resources/validation/validate_dataset/big_datasets/
+tests/resources/validation/steps/dataset_validator/parquet/*.parquet
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
