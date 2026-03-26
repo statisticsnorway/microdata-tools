@@ -1,0 +1,23 @@
+Skipping generating dataset ACCUMULATED_DS
+Begin ACCUMULATED_DS ...
+read_and_sanitize_csv row count: 196_000_000
+read_and_sanitize_csv spent: 15_826 ms
+read_and_sanitize_csv speed: 474.9 MB/s
+
+get_temporal_data spent: 87 ms
+Append temporal coverage (start, stop, status dates) to metadata
+
+parquet.write_table spent: 15_679 ms
+parquet.write_table speed: 479.3 MB/s
+
+total validate_dataset spent: 31_594 ms
+total validate_dataset file size: 7_515 MB
+total validate_dataset speed: 237.9 MB/s
+
+Done ACCUMULATED_DS. Spent: 31_624 ms
+
+1 passed in 31.84s
+******************************************************************************
+alloc_samples: 4
+max_footprint_fname: .venv/lib/python3.13/site-packages/pyarrow/compute.py:271
+max_footprint_mb: 30

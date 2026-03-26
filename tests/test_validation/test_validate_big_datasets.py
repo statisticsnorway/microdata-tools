@@ -64,14 +64,21 @@ def setup_function():
         if os.path.exists(file_path) and "true" == os.environ.get(
             "MICRODATA_TOOLS_WATCH_MODE"
         ):
-            # print(f'Skipping generating dataset {dataset_name}')
-            pass
+            logger.info(f"Skipping generating dataset {dataset_name}")
         else:
             with open(file_path, "w", encoding="utf-8") as f:
                 dates = identifier_dates[dataset_name]
-                identifier_amount = 2_000_000 if len(dates) == 7 else 14_000_000
+                identifier_amount = 28_000_000
+                # 2_000_000 if len(dates) == 7 else 14_000_000
+                cnt = 0
                 for date in dates:
                     for i in range(identifier_amount):
+                        cnt += 1
+                        if (cnt % 1_000_000) == 0:
+                            percent = (cnt * 100) / (
+                                identifier_amount * len(dates)
+                            )
+                            logger.info(f"Wrote {cnt:_} rows. {percent:.1f} %")
                         f.write(f"{i};{i};{date[0]};{date[1]};\n")
 
 

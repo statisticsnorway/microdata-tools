@@ -141,6 +141,8 @@ def read_and_sanitize_csv(
     table = _csv_to_table(
         input_data_path, identifier_data_type, measure_data_type
     )
+    logger.debug(f"read_and_sanitize_csv row count: {len(table):_}")
+    file_size = input_data_path.stat().st_size
     unit_id = _sanitize_unit_id(table, identifier_data_type)
     value = _sanitize_value(table, measure_data_type)
     epoch_start = _cast_to_epoch_date(table, "start")
@@ -153,7 +155,9 @@ def read_and_sanitize_csv(
     # print(f'number of rows: {len(unit_id):_}')
     tbl = pyarrow.Table.from_arrays(columns, column_names)
     spent_ms = current_milli_time() - start_time
+    mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
     logger.debug(f"read_and_sanitize_csv spent: {spent_ms:_} ms")
+    logger.debug(f"read_and_sanitize_csv speed: {mb_per_s:.1f} MB/s")
     return tbl
 
 
@@ -165,6 +169,7 @@ def get_temporal_data(
     returns a dictionary with information depending on the
     temporality_type of the data.
     """
+    start_time = current_milli_time()
     temporal_data = {}
     if temporality_type == "FIXED":
         stop_max = compute.max(table["stop_epoch_days"]).as_py()
@@ -219,4 +224,6 @@ def get_temporal_data(
                 table["start_epoch_days"]
             ).to_pylist()
         ]
+    spent_ms = current_milli_time() - start_time
+    logger.debug(f"get_temporal_data spent: {spent_ms:_} ms")
     return temporal_data

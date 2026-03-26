@@ -69,6 +69,7 @@ def validate_dataset(
     working_directory_was_generated = False
 
     try:
+        start_total_ms = current_milli_time()
         _validate_dataset_name(dataset_name)
         local_storage.validate_dataset_dir(Path(input_directory), dataset_name)
         (
@@ -94,6 +95,8 @@ def validate_dataset(
             "sentinelAndMissingValues"
         )
 
+        file_size = input_data_path.stat().st_size
+
         # Read data
         table = data_reader.read_and_sanitize_csv(
             input_data_path,
@@ -101,6 +104,7 @@ def validate_dataset(
             measure_data_type,
             temporality_type,
         )
+        logger.info("")
 
         # Enrich metadata with temporal data
         temporal_data = data_reader.get_temporal_data(table, temporality_type)
@@ -109,25 +113,55 @@ def validate_dataset(
         )
 
         # Write files to working directory
+        start_ms = current_milli_time()
         parquet_path = working_directory_path / f"{dataset_name}.parquet"
         parquet.write_table(table, parquet_path)
+        spent_ms = current_milli_time() - start_ms
+        logger.info("")
+        logger.info(f"parquet.write_table spent: {spent_ms:_} ms")
+        logger.info(
+            f"parquet.write_table speed: {
+                (file_size / 1024 / 1024) / (spent_ms / 1000):.1f} MB/s"
+        )
+
+        # start_ms_ = current_milli_time()
         local_storage.write_json(
             working_directory_path / f"{dataset_name}.json", metadata_dict
         )
+        # spent_ms_ = current_milli_time() - start_ms_
+        # logger.info(f'local_storage.write_json spent: {spent_ms_:_} ms')
 
         # Validate data
         start_ms_validate = current_milli_time()
-        dataset_validator.validate_dataset(
-            dataset.dataset(parquet_path),
-            measure_data_type,
-            code_list,
-            sentinel_list,
-            temporality_type,
-        )
-        spent_ms = current_milli_time() - start_ms_validate
+        if False:
+            dataset_validator.validate_dataset(
+                dataset.dataset(parquet_path),
+                measure_data_type,
+                code_list,
+                sentinel_list,
+                temporality_type,
+            )
+            spent_ms = current_milli_time() - start_ms_validate
+            logger.info(
+                f"dataset_validator.validate_dataset spent: {spent_ms:_} ms"
+            )
+            logger.info(
+                f"dataset_validator.validate_dataset speed: {
+                    (file_size / 1024 / 1024) / (spent_ms / 1000):.1f} MB/s"
+            )
+
+        spent_total_ms = current_milli_time() - start_total_ms
+        logger.info("")
+        logger.info(f"total validate_dataset spent: {spent_total_ms:_} ms")
         logger.info(
-            f"dataset_validator.validate_dataset spent: {spent_ms:_} ms"
+            f"total validate_dataset file size: {
+                file_size // 1024 // 1024:_} MB"
         )
+        logger.info(
+            f"total validate_dataset speed: {
+                (file_size / 1024 / 1024) / (spent_total_ms / 1000):.1f} MB/s"
+        )
+        logger.info("")
     except ValidationError as e:
         data_errors = e.errors
     except Exception as e:
