@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-watchexec -r -c -e py -- ./scripts/perf_once.sh
+watchexec -r -c -e py,sh -- ./scripts/perf_once.sh

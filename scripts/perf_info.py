@@ -16,8 +16,10 @@ def main(filename: str) -> None:
     alloc_samples = js["alloc_samples"]
     if fname.startswith(os.getcwd()):
         fname = fname[1 + (len(os.getcwd())) :]
+    fname_line = f"max_footprint_fname: {fname}:{lineno}"
+    logger.info("*" * len(fname_line))
     logger.info(f"alloc_samples: {alloc_samples}")
-    logger.info(f"max_footprint_fname: {fname}:{lineno}")
+    logger.info(fname_line)
     logger.info(f"max_footprint_mb: {js['max_footprint_mb']:.0f}")
 
 

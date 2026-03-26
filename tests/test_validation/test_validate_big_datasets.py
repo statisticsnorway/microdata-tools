@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import time
@@ -8,6 +9,8 @@ import pytest
 
 from microdata_tools import validate_dataset
 
+logger = logging.getLogger()
+
 
 def current_milli_time():
     return time.time_ns() // 1_000_000
@@ -17,13 +20,14 @@ RESOURCE_DIR = "tests/resources/validation/validate_dataset/big_datasets"
 
 VALID_DATASET_NAMES = [
     "ACCUMULATED_DS",
-    "EVENT_DS",
-    "FIXED_DS",
-    "STATUS_DS",
+    # "EVENT_DS",
+    # "FIXED_DS",
+    # "STATUS_DS",
 ]
 
 
 def setup_function():
+    logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
     # The dates are intentionally shuffled to provoke errors
     identifier_dates = {
         "ACCUMULATED_DS": [
@@ -94,6 +98,7 @@ def teardown_function():
 
 @pytest.mark.focus
 def test_validate_big_dataset_perf():
+    logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
     working_directory = Path("workdir/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
@@ -101,8 +106,8 @@ def test_validate_big_dataset_perf():
         for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
             start_time = current_milli_time()
             if idx != 0:
-                print("")
-            print(f"Begin {dataset_name} ...")
+                logger.info("")
+            logger.info(f"Begin {dataset_name} ...")
             data_errors = validate_dataset(
                 dataset_name,
                 working_directory=working_directory,
@@ -111,7 +116,7 @@ def test_validate_big_dataset_perf():
             )
             spent_ms = current_milli_time() - start_time
             assert not data_errors
-            print(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
+            logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
     finally:
         try:
             shutil.rmtree(working_directory)

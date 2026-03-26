@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-watchexec -r -c -e py -- ./scripts/focus_once.sh
+watchexec -r -c -e py,sh -- ./scripts/focus_once.sh
