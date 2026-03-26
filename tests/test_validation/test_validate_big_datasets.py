@@ -1,10 +1,13 @@
 import logging
+import multiprocessing as mp
 import os
 import shutil
 import time
 import uuid
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
+import psutil
 import pytest
 
 from microdata_tools import validate_dataset
@@ -103,32 +106,69 @@ def teardown_function():
 #         assert not data_errors
 
 
+_is_done = None
+
+
+def init_mem_watcher(is_done):
+    logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
+    global _is_done
+    _is_done = is_done
+
+
+def watch_mem(pid):
+    global _is_done
+    process = psutil.Process(pid)
+    max_mem = -1
+    while True:
+        done = _is_done.wait(0.1)
+        if done:
+            break
+        else:
+            mem = process.memory_info()[0] // 1024 // 1024
+            if mem > max_mem:
+                max_mem = mem
+            # logger.info(f'Memory: {mem:_} MB')
+    return max_mem
+
+
 @pytest.mark.focus
 def test_validate_big_dataset_perf():
     logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
     working_directory = Path("workdir/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
-    try:
-        for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
-            start_time = current_milli_time()
-            if idx != 0:
-                logger.info("")
-            logger.info(f"Begin {dataset_name} ...")
-            data_errors = validate_dataset(
-                dataset_name,
-                working_directory=working_directory,
-                keep_temporary_files=False,
-                input_directory=RESOURCE_DIR,
-            )
-            spent_ms = current_milli_time() - start_time
-            assert not data_errors
-            logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
-    finally:
+    mp_context = mp.get_context("spawn")
+    is_done = mp_context.Event()
+    with ProcessPoolExecutor(
+        1,
+        mp_context=mp_context,
+        initializer=init_mem_watcher,
+        initargs=(is_done,),
+    ) as mem_watcher:
+        fut = mem_watcher.submit(watch_mem, os.getpid())
         try:
-            shutil.rmtree(working_directory)
-        except Exception:
-            pass
+            for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
+                start_time = current_milli_time()
+                if idx != 0:
+                    logger.info("")
+                logger.info(f"Begin {dataset_name} ...")
+                data_errors = validate_dataset(
+                    dataset_name,
+                    working_directory=working_directory,
+                    keep_temporary_files=False,
+                    input_directory=RESOURCE_DIR,
+                )
+                spent_ms = current_milli_time() - start_time
+                assert not data_errors
+                logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
+        finally:
+            is_done.set()
+            try:
+                shutil.rmtree(working_directory)
+            except Exception:
+                pass
+        retval = fut.result()
+        logger.info(f"Max memory usage: {retval:_} MB")
 
 
 # Sample output original code in validate_dataset:
