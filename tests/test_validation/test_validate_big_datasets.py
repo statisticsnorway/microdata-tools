@@ -68,7 +68,7 @@ def setup_function():
         else:
             with open(file_path, "w", encoding="utf-8") as f:
                 dates = identifier_dates[dataset_name]
-                identifier_amount = 28_000_000
+                identifier_amount = 14_000_000
                 # 2_000_000 if len(dates) == 7 else 14_000_000
                 cnt = 0
                 for date in dates:

@@ -1,0 +1,17 @@
+Skipping generating dataset ACCUMULATED_DS
+Begin ACCUMULATED_DS ...
+read_and_sanitize_csv row count: 98_000_000
+read_and_sanitize_csv spent: 6_538 ms
+read_and_sanitize_csv speed: 563.4 MB/s
+
+get_temporal_data spent: 26 ms
+Append temporal coverage (start, stop, status dates) to metadata
+
+parquet.write_table spent: 7_198 ms
+parquet.write_table speed: 511.7 MB/s
+
+total validate_dataset spent: 13_764 ms
+total validate_dataset file size: 3_683 MB
+total validate_dataset speed: 267.6 MB/s
+
+Done ACCUMULATED_DS. Spent: 13_775 ms
