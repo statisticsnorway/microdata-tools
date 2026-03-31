@@ -209,7 +209,7 @@ def csv_to_parquet(
             line = "".join(
                 [
                     f"Wrote {processed_rows_str} rows, ",
-                    f"{mem_str} MB mem, ",
+                    f"{mem_str} MB mem used, ",
                     f"{mb_per_s_str} MB/s, ",
                     f"{percent_done_str} % done. ",
                     f"ETA: {ms_to_eta(int(remaining_ms))}",
