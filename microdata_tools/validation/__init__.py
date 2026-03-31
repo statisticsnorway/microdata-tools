@@ -4,7 +4,7 @@ import time
 from pathlib import Path
 from typing import List, Union
 
-from pyarrow import dataset, parquet
+from pyarrow import dataset
 
 from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.components import unit_id_types
@@ -12,6 +12,7 @@ from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.model.metadata import UnitIdType, UnitType
 from microdata_tools.validation.steps import (
     data_reader,
+    dataset_accumulated,
     dataset_validator,
     metadata_enricher,
     metadata_reader,
@@ -97,37 +98,49 @@ def validate_dataset(
 
         file_size = input_data_path.stat().st_size
 
-        # Read data
-        table = data_reader.read_and_sanitize_csv(
+        dataset_accumulated.read_and_sanitize_csv2(
             input_data_path,
+            Path(working_directory_path / f"{dataset_name}.parquet"),
             identifier_data_type,
             measure_data_type,
             temporality_type,
         )
-        logger.info("")
 
-        # Enrich metadata with temporal data
-        temporal_data = data_reader.get_temporal_data(table, temporality_type)
-        metadata_enricher.enrich_with_temporal_coverage(
-            metadata_dict, temporal_data
-        )
+        # Read data
+        if False:
+            table = data_reader.read_and_sanitize_csv(
+                input_data_path,
+                identifier_data_type,
+                measure_data_type,
+                temporality_type,
+            )
+            temporal_data = data_reader.get_temporal_data(
+                table, temporality_type
+            )
+            metadata_enricher.enrich_with_temporal_coverage(
+                metadata_dict, temporal_data
+            )
+        # logger.info("")
+        #
+        # # Enrich metadata with temporal data
 
-        # Write files to working directory
-        start_ms = current_milli_time()
+        #
+        # # Write files to working directory
+        # start_ms = current_milli_time()
         parquet_path = working_directory_path / f"{dataset_name}.parquet"
-        parquet.write_table(table, parquet_path)
-        spent_ms = current_milli_time() - start_ms
-        logger.info("")
-        logger.info(f"parquet.write_table spent: {spent_ms:_} ms")
-        logger.info(
-            f"parquet.write_table speed: {
-                (file_size / 1024 / 1024) / (spent_ms / 1000):.1f} MB/s"
-        )
+        # parquet.write_table(table, parquet_path)
+        # spent_ms = current_milli_time() - start_ms
+        # logger.info("")
+        # logger.info(f"parquet.write_table spent: {spent_ms:_} ms")
+        # logger.info(
+        #     f"parquet.write_table speed: {
+        #         (file_size / 1024 / 1024) / (spent_ms / 1000):.1f} MB/s"
+        # )
 
         # start_ms_ = current_milli_time()
-        local_storage.write_json(
-            working_directory_path / f"{dataset_name}.json", metadata_dict
-        )
+        # local_storage.write_json(
+        #     working_directory_path / f"{dataset_name}.json", metadata_dict
+        # )
         # spent_ms_ = current_milli_time() - start_ms_
         # logger.info(f'local_storage.write_json spent: {spent_ms_:_} ms')
 
@@ -169,12 +182,15 @@ def validate_dataset(
         raise e
     finally:
         # Delete temporary files
-        if not keep_temporary_files and working_directory_path:
-            local_storage.clean_up_temporary_files(
-                dataset_name,
-                working_directory_path,
-                delete_working_directory=working_directory_was_generated,
-            )
+        try:
+            if not keep_temporary_files and working_directory_path:
+                local_storage.clean_up_temporary_files(
+                    dataset_name,
+                    working_directory_path,
+                    delete_working_directory=working_directory_was_generated,
+                )
+        except Exception:
+            pass
     return data_errors
 
 

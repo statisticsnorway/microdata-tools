@@ -53,11 +53,10 @@ def get_temporal_data2(
     min_date = min([date for date in [start_min, stop_min] if date is not None])
     max_date = max([date for date in [start_max, stop_max] if date is not None])
 
-    temporal_data = {}
-    temporal_data["start"] = min(min_date, existing_data.get("start", min_date))
-    temporal_data["latest"] = max(
-        max_date, existing_data.get("latest", max_date)
-    )
+    temporal_data = {
+        "start": min(min_date, existing_data.get("start", min_date)),
+        "latest": max(max_date, existing_data.get("latest", max_date)),
+    }
     return temporal_data
 
 
@@ -159,7 +158,7 @@ def csv_to_parquet(
     last_log = -1
     max_row_count_str = f"{row_count:_}"
     process = psutil.Process(os.getpid())
-    logger.info("Beginning writing parquet file")
+    logger.info("Beginning writing parquet file ...")
     while True:
         try:
             batch = reader.read_next_batch()
@@ -208,7 +207,7 @@ def csv_to_parquet(
                     f"{mem_str} MB mem, ",
                     f"{mb_per_s_str} MB/s, ",
                     f"{percent_done_str} % done. ",
-                    f"ETA: {ms_to_eta(remaining_ms)}",
+                    f"ETA: {ms_to_eta(int(remaining_ms))}",
                 ]
             )
             logger.info(line)
@@ -232,7 +231,7 @@ def csv_to_parquet(
 
         sql_batch = []
         for idx in range(len(tbl)):
-            unit_id_one = unit_id[idx]
+            unit_id_one = unit_id[idx].as_py()
             start_day = epoch_start[idx].as_py()
             stop_day = epoch_stop[idx].as_py()
             sql_batch.append((str(unit_id_one), start_day, stop_day))
@@ -244,6 +243,10 @@ def csv_to_parquet(
         conn.commit()
         batch_to_write = pyarrow.RecordBatch.from_arrays(columns, column_names)
         writer.write_batch(batch_to_write)
+    spent_ms = current_milli_time() - start_time
+    logger.info(
+        f"Beginning writing parquet file ... Done in {ms_to_eta(spent_ms)}"
+    )
     return temporal_data
 
 
@@ -312,18 +315,6 @@ def read_and_sanitize_csv2(
 
         validate_start_stop(row_count, conn)
 
-    # logger.debug(f"read_and_sanitize_csv row count: {len(table):_}")
-    # unit_id = _sanitize_unit_id(table, identifier_data_type)
-    # value = _sanitize_value(table, measure_data_type)
-    # epoch_start = _cast_to_epoch_date(table, "start")
-    # epoch_stop = _cast_to_epoch_date(table, "stop")
-    # columns = [unit_id, value, epoch_start, epoch_stop]
-    # column_names = ["unit_id", "value", "start_epoch_days", "stop_epoch_days"]
-    # if temporality_type in ["STATUS", "ACCUMULATED"]:
-    #     columns.append(_generate_start_year(table))
-    #     column_names.append("start_year")
-    # print(f'number of rows: {len(unit_id):_}')
-    # tbl = pyarrow.Table.from_arrays(columns, column_names)
     spent_ms = current_milli_time() - start_time
     mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
     logger.debug(f"read_and_sanitize_csv2 spent: {spent_ms:_} ms")
