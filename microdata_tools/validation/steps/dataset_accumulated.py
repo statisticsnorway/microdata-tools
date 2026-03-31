@@ -84,9 +84,10 @@ def validate_unit_start_stop(unit_array: list) -> bool:
         _, xs, xe = unit_array[0]
         for _, ys, ye in unit_array[1:]:
             if ys <= xs <= ye:  # xs inside ys,ye
+                raise ValidationError("Overlap for dates", errors=[])
                 return False
             elif ys <= xe <= ye:  # xe inside ys,ye
-                return False
+                raise ValidationError("Overlap for dates", errors=[])
         return validate_unit_start_stop(unit_array[1:])
 
 
@@ -127,9 +128,12 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
                 remaining_ms = ms_per_row * (row_count - processed_rows)
                 row_count_len = len(f"{row_count:_}")
                 processed_rows_str = f"{processed_rows:_}".rjust(row_count_len)
+                percent_done = (processed_rows * 100) / row_count
+                percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
                 logger.info(
-                    f"Validated {processed_rows_str} rows. "
-                    + f"ETA {ms_to_eta(int(remaining_ms))}"
+                    f"Validated {processed_rows_str} rows, "
+                    + f"{percent_done_str} % done. "
+                    + f"ETA: {ms_to_eta(int(remaining_ms))}"
                 )
 
             if len(curr_unit) == 0:
@@ -141,8 +145,7 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
             else:
                 # different unit_id.
                 # first validate:
-                if not validate_unit_start_stop(curr_unit):
-                    logger.info("Bad bad bad")
+                validate_unit_start_stop(curr_unit)
                 # begin with new unit id:
                 curr_unit = [res]
 
