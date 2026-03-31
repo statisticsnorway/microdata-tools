@@ -192,6 +192,3 @@ def test_validate_big_dataset_perf():
                 pass
         samples, max_mem = fut.result()
         logger.info(f"Max memory usage: {max_mem:_} MB, samples: {samples:_}")
-
-
-# Sample output original code in validate_dataset:
