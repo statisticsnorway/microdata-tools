@@ -21,6 +21,10 @@ def current_milli_time():
     return time.time_ns() // 1_000_000
 
 
+def log_time():
+    return time.time_ns() // 1_000_000 // 1000
+
+
 RESOURCE_DIR = "tests/resources/validation/validate_dataset/big_datasets"
 
 VALID_DATASET_NAMES = [
@@ -82,6 +86,7 @@ def setup_function():
         ) and row_count == reader_utils.get_row_count(Path(file_path)):
             logger.info(f"Skipping generating dataset {dataset_name}")
         else:
+            last_log = log_time()
             start_ms = current_milli_time()
             with open(file_path, "w", encoding="utf-8") as f:
                 logger.info(f"Generating dataset {dataset_name}")
@@ -92,10 +97,15 @@ def setup_function():
                 identifier_amount = 1 + (row_count // len(dates))
                 cnt = 0
                 logger.info(f"Identifier amount: {identifier_amount:_}")
+                logger.info(f"Number of rows: {row_count:_}")
                 for date in dates:
                     for i in range(identifier_amount):
                         cnt += 1
-                        if (cnt % 1_000_000) == 0:
+                        lst_log = log_time()
+                        if lst_log == last_log and cnt != row_count:
+                            pass
+                        else:
+                            last_log = lst_log
                             percent = (cnt * 100) / row_count
                             spent_ms_so_far = current_milli_time() - start_ms
                             ms_per_row = spent_ms_so_far / cnt
