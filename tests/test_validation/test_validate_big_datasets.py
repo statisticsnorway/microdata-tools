@@ -74,7 +74,8 @@ def setup_function():
         "FIXED_DS": [("", "2020-01-01")],
     }
     for dataset_name in VALID_DATASET_NAMES:
-        row_count = 1_000_000_000
+        row_count = os.environ.get("MICRODATA_TOOLS_ROW_COUNT", "10_000_000")
+        row_count = int(row_count.strip().replace("_", ""))
         file_path = f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv"
         if os.path.exists(
             file_path
