@@ -11,6 +11,7 @@ import psutil
 import pytest
 
 from microdata_tools import validate_dataset
+from microdata_tools.validation.steps import reader_utils
 
 logger = logging.getLogger()
 
@@ -29,8 +30,17 @@ VALID_DATASET_NAMES = [
 ]
 
 
+def init_logging():
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s.%(msecs)03d %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        force=True,
+    )
+
+
 def setup_function():
-    logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
+    init_logging()
     # The dates are intentionally shuffled to provoke errors
     identifier_dates = {
         "ACCUMULATED_DS": [
@@ -63,31 +73,42 @@ def setup_function():
         "FIXED_DS": [("", "2020-01-01")],
     }
     for dataset_name in VALID_DATASET_NAMES:
+        row_count = 1_000_000_000
         file_path = f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv"
-        if os.path.exists(file_path) and "true" == os.environ.get(
-            "MICRODATA_TOOLS_WATCH_MODE"
-        ):
+        if os.path.exists(
+            file_path
+        ) and row_count == reader_utils.get_row_count(Path(file_path)):
             logger.info(f"Skipping generating dataset {dataset_name}")
         else:
             with open(file_path, "w", encoding="utf-8") as f:
+                logger.info(f"Generating dataset {dataset_name}")
+                logger.info(f"File path: {file_path}")
                 dates = identifier_dates[dataset_name]
-                identifier_amount = 14_000_000
-                # 2_000_000 if len(dates) == 7 else 14_000_000
+
+                # len(dates) * identifier_amount = row_count
+                identifier_amount = 1 + (row_count // len(dates))
                 cnt = 0
+                logger.info(f"Identifier amount: {identifier_amount:_}")
                 for date in dates:
                     for i in range(identifier_amount):
                         cnt += 1
                         if (cnt % 1_000_000) == 0:
-                            percent = (cnt * 100) / (
-                                identifier_amount * len(dates)
+                            percent = (cnt * 100) / row_count
+                            logger.info(
+                                f"Generated {cnt:_} rows. {percent:.1f} %"
                             )
-                            logger.info(f"Wrote {cnt:_} rows. {percent:.1f} %")
                         f.write(f"{i};{i};{date[0]};{date[1]};\n")
+                        if cnt == row_count:
+                            break
+                    if cnt == row_count:
+                        break
+            with open(file_path + ".rowcount", "w", encoding="utf-8") as f:
+                f.write(str(row_count))
 
 
 def teardown_function():
     for dataset_name in VALID_DATASET_NAMES:
-        if os.environ.get("MICRODATA_TOOLS_WATCH_MODE"):
+        if "false" == os.environ.get("MICRODATA_TOOLS_DELETE_FILES"):
             # print(f'Skipping removing dataset {dataset_name}')
             pass
         else:
@@ -110,7 +131,7 @@ _is_done = None
 
 
 def init_mem_watcher(is_done):
-    logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
+    init_logging()
     global _is_done
     _is_done = is_done
 
@@ -119,21 +140,23 @@ def watch_mem(pid):
     global _is_done
     process = psutil.Process(pid)
     max_mem = -1
+    samples = 0
     while True:
         done = _is_done.wait(0.1)
         if done:
             break
         else:
             mem = process.memory_info()[0] // 1024 // 1024
+            samples += 1
             if mem > max_mem:
                 max_mem = mem
             # logger.info(f'Memory: {mem:_} MB')
-    return max_mem
+    return samples, max_mem
 
 
 @pytest.mark.focus
 def test_validate_big_dataset_perf():
-    logging.basicConfig(level=logging.DEBUG, format="%(message)s", force=True)
+    init_logging()
     working_directory = Path("workdir/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
@@ -167,8 +190,8 @@ def test_validate_big_dataset_perf():
                 shutil.rmtree(working_directory)
             except Exception:
                 pass
-        retval = fut.result()
-        logger.info(f"Max memory usage: {retval:_} MB")
+        samples, max_mem = fut.result()
+        logger.info(f"Max memory usage: {max_mem:_} MB, samples: {samples:_}")
 
 
 # Sample output original code in validate_dataset:
