@@ -296,6 +296,7 @@ def csv_to_parquet(
     max_row_count_str = f"{row_count:_}"
     process = psutil.Process(os.getpid())
     logger.info("Writing parquet file ...")
+    sqlite_time = 0
     while True:
         try:
             batch = reader.read_next_batch()
@@ -328,6 +329,8 @@ def csv_to_parquet(
         _accumulated_temporal_variables_check(tbl)
 
         sql_batch = []
+        # sqlite takes ~75% of the time, most of which is spent on iterating!
+        sqlite_start = current_milli_time()
         for idx in range(len(tbl)):
             unit_id_one = unit_id[idx].as_py()
             start_day = epoch_start[idx].as_py()
@@ -340,6 +343,9 @@ def csv_to_parquet(
         )
         conn.commit()
 
+        sqlite_spent = current_milli_time() - sqlite_start
+        sqlite_time += sqlite_spent
+
         batch_to_write = pyarrow.RecordBatch.from_arrays(columns, column_names)
         writer.write_batch(batch_to_write)
 
@@ -348,6 +354,7 @@ def csv_to_parquet(
         else:
             last_log = log_time()
             spent_ms_so_far = current_milli_time() - start_time
+            sqlite_share = (sqlite_time * 100) / max(spent_ms_so_far, 1)
             ms_per_row = spent_ms_so_far / processed_rows
             remaining_ms = ms_per_row * (row_count - processed_rows)
             mb_per_s = (
@@ -366,6 +373,7 @@ def csv_to_parquet(
                 + f"{mem_str} MB mem used, "
                 + f"{mb_per_s_str} MB/s, "
                 + f"{percent_done_str} % done. "
+                + f"SQLite: {sqlite_share:.1f} %. "
                 + f"ETA: {ms_to_eta(int(remaining_ms))}"
             )
 
@@ -420,6 +428,7 @@ def read_and_sanitize_csv2(
                                         stop_day INTEGER)"""
             )
             conn.commit()
+            conn.execute("PRAGMA journal_mode = OFF;")
             with parquet.ParquetWriter(output_data_path, schema) as writer:
                 with csv.open_csv(
                     input_data_path,
