@@ -4,7 +4,7 @@ import os.path
 import sqlite3
 import time
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Union
 
 import psutil
 import pyarrow
@@ -295,6 +295,8 @@ def read_and_sanitize_csv2(
     identifier_data_type: str,
     measure_data_type: str,
     temporality_type: str,
+    code_list: Union[List, None],
+    sentinel_list: Union[List, None],
 ) -> dict[str, int]:
     """
     Reads a csv file to a pyarrow table. Sanitizes values and
