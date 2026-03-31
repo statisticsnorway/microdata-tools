@@ -98,12 +98,16 @@ def validate_dataset(
 
         file_size = input_data_path.stat().st_size
 
-        dataset_accumulated.read_and_sanitize_csv2(
+        temporal_data = dataset_accumulated.read_and_sanitize_csv2(
             input_data_path,
             Path(working_directory_path / f"{dataset_name}.parquet"),
             identifier_data_type,
             measure_data_type,
             temporality_type,
+        )
+
+        metadata_enricher.enrich_with_temporal_coverage(
+            metadata_dict, temporal_data
         )
 
         # Read data

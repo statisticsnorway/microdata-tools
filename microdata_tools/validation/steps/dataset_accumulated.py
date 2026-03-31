@@ -158,7 +158,7 @@ def csv_to_parquet(
     last_log = -1
     max_row_count_str = f"{row_count:_}"
     process = psutil.Process(os.getpid())
-    logger.info("Beginning writing parquet file ...")
+    logger.info("Writing parquet file ...")
     while True:
         try:
             batch = reader.read_next_batch()
@@ -203,7 +203,7 @@ def csv_to_parquet(
             mem_str = f"{mem}".rjust(len("1234"))
             line = "".join(
                 [
-                    f"Processed {processed_rows_str} rows, ",
+                    f"Wrote {processed_rows_str} rows, ",
                     f"{mem_str} MB mem, ",
                     f"{mb_per_s_str} MB/s, ",
                     f"{percent_done_str} % done. ",
@@ -244,9 +244,7 @@ def csv_to_parquet(
         batch_to_write = pyarrow.RecordBatch.from_arrays(columns, column_names)
         writer.write_batch(batch_to_write)
     spent_ms = current_milli_time() - start_time
-    logger.info(
-        f"Beginning writing parquet file ... Done in {ms_to_eta(spent_ms)}"
-    )
+    logger.info(f"Writing parquet file ... Done in {ms_to_eta(spent_ms)}")
     return temporal_data
 
 
@@ -256,7 +254,7 @@ def read_and_sanitize_csv2(
     identifier_data_type: str,
     measure_data_type: str,
     temporality_type: str,
-) -> pyarrow.Table:
+) -> dict[str, int]:
     """
     Reads a csv file to a pyarrow table. Sanitizes values and
     ensures the input csv data follows the requirements for the
@@ -302,7 +300,7 @@ def read_and_sanitize_csv2(
                     identifier_data_type, measure_data_type
                 ),
             ) as reader:
-                csv_to_parquet(
+                temporal_data = csv_to_parquet(
                     identifier_data_type,
                     measure_data_type,
                     file_size,
@@ -319,4 +317,4 @@ def read_and_sanitize_csv2(
     mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
     logger.debug(f"read_and_sanitize_csv2 spent: {spent_ms:_} ms")
     logger.debug(f"read_and_sanitize_csv2 speed: {mb_per_s:.1f} MB/s")
-    return None
+    return temporal_data
