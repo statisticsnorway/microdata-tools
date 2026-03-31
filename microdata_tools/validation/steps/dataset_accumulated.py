@@ -325,35 +325,40 @@ def read_and_sanitize_csv2(
     if os.path.exists("tmp.db"):
         os.remove("tmp.db")
 
-    with sqlite3.connect("tmp.db", autocommit=False) as conn:
-        conn.execute(
-            """CREATE TABLE dataset(unit_id VARCHAR,
-                                    start_day INTEGER,
-                                    stop_day INTEGER)"""
-        )
-        conn.commit()
-        with parquet.ParquetWriter(output_data_path, schema) as writer:
-            with csv.open_csv(
-                input_data_path,
-                parse_options=csv.ParseOptions(delimiter=";"),
-                read_options=ru.get_csv_read_options(),
-                convert_options=ru.get_csv_convert_options(
-                    identifier_data_type, measure_data_type
-                ),
-            ) as reader:
-                temporal_data = csv_to_parquet(
-                    identifier_data_type,
-                    measure_data_type,
-                    file_size,
-                    row_count,
-                    reader,
-                    writer,
-                    conn,
-                )
-        logger.info("Done writing parquet file!")
+    try:
+        with sqlite3.connect("tmp.db", autocommit=False) as conn:
+            conn.execute(
+                """CREATE TABLE dataset(unit_id VARCHAR,
+                                        start_day INTEGER,
+                                        stop_day INTEGER)"""
+            )
+            conn.commit()
+            with parquet.ParquetWriter(output_data_path, schema) as writer:
+                with csv.open_csv(
+                    input_data_path,
+                    parse_options=csv.ParseOptions(delimiter=";"),
+                    read_options=ru.get_csv_read_options(),
+                    convert_options=ru.get_csv_convert_options(
+                        identifier_data_type, measure_data_type
+                    ),
+                ) as reader:
+                    temporal_data = csv_to_parquet(
+                        identifier_data_type,
+                        measure_data_type,
+                        file_size,
+                        row_count,
+                        reader,
+                        writer,
+                        conn,
+                    )
+            logger.info("Done writing parquet file!")
 
-        validate_start_stop(row_count, file_size, conn)
-
+            validate_start_stop(row_count, file_size, conn)
+    finally:
+        try:
+            os.remove("tmp.db")
+        except Exception:
+            pass
     spent_ms = current_milli_time() - start_time
     mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
     logger.debug(f"read_and_sanitize_csv2 spent: {spent_ms:_} ms")
