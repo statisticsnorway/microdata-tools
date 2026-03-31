@@ -12,6 +12,7 @@ import pytest
 
 from microdata_tools import validate_dataset
 from microdata_tools.validation.steps import reader_utils
+from microdata_tools.validation.steps.dataset_accumulated import ms_to_eta
 
 logger = logging.getLogger()
 
@@ -80,6 +81,7 @@ def setup_function():
         ) and row_count == reader_utils.get_row_count(Path(file_path)):
             logger.info(f"Skipping generating dataset {dataset_name}")
         else:
+            start_ms = current_milli_time()
             with open(file_path, "w", encoding="utf-8") as f:
                 logger.info(f"Generating dataset {dataset_name}")
                 logger.info(f"File path: {file_path}")
@@ -94,8 +96,16 @@ def setup_function():
                         cnt += 1
                         if (cnt % 1_000_000) == 0:
                             percent = (cnt * 100) / row_count
+                            spent_ms_so_far = current_milli_time() - start_ms
+                            ms_per_row = spent_ms_so_far / cnt
+                            remaining_ms = ms_per_row * (row_count - cnt)
+                            cnt_str = f"{cnt:_}".rjust(len(f"{row_count:_}"))
+                            percent_str = f"{percent:.1f}".rjust(len("100.0"))
+                            eta = f"{ms_to_eta(int(remaining_ms))}"
                             logger.info(
-                                f"Generated {cnt:_} rows. {percent:.1f} %"
+                                f"Generated {cnt_str} rows. "
+                                + f"{percent_str} % done. "
+                                + f"ETA: {eta}"
                             )
                         f.write(f"{i};{i};{date[0]};{date[1]};\n")
                         if cnt == row_count:

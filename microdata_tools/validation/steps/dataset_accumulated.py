@@ -91,7 +91,9 @@ def validate_unit_start_stop(unit_array: list) -> bool:
         return validate_unit_start_stop(unit_array[1:])
 
 
-def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
+def validate_start_stop(
+    row_count: int, file_size: int, conn: sqlite3.Connection
+) -> bool:
     logger.info("Validating start and stop dates ...")
     logger.info("Creating index ...")
     start_ms = current_milli_time()
@@ -104,6 +106,7 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
     start_ms = current_milli_time()
     last_log = -1
     cursor = conn.cursor()
+    process = psutil.Process(os.getpid())
     try:
         cursor.execute(
             "SELECT unit_id, start_day, stop_day FROM dataset ORDER BY unit_id"
@@ -121,7 +124,7 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
             lst_log = log_time()
             if lst_log == last_log and processed_rows != row_count:
                 pass
-            else:
+            elif processed_rows != 1:
                 last_log = lst_log
                 spent_ms_so_far = current_milli_time() - start_ms
                 ms_per_row = spent_ms_so_far / processed_rows
@@ -130,8 +133,17 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
                 processed_rows_str = f"{processed_rows:_}".rjust(row_count_len)
                 percent_done = (processed_rows * 100) / row_count
                 percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
+                mb_per_s = (
+                    (file_size * (processed_rows / row_count)) / 1024 / 1024
+                ) / (max(spent_ms_so_far, 1) / 1000)
+                mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
+                mem = process.memory_info()[0] // 1024 // 1024
+                mem_str = f"{mem}".rjust(len("123"))
+
                 logger.info(
                     f"Validated {processed_rows_str} rows, "
+                    + f"{mem_str} MB mem used, "
+                    + f"{mb_per_s_str} MB/s, "
                     + f"{percent_done_str} % done. "
                     + f"ETA: {ms_to_eta(int(remaining_ms))}"
                 )
@@ -336,7 +348,7 @@ def read_and_sanitize_csv2(
                 )
         logger.info("Done writing parquet file!")
 
-        validate_start_stop(row_count, conn)
+        validate_start_stop(row_count, file_size, conn)
 
     spent_ms = current_milli_time() - start_time
     mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
