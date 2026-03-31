@@ -89,7 +89,7 @@ def validate_unit_start_stop(unit_array: list) -> bool:
         return validate_unit_start_stop(unit_array[1:])
 
 
-def validate_start_stop(
+def _no_overlapping_timespans_check(
     row_count: int, file_size: int, conn: sqlite3.Connection
 ) -> bool:
     logger.info("Validating start and stop dates ...")
@@ -184,9 +184,105 @@ def _get_error_list(invalid_rows: pyarrow.Table, message: str) -> list[str]:
     ]
 
 
+def _valid_unit_id_check(tbl: pyarrow.Table) -> None:
+    is_null_filter = dataset.field("unit_id").is_null()
+    is_empty_string_filter = dataset.field("unit_id") == ""
+    invalid_rows_filter = is_null_filter | is_empty_string_filter
+    invalid_rows = tbl.filter(invalid_rows_filter)
+
+    if len(invalid_rows) > 0:
+        raise ValidationError(
+            "#1 column",
+            errors=_get_error_list(
+                invalid_rows, "Invalid identifier in #1 column"
+            ),
+        )
+
+
+def _valid_value_column_check(
+    tbl: pyarrow.Table,
+    data_type: str,
+    code_list: Union[List, None],
+    sentinel_list: Union[List, None],
+) -> None:
+    """
+    Any given cell in the value column is valid only if:
+    * The cell contains a a valid non-null value
+    * The cell does not contain an empty string if data_type is STRING
+    * The value is present in the code_list if supplied
+    """
+    is_null_filter = dataset.field("value").is_null()
+    is_empty_string_filter = dataset.field("value") == ""
+    invalid_rows_filter = (
+        (is_null_filter | is_empty_string_filter)
+        if data_type == "STRING"
+        else is_null_filter
+    )
+    invalid_rows = tbl.filter(invalid_rows_filter)
+
+    if len(invalid_rows) > 0:
+        raise ValidationError(
+            "#2 column",
+            errors=_get_error_list(invalid_rows, "Invalid value in #2 column"),
+        )
+
+    if code_list:
+        unique_codes = list(
+            set(code_list_item["code"] for code_list_item in code_list)
+        )
+        if sentinel_list:
+            unique_codes += list(
+                set(
+                    sentinel_list_item["code"]
+                    for sentinel_list_item in sentinel_list
+                )
+            )
+        invalid_code_filter = ~dataset.field("value").isin(unique_codes)
+        invalid_rows = tbl.filter(invalid_code_filter)
+        if len(invalid_rows) > 0:
+            invalid_codes = (
+                invalid_rows.column("value").slice(0, 50).to_pylist()
+            )
+            invalid_unit_ids = (
+                invalid_rows.column("unit_id").slice(0, 50).to_pylist()
+            )
+            invalid_code_rows = list(zip(invalid_unit_ids, invalid_codes))
+
+            raise ValidationError(
+                "#2 column",
+                errors=[
+                    f"Error for identifier {unit_id}: {code} is not in "
+                    f"code list"
+                    for (unit_id, code) in invalid_code_rows
+                ],
+            )
+
+
+def _accumulated_temporal_variables_check(tbl: pyarrow.Table) -> None:
+    start_is_null_filter = dataset.field("start_epoch_days").is_null()
+    stop_is_null_filter = dataset.field("stop_epoch_days").is_null()
+    start_be_stop_filter = dataset.field("start_epoch_days") >= dataset.field(
+        "stop_epoch_days"
+    )
+
+    invalid_rows = tbl.filter(
+        start_is_null_filter | stop_is_null_filter | start_be_stop_filter
+    )
+
+    if len(invalid_rows) > 0:
+        raise ValidationError(
+            "#3 and #4 columns",
+            errors=_get_error_list(
+                invalid_rows, "Invalid #3 and/or #4 columns"
+            ),
+        )
+
+
 def csv_to_parquet(
     identifier_data_type: str,
     measure_data_type: str,
+    code_list: Union[List, None],
+    sentinel_list: Union[List, None],
     file_size: int,
     row_count: int,
     reader: pyarrow.csv.CSVStreamingReader,
@@ -224,51 +320,12 @@ def csv_to_parquet(
         tbl = pyarrow.Table.from_arrays(columns, column_names)
         temporal_data = get_temporal_data2(tbl, temporal_data)
         processed_rows += len(tbl)
-        percent_done = (processed_rows * 100) / row_count
-        if last_log == log_time() and processed_rows != row_count:
-            pass
-        else:
-            last_log = log_time()
-            spent_ms_so_far = current_milli_time() - start_time
-            ms_per_row = spent_ms_so_far / processed_rows
-            remaining_ms = ms_per_row * (row_count - processed_rows)
-            mb_per_s = (
-                (file_size * (processed_rows / row_count)) / 1024 / 1024
-            ) / (max(spent_ms_so_far, 1) / 1000)
-            processed_rows_str = f"{processed_rows:_}".rjust(
-                len(max_row_count_str)
-            )
-            percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
-            mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
-            mem = process.memory_info()[0] // 1024 // 1024
-            mem_str = f"{mem}".rjust(len("123"))
-            line = "".join(
-                [
-                    f"Wrote {processed_rows_str} rows, ",
-                    f"{mem_str} MB mem used, ",
-                    f"{mb_per_s_str} MB/s, ",
-                    f"{percent_done_str} % done. ",
-                    f"ETA: {ms_to_eta(int(remaining_ms))}",
-                ]
-            )
-            logger.info(line)
-        start_is_null_filter = dataset.field("start_epoch_days").is_null()
-        stop_is_null_filter = dataset.field("stop_epoch_days").is_null()
-        start_be_stop_filter = dataset.field(
-            "start_epoch_days"
-        ) >= dataset.field("stop_epoch_days")
 
-        invalid_rows = tbl.filter(
-            start_is_null_filter | stop_is_null_filter | start_be_stop_filter
+        _valid_unit_id_check(tbl)
+        _valid_value_column_check(
+            tbl, measure_data_type, code_list, sentinel_list
         )
-
-        if len(invalid_rows) > 0:
-            raise ValidationError(
-                "#3 and #4 columns",
-                errors=_get_error_list(
-                    invalid_rows, "Invalid #3 and/or #4 columns"
-                ),
-            )
+        _accumulated_temporal_variables_check(tbl)
 
         sql_batch = []
         for idx in range(len(tbl)):
@@ -282,8 +339,36 @@ def csv_to_parquet(
             sql_batch,
         )
         conn.commit()
+
         batch_to_write = pyarrow.RecordBatch.from_arrays(columns, column_names)
         writer.write_batch(batch_to_write)
+
+        if last_log == log_time() and processed_rows != row_count:
+            pass
+        else:
+            last_log = log_time()
+            spent_ms_so_far = current_milli_time() - start_time
+            ms_per_row = spent_ms_so_far / processed_rows
+            remaining_ms = ms_per_row * (row_count - processed_rows)
+            mb_per_s = (
+                (file_size * (processed_rows / row_count)) / 1024 / 1024
+            ) / (max(spent_ms_so_far, 1) / 1000)
+            processed_rows_str = f"{processed_rows:_}".rjust(
+                len(max_row_count_str)
+            )
+            percent_done = (processed_rows * 100) / row_count
+            percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
+            mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
+            mem = process.memory_info()[0] // 1024 // 1024
+            mem_str = f"{mem}".rjust(len("123"))
+            logger.info(
+                f"Wrote {processed_rows_str} rows, "
+                + f"{mem_str} MB mem used, "
+                + f"{mb_per_s_str} MB/s, "
+                + f"{percent_done_str} % done. "
+                + f"ETA: {ms_to_eta(int(remaining_ms))}"
+            )
+
     spent_ms = current_milli_time() - start_time
     logger.info(f"Writing parquet file ... Done in {ms_to_eta(spent_ms)}")
     return temporal_data
@@ -347,6 +432,8 @@ def read_and_sanitize_csv2(
                     temporal_data = csv_to_parquet(
                         identifier_data_type,
                         measure_data_type,
+                        code_list,
+                        sentinel_list,
                         file_size,
                         row_count,
                         reader,
@@ -355,7 +442,7 @@ def read_and_sanitize_csv2(
                     )
             logger.info("Done writing parquet file!")
 
-            validate_start_stop(row_count, file_size, conn)
+            _no_overlapping_timespans_check(row_count, file_size, conn)
     finally:
         try:
             os.remove("tmp.db")
