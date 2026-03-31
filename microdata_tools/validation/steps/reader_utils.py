@@ -56,7 +56,7 @@ def get_csv_convert_options(
     )
 
 
-def _sanitize_value2(
+def sanitize_value2(
     batch: pyarrow.RecordBatch, measure_data_type: str
 ) -> pyarrow.Array:
     if measure_data_type == "STRING":
@@ -67,7 +67,7 @@ def _sanitize_value2(
         return batch["value"]
 
 
-def _cast_to_epoch_date2(
+def cast_to_epoch_date2(
     batch: pyarrow.RecordBatch, column_name: str
 ) -> pyarrow.Array:
     """
@@ -76,7 +76,7 @@ def _cast_to_epoch_date2(
     return batch[column_name].cast(pyarrow.int32()).cast(pyarrow.int16())
 
 
-def _generate_start_year2(batch: pyarrow.RecordBatch) -> pyarrow.Array:
+def generate_start_year2(batch: pyarrow.RecordBatch) -> pyarrow.Array:
     """
     Generates a start year array by substringing the "start" column
     with pyarrow dates (YYYY-MM-DD) to a string pyarrow.Array (YYYY)
