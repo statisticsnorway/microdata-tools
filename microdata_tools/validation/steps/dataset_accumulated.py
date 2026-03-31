@@ -91,6 +91,7 @@ def validate_unit_start_stop(unit_array: list) -> bool:
 
 
 def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
+    logger.info("Validating start and stop dates ...")
     logger.info("Creating index ...")
     start_ms = current_milli_time()
     conn.execute("CREATE INDEX IF NOT EXISTS index_unit_id ON dataset(unit_id)")
@@ -128,6 +129,10 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
             processed_rows += 1
             if processed_rows % 1_000_000 == 0:
                 logger.info(f"seen {processed_rows:_}")
+        spent_ms = current_milli_time() - start_ms
+        logger.info(
+            f"Validating start and stop dates ... Done in {ms_to_eta(spent_ms)}"
+        )
         return True
     finally:
         cursor.close()
