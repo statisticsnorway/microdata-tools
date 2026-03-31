@@ -100,6 +100,8 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
     logger.info(
         f"Creating index ... Done in {spent_ms:_} ms aka {ms_to_eta(spent_ms)}"
     )
+    start_ms = current_milli_time()
+    last_log = -1
     cursor = conn.cursor()
     try:
         cursor.execute(
@@ -113,7 +115,24 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
                 if len(curr_unit) != 0:
                     validate_unit_start_stop(curr_unit)
                 break
-            elif len(curr_unit) == 0:
+
+            processed_rows += 1
+            lst_log = log_time()
+            if lst_log == last_log and processed_rows != row_count:
+                pass
+            else:
+                last_log = lst_log
+                spent_ms_so_far = current_milli_time() - start_ms
+                ms_per_row = spent_ms_so_far / processed_rows
+                remaining_ms = ms_per_row * (row_count - processed_rows)
+                row_count_len = len(f"{row_count:_}")
+                processed_rows_str = f"{processed_rows:_}".rjust(row_count_len)
+                logger.info(
+                    f"Validated {processed_rows_str} rows. "
+                    + f"ETA {ms_to_eta(int(remaining_ms))}"
+                )
+
+            if len(curr_unit) == 0:
                 # first unit_id
                 curr_unit.append(res)
             elif res[0] == curr_unit[0][0]:
@@ -126,9 +145,7 @@ def validate_start_stop(row_count: int, conn: sqlite3.Connection) -> bool:
                     logger.info("Bad bad bad")
                 # begin with new unit id:
                 curr_unit = [res]
-            processed_rows += 1
-            if processed_rows % 1_000_000 == 0:
-                logger.info(f"seen {processed_rows:_}")
+
         spent_ms = current_milli_time() - start_ms
         logger.info(
             f"Validating start and stop dates ... Done in {ms_to_eta(spent_ms)}"
@@ -205,7 +222,7 @@ def csv_to_parquet(
             percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
             mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
             mem = process.memory_info()[0] // 1024 // 1024
-            mem_str = f"{mem}".rjust(len("1234"))
+            mem_str = f"{mem}".rjust(len("123"))
             line = "".join(
                 [
                     f"Wrote {processed_rows_str} rows, ",
