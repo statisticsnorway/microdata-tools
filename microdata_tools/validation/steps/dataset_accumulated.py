@@ -81,12 +81,10 @@ def validate_unit_start_stop(unit_array: list) -> bool:
     elif len(unit_array) == 1:
         return True
     else:
-        _, xs, xe = unit_array[0]
-        for _, ys, ye in unit_array[1:]:
-            if ys <= xs <= ye:  # xs inside ys,ye
-                raise ValidationError("Overlap for dates", errors=[])
-                return False
-            elif ys <= xe <= ye:  # xe inside ys,ye
+        # https://stackoverflow.com/a/325964
+        _, start_a, end_a = unit_array[0]
+        for _, start_b, end_b in unit_array[1:]:
+            if start_a <= end_b and end_a >= start_b:
                 raise ValidationError("Overlap for dates", errors=[])
         return validate_unit_start_stop(unit_array[1:])
 
@@ -162,8 +160,14 @@ def validate_start_stop(
                 curr_unit = [res]
 
         spent_ms = current_milli_time() - start_ms
+        mb_per_s = (
+            (file_size * (processed_rows / row_count)) / 1024 / 1024
+        ) / (max(spent_ms, 1) / 1000)
         logger.info(
             f"Validating start and stop dates ... Done in {ms_to_eta(spent_ms)}"
+        )
+        logger.info(
+            f"Validating start and stop dates speed: {mb_per_s:.1f} MB/s"
         )
         return True
     finally:
@@ -230,7 +234,7 @@ def csv_to_parquet(
             remaining_ms = ms_per_row * (row_count - processed_rows)
             mb_per_s = (
                 (file_size * (processed_rows / row_count)) / 1024 / 1024
-            ) / (spent_ms_so_far / 1000)
+            ) / (max(spent_ms_so_far, 1) / 1000)
             processed_rows_str = f"{processed_rows:_}".rjust(
                 len(max_row_count_str)
             )
@@ -318,10 +322,10 @@ def read_and_sanitize_csv2(
         ]
     )
 
-    if os.path.exists("janei.db"):
-        os.remove("janei.db")
+    if os.path.exists("tmp.db"):
+        os.remove("tmp.db")
 
-    with sqlite3.connect("janei.db", autocommit=False) as conn:
+    with sqlite3.connect("tmp.db", autocommit=False) as conn:
         conn.execute(
             """CREATE TABLE dataset(unit_id VARCHAR,
                                     start_day INTEGER,
