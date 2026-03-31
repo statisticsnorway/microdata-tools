@@ -60,6 +60,8 @@ cover/
 workdir/
 scalene-profile.json
 
+tmp.db
+
 # Translations
 *.mo
 *.pot
