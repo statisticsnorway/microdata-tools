@@ -11,7 +11,7 @@ def pytest_addoption(parser):
     )
 
 
-if "true" == os.environ.get("MICRODATA_TOOLS_WATCH_MODE"):
+if "quiet" == os.environ.get("MICRODATA_TOOLS_TEST_PROGRESS"):
 
     def pytest_report_teststatus(report):
         category, short, verbose = "", "", ""
