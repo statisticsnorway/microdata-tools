@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from typing import Dict, List, Union
 
+import adbc_driver_sqlite.dbapi
 import psutil
 import pyarrow
 from pyarrow import compute, csv, dataset, parquet
@@ -92,7 +93,7 @@ def validate_unit_start_stop(unit_array: list) -> bool:
 def _no_overlapping_timespans_check(
     row_count: int, file_size: int, conn: sqlite3.Connection
 ) -> bool:
-    logger.info("Validating start and stop dates ...")
+    logger.info("Validating no overlapping timespans ...")
     logger.info("Creating index ...")
     start_ms = current_milli_time()
     conn.execute("CREATE INDEX IF NOT EXISTS index_unit_id ON dataset(unit_id)")
@@ -107,7 +108,8 @@ def _no_overlapping_timespans_check(
     process = psutil.Process(os.getpid())
     try:
         cursor.execute(
-            "SELECT unit_id, start_day, stop_day FROM dataset ORDER BY unit_id"
+            "SELECT unit_id, start_epoch_days, stop_epoch_days FROM dataset "
+            + "ORDER BY unit_id"
         )
         processed_rows = 0
         curr_unit = []
@@ -164,10 +166,9 @@ def _no_overlapping_timespans_check(
             (file_size * (processed_rows / row_count)) / 1024 / 1024
         ) / (max(spent_ms, 1) / 1000)
         logger.info(
-            f"Validating start and stop dates ... Done in {ms_to_eta(spent_ms)}"
-        )
-        logger.info(
-            f"Validating start and stop dates speed: {mb_per_s:.1f} MB/s"
+            "Validating no overlapping timespans done. "
+            + f"Speed: {mb_per_s:.1f} MB/s. "
+            + f"Spent {spent_ms:_} aka {ms_to_eta(spent_ms)}"
         )
         return True
     finally:
@@ -297,10 +298,12 @@ def csv_to_parquet(
     process = psutil.Process(os.getpid())
     logger.info("Writing parquet file ...")
     sqlite_time = 0
+    cursor = conn.cursor()
     while True:
         try:
             batch = reader.read_next_batch()
         except StopIteration:
+            cursor.close()
             break
         if identifier_data_type == "STRING":
             unit_id = compute.utf8_trim(batch["unit_id"], " ")
@@ -322,29 +325,27 @@ def csv_to_parquet(
         temporal_data = get_temporal_data2(tbl, temporal_data)
         processed_rows += len(tbl)
 
+        sqlite_start = current_milli_time()
+        column_names2 = [
+            "unit_id",
+            "start_epoch_days",
+            "stop_epoch_days",
+        ]
+        columns2 = [unit_id, epoch_start, epoch_stop]
+        cursor.adbc_ingest(
+            "dataset",
+            pyarrow.Table.from_arrays(columns2, column_names2),
+            mode="append",
+        )
+        conn.commit()
+        sqlite_spent = current_milli_time() - sqlite_start
+        sqlite_time += sqlite_spent
+
         _valid_unit_id_check(tbl)
         _valid_value_column_check(
             tbl, measure_data_type, code_list, sentinel_list
         )
         _accumulated_temporal_variables_check(tbl)
-
-        sql_batch = []
-        # sqlite takes ~75% of the time, most of which is spent on iterating!
-        sqlite_start = current_milli_time()
-        for idx in range(len(tbl)):
-            unit_id_one = unit_id[idx].as_py()
-            start_day = epoch_start[idx].as_py()
-            stop_day = epoch_stop[idx].as_py()
-            sql_batch.append((str(unit_id_one), start_day, stop_day))
-        conn.executemany(
-            """INSERT INTO dataset (unit_id, start_day, stop_day)
-               VALUES (?, ?, ?)""",
-            sql_batch,
-        )
-        conn.commit()
-
-        sqlite_spent = current_milli_time() - sqlite_start
-        sqlite_time += sqlite_spent
 
         batch_to_write = pyarrow.RecordBatch.from_arrays(columns, column_names)
         writer.write_batch(batch_to_write)
@@ -378,7 +379,12 @@ def csv_to_parquet(
             )
 
     spent_ms = current_milli_time() - start_time
-    logger.info(f"Writing parquet file ... Done in {ms_to_eta(spent_ms)}")
+    mb_per_s = (file_size / 1024 / 1024) / (max(spent_ms, 1) / 1000)
+    mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
+    logger.info(
+        f"Writing parquet file done. Speed: {mb_per_s_str:} MB/s. "
+        + f"Spent {spent_ms:_} ms aka {ms_to_eta(spent_ms)}"
+    )
     return temporal_data
 
 
@@ -421,11 +427,14 @@ def read_and_sanitize_csv2(
         os.remove("tmp.db")
 
     try:
-        with sqlite3.connect("tmp.db", autocommit=False) as conn:
+        with adbc_driver_sqlite.dbapi.connect(
+            "tmp.db", autocommit=False
+        ) as conn:
+            # with sqlite3.connect("tmp.db", autocommit=False) as conn:
             conn.execute(
                 """CREATE TABLE dataset(unit_id VARCHAR,
-                                        start_day INTEGER,
-                                        stop_day INTEGER)"""
+                                        start_epoch_days INTEGER,
+                                        stop_epoch_days INTEGER)"""
             )
             conn.commit()
             conn.execute("PRAGMA journal_mode = OFF;")
@@ -449,9 +458,8 @@ def read_and_sanitize_csv2(
                         writer,
                         conn,
                     )
-            logger.info("Done writing parquet file!")
-
-            _no_overlapping_timespans_check(row_count, file_size, conn)
+            with sqlite3.connect("tmp.db", autocommit=False) as conn2:
+                _no_overlapping_timespans_check(row_count, file_size, conn2)
     finally:
         try:
             os.remove("tmp.db")
