@@ -2,8 +2,6 @@ import logging
 import os
 import sqlite3
 
-import pytest
-
 logger = logging.getLogger()
 
 
@@ -61,7 +59,7 @@ def test_pagination(row_count, num_cores):
         assert iterations <= num_cores
 
 
-@pytest.mark.focus
+# @pytest.mark.focus
 def test_sqlite_pagination():
     init_logging()
 

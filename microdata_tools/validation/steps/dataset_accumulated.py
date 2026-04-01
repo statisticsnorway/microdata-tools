@@ -1,8 +1,10 @@
 # pyright: reportAttributeAccessIssue=false
 import logging
+import multiprocessing
 import os.path
 import sqlite3
 import time
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -388,6 +390,115 @@ def csv_to_parquet(
     return temporal_data
 
 
+global is_aborted
+
+
+def init_logging() -> None:
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s.%(msecs)03d %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        force=True,
+    )
+
+
+def init_worker(_is_aborted: multiprocessing.Event) -> None:
+    global is_aborted
+    is_aborted = _is_aborted
+    init_logging()
+
+
+def _no_overlapping_timespans_check_worker(
+    file_size: int, offset: int, limit: int
+) -> bool:
+    row_count = limit
+    with sqlite3.connect("tmp.db", autocommit=False) as conn:
+        logger.info("Validating no overlapping timespans ...")
+        start_ms = current_milli_time()
+        last_log = -1
+        cursor = conn.cursor()
+        process = psutil.Process(os.getpid())
+        try:
+            cursor.execute(
+                "SELECT unit_id, start_epoch_days, stop_epoch_days "
+                + "FROM dataset "
+                + "ORDER BY unit_id LIMIT ? OFFSET ?",
+                (limit, offset),
+            )
+            processed_rows = 0
+            curr_unit = []
+            while True:
+                res = cursor.fetchone()
+                if res is None:
+                    if len(curr_unit) != 0:
+                        validate_unit_start_stop(curr_unit)
+                        curr_unit_id = curr_unit[0][0]
+                        cursor.execute(
+                            "SELECT unit_id, start_epoch_days, stop_epoch_days "
+                            + "FROM DATASET WHERE unit_id = ?",
+                            (curr_unit_id,),
+                        )
+                        curr_unit_2 = cursor.fetchall()
+                        assert len(curr_unit_2) >= 1
+                        validate_unit_start_stop(curr_unit_2)
+                    break
+
+                if len(curr_unit) == 0:
+                    # first unit_id
+                    curr_unit.append(res)
+                elif res[0] == curr_unit[0][0]:
+                    # same unit_id
+                    curr_unit.append(res)
+                else:
+                    # different unit_id.
+                    # first validate:
+                    validate_unit_start_stop(curr_unit)
+                    # begin with new unit id:
+                    curr_unit = [res]
+
+                processed_rows += 1
+                lst_log = log_time()
+                if lst_log == last_log and processed_rows != row_count:
+                    pass
+                elif processed_rows != 1:
+                    last_log = lst_log
+                    spent_ms_so_far = current_milli_time() - start_ms
+                    ms_per_row = spent_ms_so_far / processed_rows
+                    remaining_ms = ms_per_row * (row_count - processed_rows)
+                    row_count_len = len(f"{row_count:_}")
+                    processed_rows_str = f"{processed_rows:_}".rjust(
+                        row_count_len
+                    )
+                    percent_done = (processed_rows * 100) / row_count
+                    percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
+                    mb_per_s = (
+                        (file_size * (processed_rows / row_count)) / 1024 / 1024
+                    ) / (max(spent_ms_so_far, 1) / 1000)
+                    mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
+                    mem = process.memory_info()[0] // 1024 // 1024
+                    mem_str = f"{mem}".rjust(len("123"))
+
+                    logger.info(
+                        f"Validated {processed_rows_str} rows, "
+                        + f"{mem_str} MB mem used, "
+                        + f"{mb_per_s_str} MB/s, "
+                        + f"{percent_done_str} % done. "
+                        + f"ETA: {ms_to_eta(int(remaining_ms))}"
+                    )
+            spent_ms = current_milli_time() - start_ms
+            mb_per_s = (
+                (file_size * (processed_rows / row_count)) / 1024 / 1024
+            ) / (max(spent_ms, 1) / 1000)
+            logger.info(
+                "Validating no overlapping timespans done. "
+                + f"Speed: {mb_per_s:.1f} MB/s. "
+                + f"Spent {spent_ms:_} aka {ms_to_eta(spent_ms)}"
+            )
+            return True
+        finally:
+            cursor.close()
+
+
 def read_and_sanitize_csv2(
     input_data_path: Path,
     output_data_path: Path,
@@ -458,8 +569,55 @@ def read_and_sanitize_csv2(
                         writer,
                         conn,
                     )
+
             with sqlite3.connect("tmp.db", autocommit=False) as conn2:
-                _no_overlapping_timespans_check(row_count, file_size, conn2)
+                logger.info("Creating index ...")
+                start_ms = current_milli_time()
+                conn2.execute(
+                    "CREATE INDEX IF NOT EXISTS "
+                    + "index_unit_id ON dataset(unit_id)"
+                )
+                conn2.commit()
+                spent_ms = current_milli_time() - start_ms
+                logger.info(
+                    f"Creating index ... Done in {spent_ms:_} ms aka "
+                    + f"{ms_to_eta(spent_ms)}"
+                )
+
+            # logger.info(f"row count is {row_count:_}")
+            worker_count = 8
+            chunk_size = (row_count // worker_count) + 1
+            logger.info(f"chunk size: {chunk_size:_}")
+            mp_context = multiprocessing.get_context("spawn")
+            _is_aborted = mp_context.Event()
+            start_time2 = current_milli_time()
+            with ProcessPoolExecutor(
+                worker_count,
+                mp_context=mp_context,
+                initializer=init_worker,
+                initargs=(_is_aborted,),
+            ) as pool:
+                jobs = []
+                s = 0
+                while s <= row_count:
+                    # logger.info(f"s is {s:_}")
+                    job = pool.submit(
+                        _no_overlapping_timespans_check_worker,
+                        1 + (file_size // worker_count),
+                        s,
+                        chunk_size,
+                    )
+                    jobs.append(job)
+                    s += chunk_size
+                for job in jobs:
+                    job.result()
+                spent_ms = current_milli_time() - start_time2
+                mb_per_s = (file_size / 1024 / 1024) / (max(spent_ms, 1) / 1000)
+                logger.info(f"Validated rows speed: {mb_per_s:.1f} MB/s")
+                logger.info(
+                    f"Validated rows done in {spent_ms:_} ms aka "
+                    + f"{ms_to_eta(spent_ms)}"
+                )
     finally:
         try:
             os.remove("tmp.db")
