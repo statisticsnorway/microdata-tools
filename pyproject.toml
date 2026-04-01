@@ -11,6 +11,9 @@ dependencies = [
     "numpy>=2.2.0",
     "pyarrow>=21.0.0",
     "pydantic>=2.11.7",
+    "adbc-driver-manager==1.10.0",
+    "adbc-driver-sqlite==1.10.0",
+    "importlib-resources==6.5.2",
 ]
 
 [dependency-groups]
