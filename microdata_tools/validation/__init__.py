@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import string
 import time
 from pathlib import Path
@@ -52,6 +53,7 @@ def get_unit_id_type_for_unit_type(
 
 
 def validate_dataset(
+    mem_pid_q: multiprocessing.SimpleQueue,
     dataset_name: str,
     working_directory: str = "",
     input_directory: str = "",
@@ -95,6 +97,7 @@ def validate_dataset(
         file_size = input_data_path.stat().st_size
 
         temporal_data = dataset_accumulated.read_and_sanitize_csv2(
+            mem_pid_q,
             input_data_path,
             Path(working_directory_path / f"{dataset_name}.parquet"),
             identifier_data_type,

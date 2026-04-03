@@ -390,7 +390,8 @@ def csv_to_parquet(
     return temporal_data
 
 
-global is_aborted
+_is_aborted: multiprocessing.Event
+_report_q: multiprocessing.SimpleQueue
 
 
 def init_logging() -> None:
@@ -402,19 +403,34 @@ def init_logging() -> None:
     )
 
 
-def init_worker(_is_aborted: multiprocessing.Event) -> None:
-    global is_aborted
-    is_aborted = _is_aborted
+def init_worker(
+    is_aborted: multiprocessing.Event,
+    mem_pid_q: multiprocessing.SimpleQueue,
+    report_q: multiprocessing.SimpleQueue,
+) -> None:
+    global _is_aborted
+    global _report_q
+    _is_aborted = is_aborted
+    _report_q = report_q
+    mem_pid_q.put(os.getpid())
     init_logging()
 
 
-def _no_overlapping_timespans_check_worker(
-    file_size: int, offset: int, limit: int
+def _no_overlapping_timespans_check_worker(offset: int, limit: int) -> bool:
+    global _report_q
+    return _no_overlapping_timespans_check_worker_inner(
+        _report_q, offset, limit
+    )
+
+
+def _no_overlapping_timespans_check_worker_inner(
+    report_q: multiprocessing.SimpleQueue,
+    offset: int,
+    limit: int,
 ) -> bool:
     row_count = limit
     with sqlite3.connect("tmp.db", autocommit=False) as conn:
-        logger.info("Validating no overlapping timespans ...")
-        start_ms = current_milli_time()
+        # logger.info("Validating no overlapping timespans ...")
         last_log = -1
         cursor = conn.cursor()
         process = psutil.Process(os.getpid())
@@ -462,44 +478,20 @@ def _no_overlapping_timespans_check_worker(
                     pass
                 elif processed_rows != 1:
                     last_log = lst_log
-                    spent_ms_so_far = current_milli_time() - start_ms
-                    ms_per_row = spent_ms_so_far / processed_rows
-                    remaining_ms = ms_per_row * (row_count - processed_rows)
-                    row_count_len = len(f"{row_count:_}")
-                    processed_rows_str = f"{processed_rows:_}".rjust(
-                        row_count_len
+                    report_q.put(
+                        {
+                            "pid": os.getpid(),
+                            "processed_rows": processed_rows,
+                            "mem": process.memory_info()[0] // 1024 // 1024,
+                        }
                     )
-                    percent_done = (processed_rows * 100) / row_count
-                    percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
-                    mb_per_s = (
-                        (file_size * (processed_rows / row_count)) / 1024 / 1024
-                    ) / (max(spent_ms_so_far, 1) / 1000)
-                    mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
-                    mem = process.memory_info()[0] // 1024 // 1024
-                    mem_str = f"{mem}".rjust(len("123"))
-
-                    logger.info(
-                        f"Validated {processed_rows_str} rows, "
-                        + f"{mem_str} MB mem used, "
-                        + f"{mb_per_s_str} MB/s, "
-                        + f"{percent_done_str} % done. "
-                        + f"ETA: {ms_to_eta(int(remaining_ms))}"
-                    )
-            spent_ms = current_milli_time() - start_ms
-            mb_per_s = (
-                (file_size * (processed_rows / row_count)) / 1024 / 1024
-            ) / (max(spent_ms, 1) / 1000)
-            logger.info(
-                "Validating no overlapping timespans done. "
-                + f"Speed: {mb_per_s:.1f} MB/s. "
-                + f"Spent {spent_ms:_} aka {ms_to_eta(spent_ms)}"
-            )
             return True
         finally:
             cursor.close()
 
 
 def read_and_sanitize_csv2(
+    mem_pid_q: multiprocessing.SimpleQueue,
     input_data_path: Path,
     output_data_path: Path,
     identifier_data_type: str,
@@ -588,14 +580,16 @@ def read_and_sanitize_csv2(
             worker_count = 8
             chunk_size = (row_count // worker_count) + 1
             logger.info(f"chunk size: {chunk_size:_}")
+            logger.info(f"row count: {row_count:_}")
             mp_context = multiprocessing.get_context("spawn")
-            _is_aborted = mp_context.Event()
+            is_aborted = mp_context.Event()
+            report_queue = mp_context.SimpleQueue()
             start_time2 = current_milli_time()
             with ProcessPoolExecutor(
                 worker_count,
                 mp_context=mp_context,
                 initializer=init_worker,
-                initargs=(_is_aborted,),
+                initargs=(is_aborted, mem_pid_q, report_queue),
             ) as pool:
                 jobs = []
                 s = 0
@@ -603,12 +597,71 @@ def read_and_sanitize_csv2(
                     # logger.info(f"s is {s:_}")
                     job = pool.submit(
                         _no_overlapping_timespans_check_worker,
-                        1 + (file_size // worker_count),
                         s,
                         chunk_size,
                     )
                     jobs.append(job)
                     s += chunk_size
+
+                def jobs_done() -> bool:
+                    for job2 in jobs:
+                        if job2.done():
+                            continue
+                        else:
+                            return False
+                    return True
+
+                stats = {}
+
+                last_log = -1
+                while not jobs_done():
+                    while not report_queue.empty():
+                        report = report_queue.get()
+                        pid = report["pid"]
+                        stats[pid] = {
+                            "processed_rows": report["processed_rows"],
+                            "mem": report["mem"],
+                        }
+                    mem = 0
+                    processed_rows = 0
+
+                    for pid in stats:
+                        stat = stats[pid]
+                        mem += stat["mem"]
+                        processed_rows += stat["processed_rows"]
+
+                    if processed_rows == 0:
+                        pass
+                    elif last_log == log_time() and processed_rows != row_count:
+                        pass
+                    else:
+                        last_log = log_time()
+                        spent_ms_so_far = current_milli_time() - start_time2
+                        ms_per_row = spent_ms_so_far / max(1, processed_rows)
+                        remaining_ms = ms_per_row * (row_count - processed_rows)
+                        mb_per_s = (
+                            (file_size * (processed_rows / row_count))
+                            / 1024
+                            / 1024
+                        ) / (max(spent_ms_so_far, 1) / 1000)
+                        processed_rows_str = f"{processed_rows:_}".rjust(
+                            len(f"{row_count:_}")
+                        )
+                        percent_done = (processed_rows * 100) / row_count
+                        percent_done_str = f"{percent_done:.1f}".rjust(
+                            len("100.0")
+                        )
+                        mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
+                        mem_str = f"{mem}".rjust(len("1234"))
+                        logger.info(
+                            f"Validated {processed_rows_str} rows, "
+                            + f"{mem_str} MB mem used, "
+                            + f"{mb_per_s_str} MB/s, "
+                            + f"{percent_done_str} % done. "
+                            + f"ETA: {ms_to_eta(int(remaining_ms))}"
+                        )
+                    time.sleep(0.016)
+
                 for job in jobs:
                     job.result()
                 spent_ms = current_milli_time() - start_time2
@@ -625,6 +678,9 @@ def read_and_sanitize_csv2(
             pass
     spent_ms = current_milli_time() - start_time
     mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
-    logger.debug(f"read_and_sanitize_csv2 spent: {spent_ms:_} ms")
+    logger.debug(
+        f"read_and_sanitize_csv2 spent {spent_ms:_} ms aka "
+        + f"{ms_to_eta(spent_ms)}"
+    )
     logger.debug(f"read_and_sanitize_csv2 speed: {mb_per_s:.1f} MB/s")
     return temporal_data

@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 import multiprocessing as mp
 import os
 import shutil
@@ -149,30 +150,62 @@ def teardown_function():
 
 
 _is_done = None
+_mem_pid_q: multiprocessing.SimpleQueue
 
 
-def init_mem_watcher(is_done):
+def init_mem_watcher(is_done, mem_pid_q):
     init_logging()
     global _is_done
+    global _mem_pid_q
     _is_done = is_done
+    _mem_pid_q = mem_pid_q
 
 
-def watch_mem(pid):
-    global _is_done
-    process = psutil.Process(pid)
+def watch_mem2(
+    is_done: multiprocessing.Event, mem_pid_q: multiprocessing.SimpleQueue
+) -> tuple[int, int]:
     max_mem = -1
     samples = 0
+    processes = {}
     while True:
-        done = _is_done.wait(0.1)
+        done = is_done.wait(0.1)
         if done:
             break
-        else:
-            mem = process.memory_info()[0] // 1024 // 1024
-            samples += 1
-            if mem > max_mem:
-                max_mem = mem
-            # logger.info(f'Memory: {mem:_} MB')
+
+        while not mem_pid_q.empty():
+            pid = mem_pid_q.get()
+            assert pid not in processes
+            proc = psutil.Process(pid)
+            processes[pid] = proc
+
+        mem = 0
+        to_delete = []
+        try:
+            for pid in processes:
+                try:
+                    process = processes[pid]
+                    mem += process.memory_info()[0] // 1024 // 1024
+                except psutil.NoSuchProcess:
+                    to_delete.append(pid)
+            for del_pid in to_delete:
+                del processes[del_pid]
+        except Exception as e:
+            logger.error("Error occurred in watch_mem:", e)
+        samples += 1
+        if mem > max_mem:
+            max_mem = mem
     return samples, max_mem
+
+
+def watch_mem():
+    global _is_done
+    global _mem_pid_q
+    init_logging()
+    try:
+        return watch_mem2(_is_done, _mem_pid_q)
+    except Exception as e:
+        logger.error("Error occurred in watch_mem:", e)
+        return -1, -1
 
 
 @pytest.mark.focus
@@ -183,13 +216,15 @@ def test_validate_big_dataset_perf():
 
     mp_context = mp.get_context("spawn")
     is_done = mp_context.Event()
+    mem_pid_q = mp_context.SimpleQueue()
     with ProcessPoolExecutor(
         1,
         mp_context=mp_context,
         initializer=init_mem_watcher,
-        initargs=(is_done,),
+        initargs=(is_done, mem_pid_q),
     ) as mem_watcher:
-        fut = mem_watcher.submit(watch_mem, os.getpid())
+        fut = mem_watcher.submit(watch_mem)
+        mem_pid_q.put(os.getpid())
         try:
             for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
                 start_time = current_milli_time()
@@ -197,6 +232,7 @@ def test_validate_big_dataset_perf():
                     logger.info("")
                 logger.info(f"Begin {dataset_name} ...")
                 data_errors = validate_dataset(
+                    mem_pid_q,
                     dataset_name,
                     working_directory=working_directory,
                     keep_temporary_files=False,
