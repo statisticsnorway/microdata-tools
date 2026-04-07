@@ -188,7 +188,7 @@ def watch_mem2(
                     rss, vms, pfaults, pageins = process.memory_info()
                     total_pfaults += pfaults
                     total_pageins += pageins
-                    vms_gb = vms / 1024 / 1024 / 1024 / 1024
+                    vms_gb = vms / 1024 / 1024 / 1024
                     mem += vms_gb
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
