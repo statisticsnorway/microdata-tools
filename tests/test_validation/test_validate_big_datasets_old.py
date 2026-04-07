@@ -163,6 +163,9 @@ def watch_mem2(
     processes = {}
     start_time = current_milli_time()
     should_log = utils.log_every_ms(3000)
+
+    old_total_pfaults = 0
+    old_total_pageins = 0
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -185,30 +188,23 @@ def watch_mem2(
                     rss, vms, pfaults, pageins = process.memory_info()
                     total_pfaults += pfaults
                     total_pageins += pageins
-                    mem += vms
+                    vms_gb = vms / 1024 / 1024 / 1024 / 1024
+                    mem += vms_gb
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
             for del_pid in to_delete:
                 del processes[del_pid]
         except Exception as e:
             logger.error("Error occurred in watch_mem:", e)
-        spent_s = (current_milli_time() - start_time) // 1000
         spent_ms = current_milli_time() - start_time
-        if spent_s > 0:
-            if should_log():
-                page_faults_per_s = total_pfaults // spent_s
-                pageins_per_s = total_pageins // spent_s
-                logger.info(
-                    f"total page faults: {total_pfaults:_} "
-                    + f"per second: {page_faults_per_s:_}"
-                )
-                logger.info(
-                    f"total pageins: {total_pageins:_} "
-                    + f"per second: {pageins_per_s:_}"
-                )
-                logger.info(
-                    f"Used memory: {mem:_} MB, uptime: {ms_to_eta(spent_ms)}"
-                )
+        delta_pfaults = total_pfaults - old_total_pfaults
+        delta_pageins = total_pageins - old_total_pageins
+        if should_log():
+            logger.info(
+                f"Δ pfaults: {delta_pfaults:_} "
+                + f"Δ pageins: {delta_pageins:_} "
+                + f"Used memory: {mem:.1f} GB, uptime: {ms_to_eta(spent_ms)}"
+            )
 
         samples += 1
         if mem > max_mem:
