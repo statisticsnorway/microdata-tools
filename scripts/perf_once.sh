@@ -6,6 +6,7 @@ LOG_DATE="$(date '+%Y%m%d_%H%M%S')"
 LOG_FILE="logs/log_${LOG_DATE}.txt"
 
 echo "Logging to '${LOG_FILE}'"
+echo "GIT sha is '$()'"
 
 env \
 MICRODATA_TOOLS_ROW_COUNT='1_000_000_000' \
@@ -20,5 +21,5 @@ uv run pytest \
 --quiet \
 --capture no \
 tests/test_validation/test_validate_big_datasets.py \
-| tee --ignore-interrupts "${LOG_FILE}"
+| tee --ignore --ignore-interrupts "${LOG_FILE}"
 
