@@ -153,6 +153,9 @@ def watch_mem2(
     processes = {}
     start_time = current_milli_time()
     should_log = utils.log_every_ms(3000)
+
+    old_total_pfaults = 0
+    old_total_pageins = 0
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -164,31 +167,43 @@ def watch_mem2(
             proc = psutil.Process(pid)
             processes[pid] = proc
 
-        mem = 0
+        vms_total = 0
+        rss_total = 0
         to_delete = []
-        tot_page_faults = 0
+        total_pfaults = 0
+        total_pageins = 0
         try:
             for pid in processes:
                 try:
                     process = processes[pid]
                     rss, vms, pfaults, pageins = process.memory_info()
-                    tot_page_faults += pfaults
-                    mem += process.memory_info()[1] // 1024 // 1024
+                    total_pfaults += pfaults
+                    total_pageins += pageins
+                    vms_total += vms / 1e9
+                    rss_total += rss / 1e9
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
             for del_pid in to_delete:
                 del processes[del_pid]
         except Exception as e:
             logger.error("Error occurred in watch_mem:", e)
-        spent_s = (current_milli_time() - start_time) // 1000
-        if spent_s > 0:
-            if should_log():
-                page_faults_per_s = tot_page_faults / spent_s
-                logger.info(f"page faults per second: {page_faults_per_s:.1f}")
+        spent_ms = current_milli_time() - start_time
+        delta_pfaults = total_pfaults - old_total_pfaults
+        delta_pageins = total_pageins - old_total_pageins
+        old_total_pfaults = total_pfaults
+        old_total_pageins = total_pageins
+        if should_log():
+            logger.info(
+                f"Δ pfaults: {delta_pfaults:_} "
+                + f"Δ pageins: {delta_pageins:_} "
+                + f"Resident mem: {rss_total:.1f} GB, "
+                + f"Virtual mem: {vms_total:.1f} GB, "
+                + f"uptime: {ms_to_eta(spent_ms)}"
+            )
 
         samples += 1
-        if mem > max_mem:
-            max_mem = mem
+        if vms_total > max_mem:
+            max_mem = vms_total
     return samples, max_mem
 
 
