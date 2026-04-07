@@ -177,7 +177,8 @@ def watch_mem2(
             proc = psutil.Process(pid)
             processes[pid] = proc
 
-        mem = 0
+        vms_total = 0
+        rss_total = 0
         to_delete = []
         total_pfaults = 0
         total_pageins = 0
@@ -188,8 +189,8 @@ def watch_mem2(
                     rss, vms, pfaults, pageins = process.memory_info()
                     total_pfaults += pfaults
                     total_pageins += pageins
-                    vms_gb = vms / 1024 / 1024 / 1024
-                    mem += vms_gb
+                    vms_total += vms / 1e9
+                    rss_total += rss / 1e9
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
             for del_pid in to_delete:
@@ -203,12 +204,14 @@ def watch_mem2(
             logger.info(
                 f"Δ pfaults: {delta_pfaults:_} "
                 + f"Δ pageins: {delta_pageins:_} "
-                + f"Used memory: {mem:.1f} GB, uptime: {ms_to_eta(spent_ms)}"
+                + f"Resident mem: {rss_total:.1f} GB, "
+                + f"Virtual mem: {vms_total:.1f} GB, "
+                + f"uptime: {ms_to_eta(spent_ms)}"
             )
 
         samples += 1
-        if mem > max_mem:
-            max_mem = mem
+        if vms_total > max_mem:
+            max_mem = vms_total
     return samples, max_mem
 
 
