@@ -10,7 +10,8 @@ from pathlib import Path
 import psutil
 import pytest
 
-from microdata_tools.validation.steps import old_init, reader_utils, utils
+from microdata_tools import validate_dataset
+from microdata_tools.validation.steps import reader_utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -130,18 +131,6 @@ def teardown_function():
             os.remove(f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv")
 
 
-# @pytest.mark.skipif("not config.getoption('include-big-data')")
-# def test_validate_big_dataset():
-#     for dataset_name in VALID_DATASET_NAMES:
-#         print(f"Validating {dataset_name}")
-#         data_errors = validate_dataset(
-#             dataset_name,
-#             keep_temporary_files=False,
-#             input_directory=RESOURCE_DIR,
-#         )
-#         assert not data_errors
-
-
 _is_done = None
 _mem_pid_q: multiprocessing.SimpleQueue
 
@@ -152,7 +141,6 @@ def init_mem_watcher(is_done, mem_pid_q):
     global _mem_pid_q
     _is_done = is_done
     _mem_pid_q = mem_pid_q
-    init_logging()
 
 
 def watch_mem2(
@@ -161,8 +149,6 @@ def watch_mem2(
     max_mem = -1
     samples = 0
     processes = {}
-    last_log = -1
-    start_ms = current_milli_time()
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -190,13 +176,6 @@ def watch_mem2(
         samples += 1
         if mem > max_mem:
             max_mem = mem
-        lst_log = utils.log_time()
-        if lst_log != last_log:
-            last_log = lst_log
-            spent_ms = current_milli_time() - start_ms
-            logger.info(
-                f"Used memory: {mem:_} MB, uptime: {ms_to_eta(spent_ms)}"
-            )
     return samples, max_mem
 
 
@@ -234,7 +213,8 @@ def test_validate_big_dataset_perf():
                 if idx != 0:
                     logger.info("")
                 logger.info(f"Begin {dataset_name} ...")
-                data_errors = old_init.validate_dataset(
+                data_errors = validate_dataset(
+                    mem_pid_q,
                     dataset_name,
                     working_directory=working_directory,
                     keep_temporary_files=False,
@@ -242,10 +222,7 @@ def test_validate_big_dataset_perf():
                 )
                 spent_ms = current_milli_time() - start_time
                 assert not data_errors
-                logger.info(
-                    f"Done {dataset_name}. Spent: {spent_ms:_} ms "
-                    + f"aka {ms_to_eta(spent_ms)}"
-                )
+                logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
         finally:
             is_done.set()
             try:
