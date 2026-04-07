@@ -3,7 +3,6 @@ import multiprocessing
 import multiprocessing as mp
 import os
 import shutil
-import time
 import uuid
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -13,18 +12,13 @@ import pytest
 
 from microdata_tools import validate_dataset
 from microdata_tools.validation.steps import reader_utils
-from microdata_tools.validation.steps.utils import ms_to_eta
+from microdata_tools.validation.steps.utils import (
+    current_milli_time,
+    log_time,
+    ms_to_eta,
+)
 
 logger = logging.getLogger()
-
-
-def current_milli_time():
-    return time.time_ns() // 1_000_000
-
-
-def log_time():
-    return time.time_ns() // 1_000_000 // 1000
-
 
 RESOURCE_DIR = "tests/resources/validation/validate_dataset/big_datasets"
 
