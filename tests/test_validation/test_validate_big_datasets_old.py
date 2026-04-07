@@ -162,6 +162,7 @@ def watch_mem2(
     samples = 0
     processes = {}
     last_log = -1
+    start_ms = current_milli_time()
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -179,7 +180,7 @@ def watch_mem2(
             for pid in processes:
                 try:
                     process = processes[pid]
-                    mem += process.memory_info()[0] // 1024 // 1024
+                    mem += process.memory_info()[1] // 1024 // 1024
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
             for del_pid in to_delete:
@@ -192,7 +193,10 @@ def watch_mem2(
         lst_log = utils.log_time()
         if lst_log != last_log:
             last_log = lst_log
-            logger.info(f"Used memory: {mem:_} MB")
+            spent_ms = current_milli_time() - start_ms
+            logger.info(
+                f"Used memory: {mem:_} MB, uptime: {ms_to_eta(spent_ms)}"
+            )
     return samples, max_mem
 
 
