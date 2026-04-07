@@ -346,6 +346,7 @@ def sanitize_and_validate_csv(
 
         logger.info("*" * 80)
         logger.info("Summary:")
+        logger.info(f"Row count: {row_count:_}")
         share1 = 100 * spent_ms1 / total_ms
         logger.debug(
             f"Validating and preparing data: {mb_per_s1:.1f} MB/s, "
