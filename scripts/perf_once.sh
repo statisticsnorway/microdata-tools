@@ -22,5 +22,5 @@ uv run pytest \
 --quiet \
 --capture no \
 tests/test_validation/test_validate_big_datasets.py \
-| tee --ignore --ignore-interrupts "${LOG_FILE}"
+| tee --append --ignore-interrupts "${LOG_FILE}"
 
