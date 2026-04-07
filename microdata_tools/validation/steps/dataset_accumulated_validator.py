@@ -3,7 +3,6 @@ import logging
 import multiprocessing
 import os.path
 import sqlite3
-import time
 from pathlib import Path
 from typing import Dict, List, Union
 
@@ -17,14 +16,6 @@ from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.steps import overlap_validator, utils
 
 logger = logging.getLogger()
-
-
-def current_milli_time() -> int:
-    return time.time_ns() // 1_000_000
-
-
-def log_time() -> int:
-    return time.time_ns() // 1_000_000 // 1000
 
 
 def get_temporal_data2(
@@ -177,7 +168,7 @@ def _csv_stream_to_sqlite(
     reader: pyarrow.csv.CSVStreamingReader,
     conn: sqlite3.Connection,
 ) -> Dict[str, int]:
-    start_time = current_milli_time()
+    start_time = utils.current_milli_time()
     temporal_data = {}
     processed_rows = 0
     last_log = -1
@@ -229,10 +220,10 @@ def _csv_stream_to_sqlite(
         conn.commit()
         temporal_data = get_temporal_data2(tbl, temporal_data)
 
-        if last_log == log_time() and processed_rows != row_count:
+        if last_log == utils.log_time() and processed_rows != row_count:
             pass
         else:
-            last_log = log_time()
+            last_log = utils.log_time()
             _stream_show_progress(
                 file_size,
                 process.memory_info()[0] // 1024 // 1024,
@@ -251,7 +242,7 @@ def _stream_show_progress(
     row_count: int,
     start_time: int,
 ) -> None:
-    spent_ms_so_far = current_milli_time() - start_time
+    spent_ms_so_far = utils.current_milli_time() - start_time
     ms_per_row = spent_ms_so_far / processed_rows
     remaining_ms = ms_per_row * (row_count - processed_rows)
     mb_per_s = ((file_size * (processed_rows / row_count)) / 1024 / 1024) / (
@@ -287,7 +278,7 @@ def sanitize_and_validate_csv(
     ensures the input csv data follows the requirements for the
     microdata data model.
     """
-    start_ms = current_milli_time()
+    start_ms = utils.current_milli_time()
     row_count = ru.get_row_count(input_data_path)
     logger.info(f"identifier_data_type: {identifier_data_type}")
     logger.info(f"measure_data_type: {measure_data_type}")
@@ -310,7 +301,7 @@ def sanitize_and_validate_csv(
             row_count,
             sentinel_list,
         )
-        spent_ms1 = current_milli_time() - start_ms
+        spent_ms1 = utils.current_milli_time() - start_ms
         mb_per_s1 = (file_size / 1024 / 1024) / (spent_ms1 / 1000)
         logger.info(
             f"Validating and preparing data ... Done in {spent_ms1:_} ms aka "
@@ -320,10 +311,10 @@ def sanitize_and_validate_csv(
             f"Validating and preparing data speed: {mb_per_s1:.1f} MB/s"
         )
 
-        start_ms2 = current_milli_time()
+        start_ms2 = utils.current_milli_time()
         logger.info("Creating index ...")
         _create_index()
-        spent_ms2 = current_milli_time() - start_ms2
+        spent_ms2 = utils.current_milli_time() - start_ms2
         mb_per_s2 = (file_size / 1024 / 1024) / (spent_ms2 / 1000)
         logger.info(
             f"Creating index ... Done in {spent_ms2:_} ms aka "
@@ -331,7 +322,7 @@ def sanitize_and_validate_csv(
         )
         logger.debug(f"Creating index speed: {mb_per_s2:.1f} MB/s")
 
-        start_ms3 = current_milli_time()
+        start_ms3 = utils.current_milli_time()
         overlap_validator.check_no_overlaps(file_size, mem_pid_q, row_count)
         spent_ms3 = utils.current_milli_time() - start_ms3
         mb_per_s3 = (file_size / 1024 / 1024) / (max(spent_ms3, 1) / 1000)
@@ -341,7 +332,7 @@ def sanitize_and_validate_csv(
             + f"{utils.ms_to_eta(spent_ms3)}"
         )
 
-        total_ms = current_milli_time() - start_ms
+        total_ms = utils.current_milli_time() - start_ms
         mb_per_s4 = (file_size / 1024 / 1024) / (total_ms / 1000)
 
         logger.info("*" * 80)
