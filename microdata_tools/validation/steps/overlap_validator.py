@@ -25,6 +25,7 @@ def _launch_jobs(
         )
         jobs.append(job)
         s += chunk_size
+    logger.info(f"Spawned {len(jobs):_} workers")
     return jobs
 
 
