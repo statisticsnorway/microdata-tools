@@ -8,6 +8,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import psutil
+import pytest
 
 from microdata_tools import validate_dataset
 from microdata_tools.validation.steps import reader_utils
@@ -201,7 +202,7 @@ def watch_mem():
         return -1, -1
 
 
-# @pytest.mark.focus
+@pytest.mark.focus
 def test_validate_big_dataset_perf():
     init_logging()
     working_directory = Path("workdir/" + str(uuid.uuid4()))
