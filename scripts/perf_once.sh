@@ -6,7 +6,8 @@ LOG_DATE="$(date '+%Y%m%d_%H%M%S')"
 LOG_FILE="logs/log_${LOG_DATE}.txt"
 
 echo "Logging to '${LOG_FILE}'"
-echo "GIT sha is '$()'"
+echo "git describe is '$(git describe --dirty)'"
+echo "git describe is '$(git describe --dirty)'" > "${LOG_FILE}"
 
 env \
 MICRODATA_TOOLS_ROW_COUNT='1_000_000_000' \
