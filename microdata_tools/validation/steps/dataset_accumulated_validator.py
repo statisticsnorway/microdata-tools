@@ -356,11 +356,11 @@ def sanitize_and_validate_csv(
         share3 = 100 * spent_ms3 / total_ms
         logger.info(f"Validated rows: {mb_per_s3:.1f} MB/s, {share3:.1f} %")
         logger.debug(f"Total speed: {mb_per_s4:.1f} MB/s")
-        logger.info("*" * 80)
-
         logger.debug(
             f"Total spent {total_ms:_} ms aka " + f"{utils.ms_to_eta(total_ms)}"
         )
+        logger.info("*" * 80)
+
         return temporal_data
     finally:
         try:
