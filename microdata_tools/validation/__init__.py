@@ -10,7 +10,7 @@ from microdata_tools.validation.components import unit_id_types
 from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.model.metadata import UnitIdType, UnitType
 from microdata_tools.validation.steps import (
-    dataset_accumulated,
+    dataset_accumulated_validator,
     metadata_enricher,
     metadata_reader,
 )
@@ -96,7 +96,7 @@ def validate_dataset(
 
         file_size = input_data_path.stat().st_size
 
-        temporal_data = dataset_accumulated.read_and_sanitize_csv2(
+        temporal_data = dataset_accumulated_validator.sanitize_and_validate_csv(
             mem_pid_q,
             input_data_path,
             Path(working_directory_path / f"{dataset_name}.parquet"),

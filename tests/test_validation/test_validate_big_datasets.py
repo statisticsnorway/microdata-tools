@@ -13,7 +13,7 @@ import pytest
 
 from microdata_tools import validate_dataset
 from microdata_tools.validation.steps import reader_utils
-from microdata_tools.validation.steps.dataset_accumulated import ms_to_eta
+from microdata_tools.validation.steps.utils import ms_to_eta
 
 logger = logging.getLogger()
 
