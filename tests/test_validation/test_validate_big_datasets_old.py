@@ -161,8 +161,8 @@ def watch_mem2(
     max_mem = -1
     samples = 0
     processes = {}
-    last_log = -1
-    start_ms = current_milli_time()
+    start_time = current_milli_time()
+    should_log = utils.log_every_ms(3000)
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -176,27 +176,43 @@ def watch_mem2(
 
         mem = 0
         to_delete = []
+        total_pfaults = 0
+        total_pageins = 0
         try:
             for pid in processes:
                 try:
                     process = processes[pid]
-                    mem += process.memory_info()[1] // 1024 // 1024
+                    rss, vms, pfaults, pageins = process.memory_info()
+                    total_pfaults += pfaults
+                    total_pageins += pageins
+                    mem += vms
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
             for del_pid in to_delete:
                 del processes[del_pid]
         except Exception as e:
             logger.error("Error occurred in watch_mem:", e)
+        spent_s = (current_milli_time() - start_time) // 1000
+        spent_ms = current_milli_time() - start_time
+        if spent_s > 0:
+            if should_log():
+                page_faults_per_s = total_pfaults // spent_s
+                pageins_per_s = total_pageins // spent_s
+                logger.info(
+                    f"total page faults: {total_pfaults:_} "
+                    + f"per second: {page_faults_per_s:_}"
+                )
+                logger.info(
+                    f"total pageins: {total_pageins:_} "
+                    + f"per second: {pageins_per_s:_}"
+                )
+                logger.info(
+                    f"Used memory: {mem:_} MB, uptime: {ms_to_eta(spent_ms)}"
+                )
+
         samples += 1
         if mem > max_mem:
             max_mem = mem
-        lst_log = utils.log_time()
-        if lst_log != last_log:
-            last_log = lst_log
-            spent_ms = current_milli_time() - start_ms
-            logger.info(
-                f"Used memory: {mem:_} MB, uptime: {ms_to_eta(spent_ms)}"
-            )
     return samples, max_mem
 
 
@@ -233,7 +249,7 @@ def test_validate_big_dataset_perf():
                 start_time = current_milli_time()
                 if idx != 0:
                     logger.info("")
-                logger.info(f"Begin {dataset_name} ...")
+                logger.info(f"OLD Begin {dataset_name} ...")
                 data_errors = old_init.validate_dataset(
                     dataset_name,
                     working_directory=working_directory,
