@@ -226,7 +226,7 @@ def _csv_stream_to_sqlite(
             last_log = utils.log_time()
             _stream_show_progress(
                 file_size,
-                process.memory_info()[0] // 1024 // 1024,
+                process.memory_info()[1] // 1024 // 1024,
                 processed_rows,
                 row_count,
                 start_time,

@@ -104,7 +104,7 @@ def _no_overlapping_timespans_check_worker_inner(
                         {
                             "pid": os.getpid(),
                             "processed_rows": processed_rows,
-                            "mem": process.memory_info()[0] // 1024 // 1024,
+                            "mem": process.memory_info()[1] // 1024 // 1024,
                         }
                     )
             return processed_rows
