@@ -8,9 +8,9 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import psutil
+import pytest
 
-from microdata_tools import validate_dataset
-from microdata_tools.validation.steps import reader_utils
+from microdata_tools.validation.steps import old_init, reader_utils, utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -152,6 +152,7 @@ def init_mem_watcher(is_done, mem_pid_q):
     global _mem_pid_q
     _is_done = is_done
     _mem_pid_q = mem_pid_q
+    init_logging()
 
 
 def watch_mem2(
@@ -160,6 +161,7 @@ def watch_mem2(
     max_mem = -1
     samples = 0
     processes = {}
+    last_log = -1
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -187,6 +189,10 @@ def watch_mem2(
         samples += 1
         if mem > max_mem:
             max_mem = mem
+        lst_log = utils.log_time()
+        if lst_log != last_log:
+            last_log = lst_log
+            logger.info(f"Used memory: {mem:_} MB")
     return samples, max_mem
 
 
@@ -201,7 +207,7 @@ def watch_mem():
         return -1, -1
 
 
-# @pytest.mark.focus
+@pytest.mark.focus
 def test_validate_big_dataset_perf():
     init_logging()
     working_directory = Path("workdir/" + str(uuid.uuid4()))
@@ -224,8 +230,7 @@ def test_validate_big_dataset_perf():
                 if idx != 0:
                     logger.info("")
                 logger.info(f"Begin {dataset_name} ...")
-                data_errors = validate_dataset(
-                    mem_pid_q,
+                data_errors = old_init.validate_dataset(
                     dataset_name,
                     working_directory=working_directory,
                     keep_temporary_files=False,
