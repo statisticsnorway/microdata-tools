@@ -253,7 +253,7 @@ def _stream_show_progress(
     percent_done = (processed_rows * 100) / row_count
     percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
     mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
-    mem_str = f"{mem_mb}".rjust(len("123"))
+    mem_str = f"{mem_mb:_}".rjust(len("123_123"))
     logger.info(
         f"Validated and prepared {processed_rows_str} rows, "
         + f"{mem_str} MB mem used, "

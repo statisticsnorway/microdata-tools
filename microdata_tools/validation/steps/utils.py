@@ -1,4 +1,6 @@
 import time
+from functools import partial
+from typing import Callable
 
 
 def current_milli_time() -> int:
@@ -22,3 +24,17 @@ def ms_to_eta(milliseconds: int) -> str:
         return f"{hours:02.0f}:{minutes:02.0f}:{seconds:02.0f}"
     else:
         return f"{minutes:02.0f}:{seconds:02.0f}"
+
+
+def _log_every_ms(ms: int, state: dict[str, int]) -> bool:
+    last_log = state["last_log"]
+    lst_log = current_milli_time() // ms
+    if last_log == lst_log:
+        return False
+    else:
+        state["last_log"] = lst_log
+        return True
+
+
+def log_every_ms(ms: int) -> Callable[[], bool]:
+    return partial(_log_every_ms, ms, {"last_log": -1})

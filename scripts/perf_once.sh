@@ -12,4 +12,6 @@ uv run pytest \
 --exitfirst \
 --quiet \
 --capture no \
-tests/test_validation/test_validate_big_datasets.py
+tests/test_validation/test_validate_big_datasets.py \
+| tee --ignore-interrupts log.txt
+

@@ -3,6 +3,7 @@ import multiprocessing
 import multiprocessing as mp
 import os
 import shutil
+import sys
 import uuid
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
@@ -11,7 +12,7 @@ import psutil
 import pytest
 
 from microdata_tools import validate_dataset
-from microdata_tools.validation.steps import reader_utils
+from microdata_tools.validation.steps import reader_utils, utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -35,6 +36,7 @@ def init_logging():
         level=logging.DEBUG,
         format="%(asctime)s.%(msecs)03d %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
+        stream=sys.stdout,
         force=True,
     )
 
@@ -149,6 +151,8 @@ def watch_mem2(
     max_mem = -1
     samples = 0
     processes = {}
+    start_time = current_milli_time()
+    should_log = utils.log_every_ms(3000)
     while True:
         done = is_done.wait(0.1)
         if done:
@@ -162,10 +166,13 @@ def watch_mem2(
 
         mem = 0
         to_delete = []
+        tot_page_faults = 0
         try:
             for pid in processes:
                 try:
                     process = processes[pid]
+                    rss, vms, pfaults, pageins = process.memory_info()
+                    tot_page_faults += pfaults
                     mem += process.memory_info()[1] // 1024 // 1024
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
@@ -173,6 +180,12 @@ def watch_mem2(
                 del processes[del_pid]
         except Exception as e:
             logger.error("Error occurred in watch_mem:", e)
+        spent_s = (current_milli_time() - start_time) // 1000
+        if spent_s > 0:
+            if should_log():
+                page_faults_per_s = tot_page_faults / spent_s
+                logger.info(f"page faults per second: {page_faults_per_s:.1f}")
+
         samples += 1
         if mem > max_mem:
             max_mem = mem
