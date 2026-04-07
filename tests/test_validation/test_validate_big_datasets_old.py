@@ -238,7 +238,10 @@ def test_validate_big_dataset_perf():
                 )
                 spent_ms = current_milli_time() - start_time
                 assert not data_errors
-                logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
+                logger.info(
+                    f"Done {dataset_name}. Spent: {spent_ms:_} ms "
+                    + f"aka {ms_to_eta(spent_ms)}"
+                )
         finally:
             is_done.set()
             try:

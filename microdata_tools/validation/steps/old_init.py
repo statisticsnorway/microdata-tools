@@ -1,3 +1,4 @@
+import logging
 import string
 from pathlib import Path
 from typing import List, Union
@@ -13,7 +14,10 @@ from microdata_tools.validation.steps import (
     dataset_validator,
     metadata_enricher,
     metadata_reader,
+    reader_utils,
 )
+
+logger = logging.getLogger()
 
 
 def _validate_dataset_name(dataset_name: str) -> None:
@@ -84,6 +88,10 @@ def validate_dataset(
         )
         sentinel_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
             "sentinelAndMissingValues"
+        )
+
+        logger.info(
+            f"Row count is: {reader_utils.get_row_count(input_data_path):_}"
         )
 
         # Read data
