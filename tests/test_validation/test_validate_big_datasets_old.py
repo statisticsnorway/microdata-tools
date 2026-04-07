@@ -200,6 +200,8 @@ def watch_mem2(
         spent_ms = current_milli_time() - start_time
         delta_pfaults = total_pfaults - old_total_pfaults
         delta_pageins = total_pageins - old_total_pageins
+        old_total_pfaults = total_pfaults
+        old_total_pageins = total_pageins
         if should_log():
             logger.info(
                 f"Δ pfaults: {delta_pfaults:_} "
