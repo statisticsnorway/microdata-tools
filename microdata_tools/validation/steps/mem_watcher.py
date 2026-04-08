@@ -1,6 +1,7 @@
 import logging
 import multiprocessing
 import sys
+import traceback
 
 import psutil
 
@@ -56,6 +57,7 @@ def _watch_mem2(
 
         vms_total = 0
         rss_total = 0
+        uss_total = 0
         to_delete = []
         total_pfaults = 0
         total_pageins = 0
@@ -72,12 +74,16 @@ def _watch_mem2(
                     # total_pageins += pageins
                     vms_total += vms / 1e9
                     rss_total += rss / 1e9
+                    uss_total += uss / 1e6
                 except psutil.NoSuchProcess:
                     to_delete.append(pid)
             for del_pid in to_delete:
                 del processes[del_pid]
-        except Exception as e:
-            logger.error(f"Error occurred in watch_mem: {str(e)}")
+        except Exception:
+            logger.error(
+                "Error occurred in watch_mem: "
+                + f"{str(traceback.format_exc())}"
+            )
             # logger.error("Error occurred in watch_mem:", e)
             # TODO denne linja er bugga
         spent_ms = utils.current_milli_time() - start_time
@@ -89,8 +95,9 @@ def _watch_mem2(
             logger.info(
                 f"Δ pfaults: {delta_pfaults:_} "
                 + f"Δ pageins: {delta_pageins:_} "
-                + f"Resident mem: {rss_total:.1f} GB, "
-                + f"Virtual mem: {vms_total:.1f} GB, "
+                + f"uss: {uss_total:.0f} MB, "
+                + f"rss: {rss_total:.1f} GB, "
+                + f"vms: {vms_total:.1f} GB, "
                 + f"uptime: {utils.ms_to_eta(spent_ms)}"
             )
 
@@ -100,7 +107,7 @@ def _watch_mem2(
     return samples, max_mem
 
 
-def watch_mem() -> None:
+def watch_mem() -> tuple[int, int]:
     global _is_done
     global _mem_pid_q
     _init_logging()
