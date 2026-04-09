@@ -133,6 +133,7 @@ def validate_dataset(
         raise e
     finally:
         # Delete temporary files
+        logger.info("validate_dataset exiting!")
         try:
             if not keep_temporary_files and working_directory_path:
                 local_storage.clean_up_temporary_files(

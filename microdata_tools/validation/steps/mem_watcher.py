@@ -91,6 +91,8 @@ def watch_mem() -> tuple[int, int]:
     _init_logging()
     try:
         return _watch_mem(_is_done, _mem_pid_q)
-    except Exception as e:
-        logger.error("Error occurred in watch_mem:", e)
+    except Exception:
+        logger.error(
+            "Error occurred in watch_mem: " + f"{str(traceback.format_exc())}"
+        )
         return -1, -1

@@ -146,6 +146,7 @@ def test_validate_big_dataset_perf():
         initializer=mem_watcher.init_mem_watcher,
         initargs=(is_done, mem_pid_q),
     ) as mem_watcher_worker:
+        logger.info(f"Main worker pid is: {str(os.getpid())}")
         fut = mem_watcher_worker.submit(mem_watcher.watch_mem)
         mem_pid_q.put(os.getpid())
         try:
