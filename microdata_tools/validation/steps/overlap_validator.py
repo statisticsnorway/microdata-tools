@@ -71,7 +71,7 @@ def _show_progress_validation(
     mem_str = f"{mem}".rjust(len("1234"))
     logger.info(
         f"Validated {processed_rows_str} rows, "
-        + f"{mem_str} MB mem used, "
+        + f"{mem_str} RSS MiB mem used, "
         + f"{mb_per_s_str} MB/s, "
         + f"{percent_done_str} % done. "
         + f"ETA: {utils.ms_to_eta(int(remaining_ms))}"
