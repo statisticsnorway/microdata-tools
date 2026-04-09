@@ -171,4 +171,7 @@ def test_validate_big_dataset_perf():
             except Exception:
                 pass
         samples, max_mem = fut.result()
-        logger.info(f"Max memory usage: {max_mem:_} MB, samples: {samples:_}")
+        logger.info(
+            f"RSS max memory usage: {max_mem / 1e6:.0f} MiB, "
+            + f"samples: {samples:_}"
+        )
