@@ -1,5 +1,4 @@
 import logging
-import multiprocessing
 import multiprocessing as mp
 import os
 import shutil
@@ -7,10 +6,9 @@ import uuid
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
-import psutil
 import pytest
 
-from microdata_tools.validation.steps import old_init, reader_utils, utils
+from microdata_tools.validation.steps import mem_watcher, old_init, reader_utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -142,92 +140,6 @@ def teardown_function():
 #         assert not data_errors
 
 
-_is_done = None
-_mem_pid_q: multiprocessing.SimpleQueue
-
-
-def init_mem_watcher(is_done, mem_pid_q):
-    init_logging()
-    global _is_done
-    global _mem_pid_q
-    _is_done = is_done
-    _mem_pid_q = mem_pid_q
-    init_logging()
-
-
-def watch_mem2(
-    is_done: multiprocessing.Event, mem_pid_q: multiprocessing.SimpleQueue
-) -> tuple[int, int]:
-    max_mem = -1
-    samples = 0
-    processes = {}
-    start_time = current_milli_time()
-    should_log = utils.log_every_ms(3000)
-
-    old_total_pfaults = 0
-    old_total_pageins = 0
-    while True:
-        done = is_done.wait(0.1)
-        if done:
-            break
-
-        while not mem_pid_q.empty():
-            pid = mem_pid_q.get()
-            assert pid not in processes
-            proc = psutil.Process(pid)
-            processes[pid] = proc
-
-        vms_total = 0
-        rss_total = 0
-        to_delete = []
-        total_pfaults = 0
-        total_pageins = 0
-        try:
-            for pid in processes:
-                try:
-                    process = processes[pid]
-                    rss, vms, pfaults, pageins = process.memory_info()
-                    total_pfaults += pfaults
-                    total_pageins += pageins
-                    vms_total += vms / 1e9
-                    rss_total += rss / 1e9
-                except psutil.NoSuchProcess:
-                    to_delete.append(pid)
-            for del_pid in to_delete:
-                del processes[del_pid]
-        except Exception as e:
-            logger.error("Error occurred in watch_mem:", e)
-        spent_ms = current_milli_time() - start_time
-        delta_pfaults = total_pfaults - old_total_pfaults
-        delta_pageins = total_pageins - old_total_pageins
-        old_total_pfaults = total_pfaults
-        old_total_pageins = total_pageins
-        if should_log():
-            logger.info(
-                f"Δ pfaults: {delta_pfaults:_} "
-                + f"Δ pageins: {delta_pageins:_} "
-                + f"Resident mem: {rss_total:.1f} GB, "
-                + f"Virtual mem: {vms_total:.1f} GB, "
-                + f"uptime: {ms_to_eta(spent_ms)}"
-            )
-
-        samples += 1
-        if vms_total > max_mem:
-            max_mem = vms_total
-    return samples, max_mem
-
-
-def watch_mem():
-    global _is_done
-    global _mem_pid_q
-    init_logging()
-    try:
-        return watch_mem2(_is_done, _mem_pid_q)
-    except Exception as e:
-        logger.error("Error occurred in watch_mem:", e)
-        return -1, -1
-
-
 @pytest.mark.focus
 def test_validate_big_dataset_perf():
     init_logging()
@@ -240,10 +152,10 @@ def test_validate_big_dataset_perf():
     with ProcessPoolExecutor(
         1,
         mp_context=mp_context,
-        initializer=init_mem_watcher,
+        initializer=mem_watcher.init_mem_watcher,
         initargs=(is_done, mem_pid_q),
-    ) as mem_watcher:
-        fut = mem_watcher.submit(watch_mem)
+    ) as mem_watcher_worker:
+        fut = mem_watcher_worker.submit(mem_watcher.watch_mem)
         mem_pid_q.put(os.getpid())
         try:
             for idx, dataset_name in enumerate(VALID_DATASET_NAMES):

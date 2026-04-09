@@ -226,7 +226,7 @@ def _csv_stream_to_sqlite(
             last_log = utils.log_time()
             _stream_show_progress(
                 file_size,
-                process.memory_info()[1] // 1024 // 1024,
+                process.memory_info().rss // 1000 // 1000,
                 processed_rows,
                 row_count,
                 start_time,
@@ -256,7 +256,7 @@ def _stream_show_progress(
     mem_str = f"{mem_mb:_}".rjust(len("123_123"))
     logger.info(
         f"Validated and prepared {processed_rows_str} rows, "
-        + f"{mem_str} MB mem used, "
+        + f"{mem_str} MiB RSS mem, "
         + f"{mb_per_s_str} MB/s, "
         + f"{percent_done_str} % done. "
         + f"ETA: {utils.ms_to_eta(int(remaining_ms))}"
