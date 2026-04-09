@@ -59,6 +59,8 @@ coverage.xml
 cover/
 workdir/
 scalene-profile.json
+logs/
+.vibe/
 
 tmp.db
 
