@@ -4,6 +4,7 @@ mkdir -p logs/
 
 TEST_FILE='tests/test_validation/test_validate_big_datasets.py'
 
+
 LOG_DATE="$(date '+%Y%m%d_%H%M%S')"
 LOG_FILE="logs/log_${LOG_DATE}.txt"
 
