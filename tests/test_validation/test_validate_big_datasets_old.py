@@ -3,12 +3,11 @@ import multiprocessing as mp
 import os
 import shutil
 import uuid
-from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pytest
 
-from microdata_tools.validation.steps import mem_watcher, old_init, reader_utils
+from microdata_tools.validation.steps import old_init, reader_utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -140,7 +139,8 @@ def teardown_function():
 #         assert not data_errors
 
 
-@pytest.mark.focus
+# @pytest.mark.skipif("not config.getoption('include-big-data')")
+@pytest.mark.perf_old
 def test_validate_big_dataset_perf():
     init_logging()
     working_directory = Path("workdir/" + str(uuid.uuid4()))
@@ -148,38 +148,27 @@ def test_validate_big_dataset_perf():
 
     mp_context = mp.get_context("spawn")
     is_done = mp_context.Event()
-    mem_pid_q = mp_context.SimpleQueue()
-    with ProcessPoolExecutor(
-        1,
-        mp_context=mp_context,
-        initializer=mem_watcher.init_mem_watcher,
-        initargs=(is_done, mem_pid_q),
-    ) as mem_watcher_worker:
-        fut = mem_watcher_worker.submit(mem_watcher.watch_mem)
-        mem_pid_q.put(os.getpid())
+    try:
+        for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
+            start_time = current_milli_time()
+            if idx != 0:
+                logger.info("")
+            logger.info(f"OLD Begin {dataset_name} ...")
+            data_errors = old_init.validate_dataset(
+                dataset_name,
+                working_directory=working_directory,
+                keep_temporary_files=False,
+                input_directory=RESOURCE_DIR,
+            )
+            spent_ms = current_milli_time() - start_time
+            assert not data_errors
+            logger.info(
+                f"Done {dataset_name}. Spent: {spent_ms:_} ms "
+                + f"aka {ms_to_eta(spent_ms)}"
+            )
+    finally:
+        is_done.set()
         try:
-            for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
-                start_time = current_milli_time()
-                if idx != 0:
-                    logger.info("")
-                logger.info(f"OLD Begin {dataset_name} ...")
-                data_errors = old_init.validate_dataset(
-                    dataset_name,
-                    working_directory=working_directory,
-                    keep_temporary_files=False,
-                    input_directory=RESOURCE_DIR,
-                )
-                spent_ms = current_milli_time() - start_time
-                assert not data_errors
-                logger.info(
-                    f"Done {dataset_name}. Spent: {spent_ms:_} ms "
-                    + f"aka {ms_to_eta(spent_ms)}"
-                )
-        finally:
-            is_done.set()
-            try:
-                shutil.rmtree(working_directory)
-            except Exception:
-                pass
-        samples, max_mem = fut.result()
-        logger.info(f"Max memory usage: {max_mem:_} MB, samples: {samples:_}")
+            shutil.rmtree(working_directory)
+        except Exception:
+            pass

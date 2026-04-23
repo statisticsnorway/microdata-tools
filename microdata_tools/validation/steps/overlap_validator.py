@@ -2,7 +2,7 @@ import logging
 import multiprocessing
 import time
 from concurrent.futures import Future, ProcessPoolExecutor
-from typing import Any
+from typing import Any, Union
 
 from microdata_tools.validation.steps import overlap_validator_worker, utils
 
@@ -138,7 +138,9 @@ def _wait_jobs_report_progress(
 
 
 def check_no_overlaps(
-    file_size: int, mem_pid_q: multiprocessing.SimpleQueue, row_count: int
+    file_size: int,
+    mem_pid_q: Union[multiprocessing.SimpleQueue, None],
+    row_count: int,
 ) -> None:
     worker_count = multiprocessing.cpu_count()
     chunk_size = (row_count // worker_count) + 1

@@ -4,13 +4,12 @@ import os
 import shutil
 import sys
 import uuid
-from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import pytest
 
 from microdata_tools import validate_dataset
-from microdata_tools.validation.steps import mem_watcher, reader_utils
+from microdata_tools.validation.steps import reader_utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -131,48 +130,39 @@ def teardown_function():
             os.remove(f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv")
 
 
-@pytest.mark.focus
+@pytest.mark.perf_init
+def test_validate_init():
+    init_logging()
+
+
+@pytest.mark.perf_new
 def test_validate_big_dataset_perf():
     init_logging()
+    logger.info(f"self pid is {os.getpid()}")
     working_directory = Path("workdir/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
     mp_context = mp.get_context("spawn")
     is_done = mp_context.Event()
-    mem_pid_q = mp_context.SimpleQueue()
-    with ProcessPoolExecutor(
-        1,
-        mp_context=mp_context,
-        initializer=mem_watcher.init_mem_watcher,
-        initargs=(is_done, mem_pid_q),
-    ) as mem_watcher_worker:
-        logger.info(f"Main worker pid is: {str(os.getpid())}")
-        fut = mem_watcher_worker.submit(mem_watcher.watch_mem)
-        mem_pid_q.put(os.getpid())
+    logger.info(f"Main worker pid is: {str(os.getpid())}")
+    try:
+        for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
+            start_time = current_milli_time()
+            if idx != 0:
+                logger.info("")
+            logger.info(f"Begin {dataset_name} ...")
+            data_errors = validate_dataset(
+                dataset_name,
+                working_directory=working_directory,
+                keep_temporary_files=False,
+                input_directory=RESOURCE_DIR,
+            )
+            spent_ms = current_milli_time() - start_time
+            assert not data_errors
+            logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
+    finally:
+        is_done.set()
         try:
-            for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
-                start_time = current_milli_time()
-                if idx != 0:
-                    logger.info("")
-                logger.info(f"Begin {dataset_name} ...")
-                data_errors = validate_dataset(
-                    mem_pid_q,
-                    dataset_name,
-                    working_directory=working_directory,
-                    keep_temporary_files=False,
-                    input_directory=RESOURCE_DIR,
-                )
-                spent_ms = current_milli_time() - start_time
-                assert not data_errors
-                logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
-        finally:
-            is_done.set()
-            try:
-                shutil.rmtree(working_directory)
-            except Exception:
-                pass
-        samples, max_mem = fut.result()
-        logger.info(
-            f"RSS max memory usage: {max_mem / 1e6:.0f} MiB, "
-            + f"samples: {samples:_}"
-        )
+            shutil.rmtree(working_directory)
+        except Exception:
+            pass

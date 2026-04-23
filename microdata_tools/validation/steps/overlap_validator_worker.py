@@ -1,6 +1,7 @@
 import multiprocessing
 import os
 import sqlite3
+from typing import Union
 
 import psutil
 
@@ -9,6 +10,27 @@ from microdata_tools.validation.steps import utils
 
 _is_error: multiprocessing.Event
 _report_q: multiprocessing.SimpleQueue
+
+
+def init_worker(
+    is_error: multiprocessing.Event,
+    mem_pid_q: Union[multiprocessing.SimpleQueue, None],
+    report_q: multiprocessing.SimpleQueue,
+) -> None:
+    global _is_error
+    global _report_q
+    _is_error = is_error
+    _report_q = report_q
+    if mem_pid_q is not None:
+        mem_pid_q.put(os.getpid())
+
+
+def no_overlapping_timespans_check_worker(offset: int, limit: int) -> int:
+    global _report_q
+    global _is_error
+    return _no_overlapping_timespans_check_worker_inner(
+        _is_error, _report_q, offset, limit
+    )
 
 
 def validate_unit_start_stop(unit_array: list) -> bool:
@@ -23,26 +45,6 @@ def validate_unit_start_stop(unit_array: list) -> bool:
             if start_a <= end_b and end_a >= start_b:
                 raise ValidationError("Overlap for dates", errors=[])
         return validate_unit_start_stop(unit_array[1:])
-
-
-def init_worker(
-    is_error: multiprocessing.Event,
-    mem_pid_q: multiprocessing.SimpleQueue,
-    report_q: multiprocessing.SimpleQueue,
-) -> None:
-    global _is_error
-    global _report_q
-    _is_error = is_error
-    _report_q = report_q
-    mem_pid_q.put(os.getpid())
-
-
-def no_overlapping_timespans_check_worker(offset: int, limit: int) -> int:
-    global _report_q
-    global _is_error
-    return _no_overlapping_timespans_check_worker_inner(
-        _is_error, _report_q, offset, limit
-    )
 
 
 def _no_overlapping_timespans_check_worker_inner(
