@@ -19,6 +19,8 @@ export MICRODATA_TOOLS_TEST_PROGRESS='quiet'
 export MICRODATA_TOOLS_DELETE_FILES='false'
 export PYTHONUNBUFFERED=1
 
+which sar || { echo "command 'sar' not installed. please install it. for example: sudo apt-get install sysstat"; exit 1;}
+
 uv run pytest \
 -m perf_init \
 --no-header \
