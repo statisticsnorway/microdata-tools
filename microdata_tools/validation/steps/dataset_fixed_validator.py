@@ -2,18 +2,16 @@
 import logging
 import multiprocessing
 import os.path
-import sqlite3
 from pathlib import Path
 from typing import Dict, List, Union
 
-import adbc_driver_sqlite.dbapi
 import psutil
 import pyarrow
 from pyarrow import compute, csv, dataset
 
 import microdata_tools.validation.steps.reader_utils as ru
 from microdata_tools.validation.exceptions import ValidationError
-from microdata_tools.validation.steps import overlap_validator, utils
+from microdata_tools.validation.steps import utils
 
 logger = logging.getLogger()
 
@@ -139,40 +137,26 @@ def _valid_value_column_check(
             )
 
 
-def _accumulated_temporal_variables_check(tbl: pyarrow.Table) -> None:
-    start_is_null_filter = dataset.field("start_epoch_days").is_null()
+def _fixed_temporal_variables_check(tbl: pyarrow.Table) -> None:
+    """
+    Any given row in a table with temporalityType=FIXED is valid only if:
+    * The start_epoch_days column contains null (empty)
+    * The stop_epoch_days column contains a non-null value (int32)
+    """
+    start_is_valid_filter = dataset.field("start_epoch_days").is_valid()
     stop_is_null_filter = dataset.field("stop_epoch_days").is_null()
-    start_be_stop_filter = dataset.field("start_epoch_days") >= dataset.field(
-        "stop_epoch_days"
-    )
-
-    invalid_rows1 = tbl.filter(
-        start_is_null_filter | stop_is_null_filter | start_be_stop_filter
-    )
-
-    if len(invalid_rows1) > 0:
-        invalid_rows2 = tbl.filter(start_is_null_filter)
-        if len(invalid_rows2) > 0:
-            logger.error(f"Error count start_is_null: {len(invalid_rows2)}")
-
-        invalid_rows3 = tbl.filter(stop_is_null_filter)
-        if len(invalid_rows3) > 0:
-            logger.error(f"Error count stop_is_null: {len(invalid_rows3)}")
-
-        invalid_rows4 = tbl.filter(start_be_stop_filter)
-        if len(invalid_rows4) > 0:
-            logger.error(f"Error count start_be_stop: {len(invalid_rows4)}")
-
-        logger.error(f"Error count: {len(invalid_rows1)} of total {len(tbl)}")
+    invalid_rows_filter = start_is_valid_filter | stop_is_null_filter
+    invalid_rows = tbl.filter(invalid_rows_filter)
+    if len(invalid_rows) > 0:
         raise ValidationError(
             "#3 and #4 columns",
             errors=_get_error_list(
-                invalid_rows1, "Invalid #3 and/or #4 columns"
+                invalid_rows, "Invalid #3 and/or #4 columns"
             ),
         )
 
 
-def _csv_stream_to_sqlite(
+def _csv_stream_validate(
     identifier_data_type: str,
     measure_data_type: str,
     code_list: Union[List, None],
@@ -180,7 +164,6 @@ def _csv_stream_to_sqlite(
     file_size: int,
     row_count: int,
     reader: pyarrow.csv.CSVStreamingReader,
-    conn: sqlite3.Connection,
 ) -> Dict[str, int]:
     logger.debug("Streaming to sqlite and validating")
     start_time = utils.current_milli_time()
@@ -188,12 +171,10 @@ def _csv_stream_to_sqlite(
     processed_rows = 0
     last_log = -1
     process = psutil.Process(os.getpid())
-    cursor = conn.cursor()
     while True:
         try:
             batch = reader.read_next_batch()
         except StopIteration:
-            cursor.close()
             break
         if identifier_data_type == "STRING":
             unit_id = compute.utf8_trim(batch["unit_id"], " ")
@@ -217,22 +198,10 @@ def _csv_stream_to_sqlite(
         _valid_value_column_check(
             tbl, measure_data_type, code_list, sentinel_list
         )
-        _accumulated_temporal_variables_check(tbl)
+        _fixed_temporal_variables_check(tbl)
 
         processed_rows += len(tbl)
 
-        column_names2 = [
-            "unit_id",
-            "start_epoch_days",
-            "stop_epoch_days",
-        ]
-        columns2 = [unit_id, epoch_start, epoch_stop]
-        cursor.adbc_ingest(
-            "dataset",
-            pyarrow.Table.from_arrays(columns2, column_names2),
-            mode="append",
-        )
-        conn.commit()
         temporal_data = get_temporal_data2(tbl, temporal_data)
 
         if last_log == utils.log_time() and processed_rows != row_count:
@@ -281,7 +250,6 @@ def _stream_show_progress(
 def sanitize_and_validate_csv(
     mem_pid_q: Union[multiprocessing.SimpleQueue, None],
     input_data_path: Path,
-    output_data_path: Path,
     identifier_data_type: str,
     measure_data_type: str,
     temporality_type: str,
@@ -301,86 +269,25 @@ def sanitize_and_validate_csv(
     logger.info(f"row_count: {row_count:_}")
     file_size = input_data_path.stat().st_size
 
-    if os.path.exists("tmp.db"):
-        os.remove("tmp.db")
+    logger.info("Validating and preparing data ...")
+    temporal_data = _populate_sqlite(
+        code_list,
+        file_size,
+        identifier_data_type,
+        input_data_path,
+        measure_data_type,
+        row_count,
+        sentinel_list,
+    )
+    spent_ms1 = utils.current_milli_time() - start_ms
+    mb_per_s1 = (file_size / 1024 / 1024) / (spent_ms1 / 1000)
+    logger.info(
+        f"Validating and preparing data ... Done in {spent_ms1:_} ms aka "
+        + f"{utils.ms_to_eta(spent_ms1)}"
+    )
+    logger.debug(f"Validating and preparing data speed: {mb_per_s1:.1f} MB/s")
 
-    try:
-        logger.info("Validating and preparing data ...")
-        temporal_data = _populate_sqlite(
-            code_list,
-            file_size,
-            identifier_data_type,
-            input_data_path,
-            measure_data_type,
-            output_data_path,
-            row_count,
-            sentinel_list,
-        )
-        spent_ms1 = utils.current_milli_time() - start_ms
-        mb_per_s1 = (file_size / 1024 / 1024) / (spent_ms1 / 1000)
-        logger.info(
-            f"Validating and preparing data ... Done in {spent_ms1:_} ms aka "
-            + f"{utils.ms_to_eta(spent_ms1)}"
-        )
-        logger.debug(
-            f"Validating and preparing data speed: {mb_per_s1:.1f} MB/s"
-        )
-
-        start_ms2 = utils.current_milli_time()
-        logger.info("Creating index ...")
-        _create_index()
-        spent_ms2 = utils.current_milli_time() - start_ms2
-        mb_per_s2 = (file_size / 1024 / 1024) / (spent_ms2 / 1000)
-        logger.info(
-            f"Creating index ... Done in {spent_ms2:_} ms aka "
-            + f"{utils.ms_to_eta(spent_ms2)}"
-        )
-        logger.debug(f"Creating index speed: {mb_per_s2:.1f} MB/s")
-
-        start_ms3 = utils.current_milli_time()
-        overlap_validator.check_no_overlaps(file_size, mem_pid_q, row_count)
-        spent_ms3 = utils.current_milli_time() - start_ms3
-        mb_per_s3 = (file_size / 1024 / 1024) / (max(spent_ms3, 1) / 1000)
-        logger.info(f"Validated rows speed: {mb_per_s3:.1f} MB/s")
-        logger.info(
-            f"Validated rows done in {spent_ms3:_} ms aka "
-            + f"{utils.ms_to_eta(spent_ms3)}"
-        )
-
-        total_ms = utils.current_milli_time() - start_ms
-        mb_per_s4 = (file_size / 1024 / 1024) / (total_ms / 1000)
-
-        logger.info("*" * 80)
-        logger.info("Summary:")
-        logger.info(f"Row count: {row_count:_}")
-        share1 = 100 * spent_ms1 / total_ms
-        logger.debug(
-            f"Validating and preparing data: {mb_per_s1:.1f} MB/s, "
-            + f"{share1:.1f} %"
-        )
-        share2 = 100 * spent_ms2 / total_ms
-        logger.debug(f"Creating index: {mb_per_s2:.1f} MB/s, {share2:.1f} %")
-        share3 = 100 * spent_ms3 / total_ms
-        logger.info(f"Validated rows: {mb_per_s3:.1f} MB/s, {share3:.1f} %")
-        logger.debug(f"Total speed: {mb_per_s4:.1f} MB/s")
-        logger.debug(
-            f"Total spent {total_ms:_} ms aka " + f"{utils.ms_to_eta(total_ms)}"
-        )
-        logger.info("*" * 80)
-
-        return temporal_data
-    finally:
-        try:
-            os.remove("tmp.db")
-        except Exception:
-            pass
-
-
-def _create_index() -> None:
-    with sqlite3.connect("tmp.db", autocommit=True) as conn:
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS index_unit_id ON dataset(unit_id)"
-        )
+    return temporal_data
 
 
 def _populate_sqlite(
@@ -389,38 +296,26 @@ def _populate_sqlite(
     identifier_data_type: str,
     input_data_path: Path,
     measure_data_type: str,
-    output_data_path: Path,
     row_count: int,
     sentinel_list: list | None,
 ) -> dict[str, int]:
 
-    with adbc_driver_sqlite.dbapi.connect("tmp.db", autocommit=False) as conn:
-        conn.execute(
-            """CREATE TABLE dataset
-               (
-                   unit_id          VARCHAR,
-                   start_epoch_days INTEGER,
-                   stop_epoch_days  INTEGER
-               )"""
+    with csv.open_csv(
+        input_data_path,
+        parse_options=csv.ParseOptions(delimiter=";"),
+        read_options=ru.get_csv_read_options(),
+        convert_options=ru.get_csv_convert_options(
+            identifier_data_type, measure_data_type
+        ),
+    ) as reader:
+        temporal_data = _csv_stream_validate(
+            identifier_data_type,
+            measure_data_type,
+            code_list,
+            sentinel_list,
+            file_size,
+            row_count,
+            reader,
         )
-        conn.commit()
-        with csv.open_csv(
-            input_data_path,
-            parse_options=csv.ParseOptions(delimiter=";"),
-            read_options=ru.get_csv_read_options(),
-            convert_options=ru.get_csv_convert_options(
-                identifier_data_type, measure_data_type
-            ),
-        ) as reader:
-            temporal_data = _csv_stream_to_sqlite(
-                identifier_data_type,
-                measure_data_type,
-                code_list,
-                sentinel_list,
-                file_size,
-                row_count,
-                reader,
-                conn,
-            )
     logger.info("returning temporal_data")
     return temporal_data

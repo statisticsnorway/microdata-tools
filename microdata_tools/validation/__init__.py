@@ -11,6 +11,7 @@ from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.model.metadata import UnitIdType, UnitType
 from microdata_tools.validation.steps import (
     dataset_accumulated_validator,
+    dataset_fixed_validator,
     metadata_enricher,
     metadata_reader,
 )
@@ -53,11 +54,11 @@ def get_unit_id_type_for_unit_type(
 
 
 def validate_dataset(
-    mem_pid_q: multiprocessing.SimpleQueue,
     dataset_name: str,
     working_directory: str = "",
     input_directory: str = "",
     keep_temporary_files: bool = False,
+    mem_pid_q: multiprocessing.SimpleQueue = None,
 ) -> List[str]:
     """
     Validate a dataset and return a list of errors.
@@ -96,16 +97,33 @@ def validate_dataset(
 
         file_size = input_data_path.stat().st_size
 
-        temporal_data = dataset_accumulated_validator.sanitize_and_validate_csv(
-            mem_pid_q,
-            input_data_path,
-            Path(working_directory_path / f"{dataset_name}.parquet"),
-            identifier_data_type,
-            measure_data_type,
-            temporality_type,
-            code_list,
-            sentinel_list,
-        )
+        if temporality_type == "ACCUMULATED":
+            temporal_data = (
+                dataset_accumulated_validator.sanitize_and_validate_csv(
+                    mem_pid_q,
+                    input_data_path,
+                    Path(working_directory_path / f"{dataset_name}.parquet"),
+                    identifier_data_type,
+                    measure_data_type,
+                    temporality_type,
+                    code_list,
+                    sentinel_list,
+                )
+            )
+        elif temporality_type == "FIXED":
+            temporal_data = dataset_fixed_validator.sanitize_and_validate_csv(
+                mem_pid_q,
+                input_data_path,
+                identifier_data_type,
+                measure_data_type,
+                temporality_type,
+                code_list,
+                sentinel_list,
+            )
+        else:
+            raise RuntimeError(
+                f"Unhandled temporality type '{temporality_type}'"
+            )
 
         metadata_enricher.enrich_with_temporal_coverage(
             metadata_dict, temporal_data

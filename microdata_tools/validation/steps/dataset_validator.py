@@ -362,34 +362,34 @@ def validate_dataset(
     _valid_unit_id_check(data)
     _valid_value_column_check(data, measure_data_type, code_list, sentinel_list)
     if temporality_type == "FIXED":
-        _fixed_temporal_variables_check(data)
-        _only_unique_identifiers_check(data)
+        _fixed_temporal_variables_check(data)  # per row
+        _only_unique_identifiers_check(data)  # per table
     elif temporality_type == "STATUS":
-        _status_temporal_variables_check(data)
-        _status_uniquesness_check(data)
+        _status_temporal_variables_check(data)  # per row
+        _status_uniquesness_check(data)  # per table
     elif temporality_type == "ACCUMULATED":
         start_ms = current_milli_time()
-        _accumulated_temporal_variables_check(data)
+        _accumulated_temporal_variables_check(data)  # per row
         spent_ms = current_milli_time() - start_ms
         logger.debug(
             f"_accumulated_temporal_variables_check spent: {spent_ms:_} ms"
         )
 
         start_ms_ = current_milli_time()
-        _no_overlapping_timespans_check(data)
+        _no_overlapping_timespans_check(data)  # per table
         spent_ms_ = current_milli_time() - start_ms_
         logger.debug(f"_no_overlapping_timespans_check spent: {spent_ms_:_} ms")
 
     elif temporality_type == "EVENT":
         start_ms__ = current_milli_time()
-        _event_temporal_variables_check(data)
+        _event_temporal_variables_check(data)  # per row
         spent_ms__ = current_milli_time() - start_ms__
         logger.debug(
             f"_event_temporal_variables_check spent: {spent_ms__:_} ms"
         )
 
         start_ms___ = current_milli_time()
-        _no_overlapping_timespans_check(data)
+        _no_overlapping_timespans_check(data)  # per table
         spent_ms___ = current_milli_time() - start_ms___
         logger.debug(
             f"_no_overlapping_timespans_check spent: {spent_ms___:_} ms"
