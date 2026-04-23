@@ -103,10 +103,12 @@ jobs:
           fi
 
       - name: Create and push tag
+        id: check-version
         if: steps.tag_exists.outputs.exists == 'false'
         run: |
           git tag "v${{ steps.version.outputs.value }}"
           git push origin "v${{ steps.version.outputs.value }}"
+          echo "tag=v${{ steps.version.outputs.value }}" >> $GITHUB_OUTPUT
 
       - name: Build package
         run: |
