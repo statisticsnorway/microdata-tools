@@ -88,18 +88,25 @@ jobs:
       - name: Sync dependencies
         run: uv sync
 
-      - name: Check if there is a parent commit
-        id: check-parent-commit
-        run: |
-          echo "sha=$(git rev-parse --verify --quiet HEAD^)" >> $GITHUB_OUTPUT
+      - name: Get current version
+        id: version
+        run: echo "value=$(uv version --short)" >> $GITHUB_OUTPUT
 
-      - name: Detect and tag new version
-        id: check-version
-        if: steps.check-parent-commit.outputs.sha
-        uses: salsify/action-detect-and-tag-new-version@b1778166f13188a9d478e2d1198f993011ba9864 #v2.0.3
-        with:
-          version-command: |
-            bash -o pipefail -c "uv version --short"
+      - name: Check if tag exists
+        id: tag_exists
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ steps.version.outputs.value }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        if: steps.tag_exists.outputs.exists == 'false'
+        run: |
+          git tag "v${{ steps.version.outputs.value }}"
+          git push origin "v${{ steps.version.outputs.value }}"
 
       - name: Build package
         run: |
