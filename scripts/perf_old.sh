@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 mkdir -p logs/
 
 LOG_DATE="$(date '+%Y%m%d_%H%M%S')"
@@ -28,7 +27,7 @@ uv run pytest \
 --quiet \
 --capture no
 
-sar -B 1 > mem_new.log 2>&1 &
+sar -B 1 > mem_old.log 2>&1 &
 SAR_PID1="$!"
 
 onEXIT () {
@@ -41,7 +40,7 @@ onEXIT () {
 trap onEXIT EXIT
 
 uv run pytest \
--m perf_new \
+-m perf_old \
 --no-header \
 --failed-first \
 --exitfirst \
