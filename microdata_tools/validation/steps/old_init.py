@@ -253,7 +253,7 @@ def validate_dataset_parquet(
     finally:
         # Delete temporary files
         if not keep_temporary_files and working_directory_path:
-            local_storage.clean_up_temporary_files(
+            local_storage.clean_up_temporary_files_silent(
                 dataset_name,
                 working_directory_path,
                 delete_working_directory=working_directory_was_generated,

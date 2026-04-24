@@ -109,3 +109,48 @@ def clean_up_temporary_files(
                     "when attempting to delete temporary files."
                 )
                 raise e
+
+
+def clean_up_temporary_files_silent(
+    dataset_name: str,
+    working_directory: Path,
+    delete_working_directory: bool = False,
+) -> None:
+    generated_files = [
+        f"{dataset_name}.parquet",
+        f"{dataset_name}.json",
+    ]
+    if delete_working_directory:
+        temporary_files = os.listdir(working_directory)
+        unknown_files = [
+            file for file in temporary_files if file not in generated_files
+        ]
+        if not unknown_files:
+            try:
+                shutil.rmtree(working_directory)
+            except Exception as e:
+                logger.error(
+                    "An exception occured while attempting to delete"
+                    f"temporary files: {e}"
+                )
+                raise e
+        else:
+            for file in generated_files:
+                try:
+                    os.remove(working_directory / file)
+                except FileNotFoundError as e:
+                    logger.error(
+                        f"Could not find file {file} in working directory "
+                        "when attempting to delete temporary files."
+                    )
+                    raise e
+    else:
+        for file in generated_files:
+            try:
+                os.remove(working_directory / file)
+            except FileNotFoundError:
+                logger.error(
+                    f"Could not find file {file} in working directory "
+                    "when attempting to delete temporary files."
+                )
+                pass
