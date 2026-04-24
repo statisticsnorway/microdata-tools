@@ -1,8 +1,6 @@
 import logging
-import multiprocessing as mp
 import os
 import shutil
-import sys
 import uuid
 from pathlib import Path
 
@@ -15,6 +13,7 @@ from microdata_tools.validation.steps.utils import (
     log_time,
     ms_to_eta,
 )
+from tests import log_setup
 
 logger = logging.getLogger()
 
@@ -28,18 +27,8 @@ VALID_DATASET_NAMES = [
 ]
 
 
-def init_logging():
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s.%(msecs)03d %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        stream=sys.stdout,
-        force=True,
-    )
-
-
 def setup_function():
-    init_logging()
+    log_setup.init_logging()
     # The dates are intentionally shuffled to provoke errors
     identifier_dates = {
         "ACCUMULATED_DS": [
@@ -132,18 +121,16 @@ def teardown_function():
 
 @pytest.mark.perf_init
 def test_validate_init():
-    init_logging()
+    log_setup.init_logging()
 
 
 @pytest.mark.perf_new
 def test_validate_big_dataset_perf():
-    init_logging()
+    log_setup.init_logging()
     logger.info(f"self pid is {os.getpid()}")
     working_directory = Path("workdir/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
-    mp_context = mp.get_context("spawn")
-    is_done = mp_context.Event()
     logger.info(f"Main worker pid is: {str(os.getpid())}")
     try:
         for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
@@ -161,7 +148,6 @@ def test_validate_big_dataset_perf():
             assert not data_errors
             logger.info(f"Done {dataset_name}. Spent: {spent_ms:_} ms")
     finally:
-        is_done.set()
         try:
             shutil.rmtree(working_directory)
         except Exception:

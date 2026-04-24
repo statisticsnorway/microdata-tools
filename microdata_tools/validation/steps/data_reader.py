@@ -143,17 +143,27 @@ def read_and_sanitize_csv(
     )
     logger.debug(f"read_and_sanitize_csv row count: {len(table):_}")
     file_size = input_data_path.stat().st_size
+    logger.debug("tick ...")
     unit_id = _sanitize_unit_id(table, identifier_data_type)
+    logger.debug("tick ...")
     value = _sanitize_value(table, measure_data_type)
+    logger.debug("tick ...")
     epoch_start = _cast_to_epoch_date(table, "start")
+    logger.debug("tick ...")
     epoch_stop = _cast_to_epoch_date(table, "stop")
+    logger.debug("tick ...")
     columns = [unit_id, value, epoch_start, epoch_stop]
     column_names = ["unit_id", "value", "start_epoch_days", "stop_epoch_days"]
     if temporality_type in ["STATUS", "ACCUMULATED"]:
-        columns.append(_generate_start_year(table))
+        logger.debug("tick ...")
+        columns.append(_generate_start_year(table))  # <== OOM her
+        logger.debug("tick ...")
         column_names.append("start_year")
+        logger.debug("tick ...")
     # print(f'number of rows: {len(unit_id):_}')
+    logger.debug("tick ...")
     tbl = pyarrow.Table.from_arrays(columns, column_names)
+    logger.debug("tick ...")
     spent_ms = current_milli_time() - start_time
     mb_per_s = (file_size / 1024 / 1024) / (spent_ms / 1000)
     logger.debug(f"read_and_sanitize_csv spent: {spent_ms:_} ms")

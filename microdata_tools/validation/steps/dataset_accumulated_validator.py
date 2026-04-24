@@ -9,7 +9,7 @@ from typing import Dict, List, Union
 import adbc_driver_sqlite.dbapi
 import psutil
 import pyarrow
-from pyarrow import compute, csv, dataset
+from pyarrow import compute, csv, dataset, parquet
 
 import microdata_tools.validation.steps.reader_utils as ru
 from microdata_tools.validation.exceptions import ValidationError
@@ -181,6 +181,7 @@ def _csv_stream_to_sqlite(
     row_count: int,
     reader: pyarrow.csv.CSVStreamingReader,
     conn: sqlite3.Connection,
+    writer: pyarrow.parquet.ParquetWriter,
 ) -> Dict[str, int]:
     logger.debug("Streaming to sqlite and validating")
     start_time = utils.current_milli_time()
@@ -212,6 +213,7 @@ def _csv_stream_to_sqlite(
         ]
         columns.append(ru.generate_start_year2(batch))
         tbl = pyarrow.Table.from_arrays(columns, column_names)
+        writer.write_table(tbl)
 
         _valid_unit_id_check(tbl)
         _valid_value_column_check(
@@ -412,15 +414,34 @@ def _populate_sqlite(
                 identifier_data_type, measure_data_type
             ),
         ) as reader:
-            temporal_data = _csv_stream_to_sqlite(
-                identifier_data_type,
-                measure_data_type,
-                code_list,
-                sentinel_list,
-                file_size,
-                row_count,
-                reader,
-                conn,
+            parquet_data_path = str(input_data_path)[:-4] + ".parquet"
+            logger.info(f"parquet path is: {parquet_data_path}")
+            schema = pyarrow.schema(
+                [
+                    (
+                        "unit_id",
+                        ru.microdata_data_type_to_pyarrow(identifier_data_type),
+                    ),
+                    (
+                        "value",
+                        ru.microdata_data_type_to_pyarrow(measure_data_type),
+                    ),
+                    ("start_epoch_days", pyarrow.int16()),
+                    ("stop_epoch_days", pyarrow.int16()),
+                    ("start_year", pyarrow.string()),
+                ]
             )
+            with parquet.ParquetWriter(parquet_data_path, schema) as writer:
+                temporal_data = _csv_stream_to_sqlite(
+                    identifier_data_type,
+                    measure_data_type,
+                    code_list,
+                    sentinel_list,
+                    file_size,
+                    row_count,
+                    reader,
+                    conn,
+                    writer,
+                )
     logger.info("returning temporal_data")
     return temporal_data

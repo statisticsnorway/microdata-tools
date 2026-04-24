@@ -1,5 +1,4 @@
 import logging
-import multiprocessing as mp
 import os
 import shutil
 import uuid
@@ -13,6 +12,7 @@ from microdata_tools.validation.steps.utils import (
     log_time,
     ms_to_eta,
 )
+from tests import log_setup
 
 logger = logging.getLogger()
 
@@ -26,17 +26,8 @@ VALID_DATASET_NAMES = [
 ]
 
 
-def init_logging():
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(asctime)s.%(msecs)03d %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        force=True,
-    )
-
-
 def setup_function():
-    init_logging()
+    log_setup.init_logging()
     # The dates are intentionally shuffled to provoke errors
     identifier_dates = {
         "ACCUMULATED_DS": [
@@ -142,12 +133,10 @@ def teardown_function():
 # @pytest.mark.skipif("not config.getoption('include-big-data')")
 @pytest.mark.perf_old
 def test_validate_big_dataset_perf():
-    init_logging()
+    log_setup.init_logging()
     working_directory = Path("workdir/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
-    mp_context = mp.get_context("spawn")
-    is_done = mp_context.Event()
     try:
         for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
             start_time = current_milli_time()
@@ -167,7 +156,6 @@ def test_validate_big_dataset_perf():
                 + f"aka {ms_to_eta(spent_ms)}"
             )
     finally:
-        is_done.set()
         try:
             shutil.rmtree(working_directory)
         except Exception:
