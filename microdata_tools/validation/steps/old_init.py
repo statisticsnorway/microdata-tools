@@ -185,3 +185,77 @@ def validate_metadata(
                 delete_working_directory=working_directory_was_generated,
             )
     return data_errors
+
+
+def validate_dataset_parquet(
+    dataset_name: str,
+    working_directory: str = "",
+    input_directory: str = "",
+    keep_temporary_files: bool = False,
+) -> List[str]:
+    """
+    Validate a dataset and return a list of errors.
+    If the dataset is valid, the list will be empty.
+    """
+    data_errors = []
+    working_directory_path = None
+    working_directory_was_generated = False
+
+    try:
+        _validate_dataset_name(dataset_name)
+        local_storage.validate_dataset_dir(Path(input_directory), dataset_name)
+        (
+            working_directory_path,
+            working_directory_was_generated,
+        ) = local_storage.resolve_working_directory(working_directory)
+        input_dataset_directory = Path(input_directory) / dataset_name
+        input_metadata_path = input_dataset_directory / f"{dataset_name}.json"
+        input_data_path = input_dataset_directory / f"{dataset_name}.csv"
+        parquet_path = input_dataset_directory / f"{dataset_name}.parquet"
+        # Read and validate metadata
+        metadata_dict = metadata_reader.run_reader(
+            dataset_name, input_metadata_path
+        )
+        measure_data_type = metadata_dict["measureVariables"][0]["dataType"]
+        # identifier_data_type = metadata_dict["identifierVariables"][0][
+        #     "dataType"
+        # ]
+        temporality_type = metadata_dict["temporalityType"]
+        code_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
+            "codeList"
+        )
+        sentinel_list = metadata_dict["measureVariables"][0]["valueDomain"].get(
+            "sentinelAndMissingValues"
+        )
+
+        logger.info(
+            f"Row count is: {reader_utils.get_row_count(input_data_path):_}"
+        )
+
+        # Write files to working directory
+        local_storage.write_json(
+            working_directory_path / f"{dataset_name}.json", metadata_dict
+        )
+
+        # Validate data
+        dataset_validator.validate_dataset(
+            dataset.dataset(parquet_path),
+            measure_data_type,
+            code_list,
+            sentinel_list,
+            temporality_type,
+        )
+    except ValidationError as e:
+        data_errors = e.errors
+    except Exception as e:
+        # Raise unexpected exceptions to user
+        raise e
+    finally:
+        # Delete temporary files
+        if not keep_temporary_files and working_directory_path:
+            local_storage.clean_up_temporary_files(
+                dataset_name,
+                working_directory_path,
+                delete_working_directory=working_directory_was_generated,
+            )
+    return data_errors

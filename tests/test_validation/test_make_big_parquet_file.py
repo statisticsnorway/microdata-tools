@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 
 from microdata_tools import validate_dataset
+from microdata_tools.validation.steps import old_init
+from microdata_tools.validation.steps.utils import current_milli_time, ms_to_eta
 from tests import log_setup
 
 logger = logging.getLogger()
@@ -62,33 +64,37 @@ def setup_function():
 
 
 @pytest.mark.create_parquet
-def test_validate_big_dataset_perf():
+def test_create_parquet():
     log_setup.init_logging()
 
-    # return
-    # working_directory = Path("workdir/" + str(uuid.uuid4()))
-    # os.makedirs(working_directory)
-    #
-    # try:
-    #     for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
-    #         start_time = current_milli_time()
-    #         if idx != 0:
-    #             logger.info("")
-    #         logger.info(f"OLD Begin {dataset_name} ...")
-    #         data_errors = old_init.validate_dataset(
-    #             dataset_name,
-    #             working_directory=working_directory,
-    #             keep_temporary_files=False,
-    #             input_directory=RESOURCE_DIR,
-    #         )
-    #         spent_ms = current_milli_time() - start_time
-    #         assert not data_errors
-    #         logger.info(
-    #             f"Done {dataset_name}. Spent: {spent_ms:_} ms "
-    #             + f"aka {ms_to_eta(spent_ms)}"
-    #         )
-    # finally:
-    #     try:
-    #         shutil.rmtree(working_directory)
-    #     except Exception:
-    #         pass
+
+@pytest.mark.validate_parquet
+def test_validate_parquet():
+    log_setup.init_logging()
+
+    working_directory = Path("workdir/" + str(uuid.uuid4()))
+    os.makedirs(working_directory)
+
+    try:
+        for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
+            start_time = current_milli_time()
+            if idx != 0:
+                logger.info("")
+            logger.info(f"OLD Begin {dataset_name} ...")
+            data_errors = old_init.validate_dataset_parquet(
+                dataset_name,
+                working_directory=working_directory,
+                keep_temporary_files=False,
+                input_directory=RESOURCE_DIR,
+            )
+            spent_ms = current_milli_time() - start_time
+            assert not data_errors
+            logger.info(
+                f"Done {dataset_name}. Spent: {spent_ms:_} ms "
+                + f"aka {ms_to_eta(spent_ms)}"
+            )
+    finally:
+        try:
+            shutil.rmtree(working_directory)
+        except Exception:
+            pass

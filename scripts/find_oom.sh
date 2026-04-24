@@ -20,7 +20,7 @@ export MICRODATA_TOOLS_TEST_PROGRESS='quiet'
 export MICRODATA_TOOLS_DELETE_FILES='false'
 export PYTHONUNBUFFERED=1
 
-#which sar || { echo "command 'sar' not installed. please install it. for example: sudo apt-get install sysstat"; exit 1;}
+which sar || { echo "command 'sar' not installed. please install it. for example: sudo apt-get install sysstat"; exit 1;}
 
 echo "Creating CSV file ..."
 uv run pytest \
@@ -34,6 +34,27 @@ uv run pytest \
 echo "Creating parquet file ..."
 uv run pytest \
 -m create_parquet \
+--no-header \
+--failed-first \
+--exitfirst \
+--quiet \
+--capture no
+
+sar -B 1 > mem_validate_parquet_old.log 2>&1 &
+SAR_PID1="$!"
+
+onEXIT () {
+  set +x
+  EXIT_STATUS="$?"
+  kill "$SAR_PID1"
+  exit "$EXIT_STATUS"
+}
+
+trap onEXIT EXIT
+
+echo "Validating parquet file ..."
+uv run pytest \
+-m validate_parquet \
 --no-header \
 --failed-first \
 --exitfirst \
