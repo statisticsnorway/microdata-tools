@@ -15,7 +15,7 @@ echo "git describe is '$(git describe --dirty)'" >> "${LOG_FILE}"
 
 set -euox pipefail
 
-export MICRODATA_TOOLS_ROW_COUNT='30_000_000'
+export MICRODATA_TOOLS_ROW_COUNT='120_000_000'
 export MICRODATA_TOOLS_TEST_PROGRESS='quiet'
 export MICRODATA_TOOLS_DELETE_FILES='false'
 export PYTHONUNBUFFERED=1
@@ -52,6 +52,7 @@ onEXIT () {
 
 trap onEXIT EXIT
 
+OOM_COUNT_1="$(dmesg | grep -i 'out of memory' | wc -l)"
 echo "Validating parquet file ..."
 uv run pytest \
 -m validate_parquet \
@@ -59,4 +60,11 @@ uv run pytest \
 --failed-first \
 --exitfirst \
 --quiet \
---capture no
+--capture no && \
+printf "\e[0;32mOK validate\e[0m\n" \
+|| printf "\e[0;31mFAILED to validate\e[0m\n"
+
+OOM_COUNT_2="$(dmesg | grep -i 'out of memory' | wc -l)"
+if [[ "$OOM_COUNT_1" != "$OOM_COUNT_2" ]]; then
+  printf "\e[0;31mOOM occurred\e[0m\n"
+fi
