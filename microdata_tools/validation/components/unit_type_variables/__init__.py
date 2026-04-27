@@ -43,6 +43,7 @@ UNIT_TYPE_VARIABLES = {
     ),
     "SOESKEN": load_json(UNIT_TYPE_VARIABLES_DIR / "SOESKEN.json"),
     "BEDRIFT": load_json(UNIT_TYPE_VARIABLES_DIR / "BEDRIFT.json"),
+    "BRUKSENHET": load_json(UNIT_TYPE_VARIABLES_DIR / "BRUKSENHET.json"),
 }
 
 
