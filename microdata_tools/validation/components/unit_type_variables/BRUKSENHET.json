@@ -1,0 +1,61 @@
+{
+  "shortName": "BRUKSENHETID_1",
+  "name": [
+    {
+      "languageCode": "no",
+      "value": "Bruksenhetidentifikator"
+    },
+    {
+      "languageCode": "en",
+      "value": "Utility unit identifier"
+    }
+  ],
+  "description": [
+    {
+      "languageCode": "no",
+      "value": "Identifikator for bruksenhet i microdata"
+    },
+    {
+      "languageCode": "en",
+      "value": "Identifier for utility unit in microdata"
+    }
+  ],
+  "dataType": "STRING",
+  "unitType": {
+    "shortName": "BRUKSENHET",
+    "requiresPseudonymization": true,
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Bruksenhet"
+      },
+      {
+        "languageCode": "en",
+        "value": "Utility unit"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Bruksenhet er definert som rom, eller en samling rom og åpne deler, som sammen anvendes i en bestemt hensikt av en bruker som kan være eier, leier eller annen bruksrettshaver. Videre kan en bruksenhet være en bygning, f.eks. kontorbygg, eller flere bygninger, f.eks. sykehus, men kan også være del av bygning, f.eks. boenhet (bolig), kontorenhet, avdeling i sykehus."
+      },
+      {
+        "languageCode": "en",
+        "value": "Utility unit is defined as a room, or a collection of rooms and open areas, that are collectively used for a specific purpose by a user, who may be the owner, tenant, or another usufructuary. Furthermore, a functional unit may be a building, e.g., an office building, or multiple buildings, e.g., a hospital, but it may also be a part of a building, e.g., a dwelling, office  or a department in a hospital."
+      }
+    ]
+  },
+  "format": "RandomUInt48",
+  "valueDomain": {
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Pseudonymisert bruksenhetsnummer"
+      },
+      {
+        "languageCode": "en",
+        "value": "Pseudonymized utility unit number"
+      }
+    ]
+  }
+}

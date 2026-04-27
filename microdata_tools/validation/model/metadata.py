@@ -56,6 +56,7 @@ class UnitType(str, Enum):
     FENGSLINGER_TILGANG = "FENGSLINGER_TILGANG"
     SOESKEN = "SOESKEN"
     BEDRIFT = "BEDRIFT"
+    BRUKSENHET = "BRUKSENHET"
 
 
 class UnitIdType(str, Enum):
@@ -75,6 +76,7 @@ class UnitIdType(str, Enum):
     MALEPUNKT_ID = "MALEPUNKT_ID"
     KRG_TILFELLEID = "KRG_TILFELLEID"
     FENGSLINGER_TILGANG_ID = "FENGSLINGER_TILGANG_ID"
+    BRUKSENHETSNUMMER = "BRUKSENHETSNUMMER"
 
 
 class LocalizedString(BaseModel):
