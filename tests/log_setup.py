@@ -30,7 +30,7 @@ def init_logging():
     handler = logging.StreamHandler(stream=sys.stdout)
     handler.setFormatter(CustomFormatter())
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[handler],
         force=True,

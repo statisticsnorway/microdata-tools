@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euox pipefail
+
+uv run ruff format
+
+uv run ruff check --force-exclude --fix
