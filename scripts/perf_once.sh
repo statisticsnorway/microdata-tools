@@ -21,7 +21,7 @@ export MICRODATA_TOOLS_DELETE_FILES='false'
 export PYTHONUNBUFFERED=1
 
 export MICRODATA_TOOLS_TEST_DISK="/Volumes/Lakris/microdata_tools"
-export MICRODATA_TOOLS_TMP_DB_FILE="/Volumes/Lakris/microdata_tools/tmp.db"
+export MICRODATA_TOOLS_WORK_DIR="/Volumes/Lakris/microdata_tools/workdir"
 
 which sar || { echo "command 'sar' not installed. please install it. for example: sudo apt-get install -y sysstat"; exit 1;}
 

@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from microdata_tools import validate_dataset
-from microdata_tools.validation.steps import reader_utils
+from microdata_tools.validation.steps import config, reader_utils
 from microdata_tools.validation.steps.utils import (
     current_milli_time,
     log_time,
@@ -18,12 +18,12 @@ from tests import log_setup
 logger = logging.getLogger()
 
 if "MICRODATA_TOOLS_TEST_DISK" in os.environ:
-    _PREFIX = os.getenv("MICRODATA_TOOLS_TEST_DISK") + "/"
+    _PREFIX = os.getenv("MICRODATA_TOOLS_TEST_DISK")
 else:
-    _PREFIX = ""
+    _PREFIX = "."
 
 RESOURCE_DIR = (
-    f"{_PREFIX}tests/resources/validation/validate_dataset/big_datasets"
+    f"{_PREFIX}/tests/resources/validation/validate_dataset/big_datasets"
 )
 
 VALID_DATASET_NAMES = [
@@ -136,7 +136,7 @@ def test_validate_init():
 def test_validate_big_dataset_perf():
     log_setup.init_logging()
     logger.info(f"self pid is {os.getpid()}")
-    working_directory = Path("workdir/" + str(uuid.uuid4()))
+    working_directory = Path(config.work_dir() + "/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
     logger.info(f"Main worker pid is: {str(os.getpid())}")
