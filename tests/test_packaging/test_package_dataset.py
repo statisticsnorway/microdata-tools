@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import tarfile
@@ -9,6 +10,9 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from pytest import MonkeyPatch
 
 from microdata_tools import package_dataset
+from tests import log_setup
+
+logger = logging.getLogger()
 
 RSA_KEYS_DIRECTORY = Path("tests/resources/packaging/rsa_keys")
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_package")
@@ -16,12 +20,17 @@ OUTPUT_DIRECTORY = Path("tests/resources/packaging/output")
 
 
 def setup_function():
+    log_setup.init_logging()
+    logger.info("backing up tests/resources ...")
     shutil.copytree("tests/resources", "tests/resources_backup")
+    logger.info("backing up tests/resources ... OK")
 
 
 def teardown_function():
+    logger.info("restoring tests/resources ...")
     shutil.rmtree("tests/resources")
     shutil.move("tests/resources_backup", "tests/resources")
+    logger.info("restoring tests/resources ... OK")
 
 
 def test_package_dataset():

@@ -1,5 +1,4 @@
 import logging
-import multiprocessing
 import string
 import time
 from pathlib import Path
@@ -58,7 +57,6 @@ def validate_dataset(
     working_directory: str = "",
     input_directory: str = "",
     keep_temporary_files: bool = False,
-    mem_pid_q: multiprocessing.SimpleQueue = None,
 ) -> List[str]:
     """
     Validate a dataset and return a list of errors.
@@ -100,7 +98,6 @@ def validate_dataset(
         if temporality_type == "ACCUMULATED":
             temporal_data = (
                 dataset_accumulated_validator.sanitize_and_validate_csv(
-                    mem_pid_q,
                     input_data_path,
                     Path(working_directory_path / f"{dataset_name}.parquet"),
                     identifier_data_type,
@@ -112,7 +109,6 @@ def validate_dataset(
             )
         elif temporality_type == "FIXED":
             temporal_data = dataset_fixed_validator.sanitize_and_validate_csv(
-                mem_pid_q,
                 input_data_path,
                 identifier_data_type,
                 measure_data_type,

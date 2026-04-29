@@ -29,14 +29,24 @@ def setup_function():
         parquet_file_path = (
             f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.parquet"
         )
+        parquet_done_file_path = (
+            f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.parquet.done"
+        )
+        logger.info(f"Parquet file path: {parquet_file_path}")
+        logger.info(f"Parquet done file path: {parquet_done_file_path}")
         assert os.path.exists(csv_file_path)
         create = False
-        if not os.path.exists(parquet_file_path):
+        if not os.path.exists(parquet_done_file_path):
+            create = True
+        elif not os.path.exists(parquet_file_path):
             create = True
         else:
             f1 = os.path.getmtime(csv_file_path)
-            f2 = os.path.getmtime(parquet_file_path)
+            f2 = os.path.getmtime(parquet_done_file_path)
+            f3 = os.path.getmtime(parquet_file_path)
             if f1 > f2:
+                create = True
+            if f1 > f3:
                 create = True
         if create:
             logger.info("Creating parquet file ...")
@@ -53,6 +63,8 @@ def setup_function():
                     keep_temporary_files=False,
                     input_directory=RESOURCE_DIR,
                 )
+                with open(parquet_done_file_path, mode="w") as f:
+                    f.write("done")
                 assert not data_errors
             finally:
                 try:

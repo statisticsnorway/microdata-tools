@@ -1,36 +1,13 @@
-import multiprocessing
+import logging
 import os
 import sqlite3
-from typing import Union
 
 import psutil
 
 from microdata_tools.validation.exceptions import ValidationError
-from microdata_tools.validation.steps import utils
+from microdata_tools.validation.steps import config, utils
 
-_is_error: multiprocessing.Event
-_report_q: multiprocessing.SimpleQueue
-
-
-def init_worker(
-    is_error: multiprocessing.Event,
-    mem_pid_q: Union[multiprocessing.SimpleQueue, None],
-    report_q: multiprocessing.SimpleQueue,
-) -> None:
-    global _is_error
-    global _report_q
-    _is_error = is_error
-    _report_q = report_q
-    if mem_pid_q is not None:
-        mem_pid_q.put(os.getpid())
-
-
-def no_overlapping_timespans_check_worker(offset: int, limit: int) -> int:
-    global _report_q
-    global _is_error
-    return _no_overlapping_timespans_check_worker_inner(
-        _is_error, _report_q, offset, limit
-    )
+logger = logging.getLogger()
 
 
 def validate_unit_start_stop(unit_array: list) -> bool:
@@ -47,23 +24,46 @@ def validate_unit_start_stop(unit_array: list) -> bool:
         return validate_unit_start_stop(unit_array[1:])
 
 
-def _no_overlapping_timespans_check_worker_inner(
-    is_error: multiprocessing.Event,
-    report_q: multiprocessing.SimpleQueue,
-    offset: int,
-    limit: int,
+def _show_progress_validation(
+    file_size: int,
+    mem: int,
+    processed_rows: int,
+    row_count: int,
+    spent_ms_so_far: int,
+) -> None:
+    ms_per_row = spent_ms_so_far / max(1, processed_rows)
+    remaining_ms = ms_per_row * (row_count - processed_rows)
+    mb_per_s = ((file_size * (processed_rows / row_count)) / 1024 / 1024) / (
+        max(spent_ms_so_far, 1) / 1000
+    )
+    processed_rows_str = f"{processed_rows:_}".rjust(len(f"{row_count:_}"))
+    percent_done = (processed_rows * 100) / row_count
+    percent_done_str = f"{percent_done:.1f}".rjust(len("100.0"))
+    mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
+    mem_str = f"{mem}".rjust(len("1234"))
+    logger.info(
+        f"Overlap validated {processed_rows_str} rows, "
+        + f"{mem_str} RSS MiB mem used, "
+        + f"{mb_per_s_str} MB/s, "
+        + f"{percent_done_str} % done. "
+        + f"ETA: {utils.ms_to_eta(int(remaining_ms))}"
+    )
+
+
+def no_overlapping_timespans_check_worker(
+    file_size: int,
+    row_count: int,
 ) -> int:
-    row_count = limit
-    with sqlite3.connect("tmp.db", autocommit=False) as conn:
+    with sqlite3.connect(config.tmp_db_file(), autocommit=False) as conn:
         last_report = -1
         cursor = conn.cursor()
         process = psutil.Process(os.getpid())
+        start_time = utils.current_milli_time()
         try:
             cursor.execute(
                 "SELECT unit_id, start_epoch_days, stop_epoch_days "
                 + "FROM dataset "
-                + "ORDER BY unit_id LIMIT ? OFFSET ?",
-                (limit, offset),
+                + "ORDER BY unit_id"
             )
             processed_rows = 0
             curr_unit = []
@@ -100,15 +100,16 @@ def _no_overlapping_timespans_check_worker_inner(
                 lst_report = utils.log_time()
                 if lst_report == last_report and processed_rows != row_count:
                     pass
-                elif processed_rows != 1:
+                else:
                     last_report = lst_report
-                    report_q.put(
-                        {
-                            "pid": os.getpid(),
-                            "processed_rows": processed_rows,
-                            "mem": process.memory_info().rss // 1000 // 1000,
-                        }
+                    _show_progress_validation(
+                        file_size,
+                        process.memory_info().rss // 1000 // 1000,
+                        processed_rows,
+                        row_count,
+                        utils.current_milli_time() - start_time,
                     )
+
             return processed_rows
         finally:
             cursor.close()

@@ -17,7 +17,14 @@ from tests import log_setup
 
 logger = logging.getLogger()
 
-RESOURCE_DIR = "tests/resources/validation/validate_dataset/big_datasets"
+if "MICRODATA_TOOLS_TEST_DISK" in os.environ:
+    _PREFIX = os.getenv("MICRODATA_TOOLS_TEST_DISK") + "/"
+else:
+    _PREFIX = ""
+
+RESOURCE_DIR = (
+    f"{_PREFIX}tests/resources/validation/validate_dataset/big_datasets"
+)
 
 VALID_DATASET_NAMES = [
     "ACCUMULATED_DS",
@@ -67,6 +74,7 @@ def setup_function():
         if os.path.exists(
             file_path
         ) and row_count == reader_utils.get_row_count(Path(file_path)):
+            logger.info(f"File path is: {file_path}")
             logger.info(f"Skipping generating dataset {dataset_name}")
         else:
             last_log = log_time()

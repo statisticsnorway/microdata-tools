@@ -1,6 +1,5 @@
 # pyright: reportAttributeAccessIssue=false
 import logging
-import multiprocessing
 import os.path
 from pathlib import Path
 from typing import Dict, List, Union
@@ -248,7 +247,6 @@ def _stream_show_progress(
 
 
 def sanitize_and_validate_csv(
-    mem_pid_q: Union[multiprocessing.SimpleQueue, None],
     input_data_path: Path,
     identifier_data_type: str,
     measure_data_type: str,

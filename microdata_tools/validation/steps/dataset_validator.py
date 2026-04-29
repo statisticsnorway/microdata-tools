@@ -313,9 +313,16 @@ def _no_overlapping_timespans_check(data: FileSystemDataset) -> None:
         for index in range(0, len(iterable), batch_size):
             yield iterable[index : index + batch_size]
 
-    identifiers = data.to_table(columns=["unit_id"])
-    unique_identifiers = compute.unique(identifiers["unit_id"])
+    logger.info("begin to_table ...")
+    identifiers = data.to_table(
+        columns=["unit_id"]
+    )  # <-- OOM #2 her ved 90M rader og 2GB ram
+    logger.info("begin compute...")
+    unique_identifiers = (
+        compute.unique(identifiers["unit_id"])  # < --OOM
+    )  # 3 ved 75M rader og 2GB ram
     error_list = []
+    logger.info("tick ...")
     for identifier_batch in batch(unique_identifiers, 500_000):
         identifier_time_spans = data.to_table(
             filter=dataset.field("unit_id").isin(identifier_batch),
@@ -359,8 +366,11 @@ def validate_dataset(
     sentinel_list: Union[List, None],
     temporality_type: str,
 ) -> None:
+    logger.info("tick ...")
     _valid_unit_id_check(data)
+    logger.info("tick ...")
     _valid_value_column_check(data, measure_data_type, code_list, sentinel_list)
+    logger.info("tick ...")
     if temporality_type == "FIXED":
         _fixed_temporal_variables_check(data)  # per row
         _only_unique_identifiers_check(data)  # per table
@@ -369,6 +379,7 @@ def validate_dataset(
         _status_uniquesness_check(data)  # per table
     elif temporality_type == "ACCUMULATED":
         start_ms = current_milli_time()
+        logger.info("tick ...")
         _accumulated_temporal_variables_check(data)  # per row
         spent_ms = current_milli_time() - start_ms
         logger.debug(
@@ -376,6 +387,7 @@ def validate_dataset(
         )
 
         start_ms_ = current_milli_time()
+        logger.info("tick ...")
         _no_overlapping_timespans_check(data)  # per table
         spent_ms_ = current_milli_time() - start_ms_
         logger.debug(f"_no_overlapping_timespans_check spent: {spent_ms_:_} ms")

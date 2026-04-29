@@ -156,7 +156,9 @@ def read_and_sanitize_csv(
     column_names = ["unit_id", "value", "start_epoch_days", "stop_epoch_days"]
     if temporality_type in ["STATUS", "ACCUMULATED"]:
         logger.debug("tick ...")
-        columns.append(_generate_start_year(table))  # <== OOM her
+        columns.append(
+            _generate_start_year(table)
+        )  # <-- OOM #1 her ved 30M rader og 2GB ram
         logger.debug("tick ...")
         column_names.append("start_year")
         logger.debug("tick ...")

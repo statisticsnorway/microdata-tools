@@ -1,6 +1,5 @@
 # pyright: reportAttributeAccessIssue=false
 import logging
-import multiprocessing
 import os.path
 import sqlite3
 from pathlib import Path
@@ -13,7 +12,11 @@ from pyarrow import compute, csv, dataset, parquet
 
 import microdata_tools.validation.steps.reader_utils as ru
 from microdata_tools.validation.exceptions import ValidationError
-from microdata_tools.validation.steps import overlap_validator, utils
+from microdata_tools.validation.steps import (
+    config,
+    overlap_validator_worker,
+    utils,
+)
 
 logger = logging.getLogger()
 
@@ -281,7 +284,6 @@ def _stream_show_progress(
 
 
 def sanitize_and_validate_csv(
-    mem_pid_q: Union[multiprocessing.SimpleQueue, None],
     input_data_path: Path,
     output_data_path: Path,
     identifier_data_type: str,
@@ -303,8 +305,8 @@ def sanitize_and_validate_csv(
     logger.info(f"row_count: {row_count:_}")
     file_size = input_data_path.stat().st_size
 
-    if os.path.exists("tmp.db"):
-        os.remove("tmp.db")
+    if os.path.exists(config.tmp_db_file()):
+        os.remove(config.tmp_db_file())
 
     try:
         logger.info("Validating and preparing data ...")
@@ -340,7 +342,9 @@ def sanitize_and_validate_csv(
         logger.debug(f"Creating index speed: {mb_per_s2:.1f} MB/s")
 
         start_ms3 = utils.current_milli_time()
-        overlap_validator.check_no_overlaps(file_size, mem_pid_q, row_count)
+        overlap_validator_worker.no_overlapping_timespans_check_worker(
+            file_size, row_count
+        )
         spent_ms3 = utils.current_milli_time() - start_ms3
         mb_per_s3 = (file_size / 1024 / 1024) / (max(spent_ms3, 1) / 1000)
         logger.info(f"Validated rows speed: {mb_per_s3:.1f} MB/s")
@@ -373,13 +377,13 @@ def sanitize_and_validate_csv(
         return temporal_data
     finally:
         try:
-            os.remove("tmp.db")
+            os.remove(config.tmp_db_file())
         except Exception:
             pass
 
 
 def _create_index() -> None:
-    with sqlite3.connect("tmp.db", autocommit=True) as conn:
+    with sqlite3.connect(config.tmp_db_file(), autocommit=True) as conn:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS index_unit_id ON dataset(unit_id)"
         )
@@ -396,7 +400,9 @@ def _populate_sqlite(
     sentinel_list: list | None,
 ) -> dict[str, int]:
 
-    with adbc_driver_sqlite.dbapi.connect("tmp.db", autocommit=False) as conn:
+    with adbc_driver_sqlite.dbapi.connect(
+        config.tmp_db_file(), autocommit=False
+    ) as conn:
         conn.execute(
             """CREATE TABLE dataset
                (
