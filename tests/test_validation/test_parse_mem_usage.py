@@ -1,7 +1,9 @@
+import datetime
 import logging
 import os
 import re
 
+import matplotlib
 import matplotlib.pyplot as plt
 import pytest
 
@@ -35,9 +37,15 @@ def parse_data(log_file):
 
             t += 1
             parts = re.split(r"\s+", lin)
+            hh_mm_ss = parts[0].split(":")
+            hh = int(hh_mm_ss[0])
+            mm = int(hh_mm_ss[1])
+            ss = int(hh_mm_ss[2])
 
             row = {
-                "time": t,
+                "t": t,
+                "time": parts[0],
+                "datetime": datetime.datetime(2026, 4, 29, hh, mm, ss),
                 "pgpin/s": float(parts[1]),
                 "pgpout/s": float(parts[2]),
                 "faults/s": float(parts[3]),
@@ -58,12 +66,20 @@ def parse_data(log_file):
 def test_mem_viz():
     log_setup.init_logging()
     data = parse_data(mem_log_file())
+    data = [row for row in data if row["time"] >= "15:00:00"]
 
-    x = [row["time"] for row in data]
+    x = [row["datetime"] for row in data]
     y_label = "majflt/s"
     y = [row[y_label] for row in data]
     plt.plot(x, y)
     plt.ylabel(y_label)
-    plt.xlabel("time (seconds)")
+    plt.xlabel("Time (HH:MM)")
+
+    # generate a formatter, using the fields required
+    fmtr = matplotlib.dates.DateFormatter("%H:%M")
+    # need a handle to the current axes to manipulate it
+    ax = plt.gca()
+    # set this formatter to the axis
+    ax.xaxis.set_major_formatter(fmtr)
     plt.savefig("plot.png")
     print("done!")

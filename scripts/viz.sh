@@ -4,7 +4,7 @@ export MICRODATA_TOOLS_TEST_PROGRESS='quiet'
 export MICRODATA_TOOLS_DELETE_FILES='false'
 export PYTHONUNBUFFERED=1
 
-export MICRODATA_TOOLS_MEM_LOG_FILE="mem_new.log"
+export MICRODATA_TOOLS_MEM_LOG_FILE="error_logs/mem_new.log"
 
 set -euox pipefail
 
