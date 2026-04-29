@@ -6,12 +6,12 @@ LOG_DATE="$(date '+%Y%m%d_%H%M%S')"
 LOG_FILE="logs/log_${LOG_DATE}.txt"
 
 echo "Logging to '${LOG_FILE}'"
+touch "${LOG_FILE}"
 
-#echo "Test file is '${TEST_FILE}'"
-echo "git describe is '$(git describe --dirty)'"
+echo "git describe is '$(git describe --dirty)'" | tee --append --ignore-interrupts "${LOG_FILE}"
 
-#echo "Test file is '${TEST_FILE}'" > "${LOG_FILE}"
-echo "git describe is '$(git describe --dirty)'" >> "${LOG_FILE}"
+TOTAL_RAM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
+echo "Total RAM: $((TOTAL_RAM / 1024)) MB" | tee --append --ignore-interrupts "${LOG_FILE}"
 
 set -euox pipefail
 
@@ -31,7 +31,8 @@ uv run pytest \
 --failed-first \
 --exitfirst \
 --quiet \
---capture no
+--capture no \
+| tee --append --ignore-interrupts "${LOG_FILE}"
 
 sar -B 1 > mem_new.log 2>&1 &
 SAR_PID1="$!"
