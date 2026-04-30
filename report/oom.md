@@ -6,7 +6,7 @@ Eg har sett på minnebruk i microdata-tools ved hjelp av ein linux VM med 2GB RA
 
 Den gamle koden les heile CSV-fila til minnet for deretter å skriva den til Parquet. Dette er den mest minnekrevjande operasjonen så langt eg kan sjå. Her OOM-er det allereie ved 30M rader og 2GB RAM.
 
-*Effekt*
+### Effekt
 Den nye koden klarar 1164M rader med 0.5 GB RAM før den får OOM.
 
 ```
@@ -21,13 +21,13 @@ python3 -c 'print(f"{0.0064 * 255:.1f} GB")'
 => 1.6 GB
 ```
 
-*Ekstra info*
+### Ekstra info
 Den nye koden OOM-er også ved store datamengder. Eg meiner grunnen til dette er at ParquetWriter-en lyt halda ein viss mengde data i minnet for å kunne skriva ferdig fila. Eg har ikkje stadfesta denne mistanken.
 
-*Nedside*
+### Nedside
 Ingen.
 
-*Konklusjon*
+### Konklusjon
 Dette er verdt å gjera dette tiltaket.
 
 
@@ -38,7 +38,7 @@ Henting av identifiers, `identifiers = data.to_table[columns=['unit_id']`, OOM-e
 
 Compute unique av identifiers, `compute.unique(identifiers['unit_id']`, OOM-er ved 75M rader og 2GB ram.
 
-*Effekt*
+### Effekt
 Den nye koden klarar minst 1000M rader med 0.5 GB RAM. Eg ser ikkje (nesten) ikkje nokon grunn til at den nye koden nokon gong skal OOM-e.
 
 ```
@@ -48,10 +48,10 @@ python3 -c 'old_mem_per_mrow = 2 / 90; new_mem_per_mrow = 0.5 / 1000; print(f"{(
 
 Den nye koden har altså `2.2%` av opprinneleg minnebruk.
 
-*Nedside*
+### Nedside
 Ein lyt skriva logikken til/mot SQL i motsetnad til Parquet. I praksis er dette berre iterering av sorterte rader. Dette er SQL betre på enn Parquet.
 
-*Konklusjon*
+### Konklusjon
 Dette er verdt å gjera dette tiltaket.
 
 
