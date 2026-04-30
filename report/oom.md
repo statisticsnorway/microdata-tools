@@ -83,7 +83,7 @@ Uansett var det interessant og noko ein eventuelt kan fylgja med på.
 [17162.183312] Out of memory: Killed process 1263 (pytest) total-vm:1841628kB, anon-rss:354052kB, file-rss:480kB, shmem-rss:0kB, UID:0 pgtables:1072kB oom_score_adj:0
 ```
 
-Utviklina av `major page faults/second`:
+Utviklinga av `major page faults/second`:
 
 ![diagram](plot.png)
 
