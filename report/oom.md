@@ -8,13 +8,16 @@ Den gamle koden les heile CSV-fila til minnet for deretter å skriva den til Par
 
 ### Effekt
 Den nye koden klarar 1164M rader med 0.5 GB RAM før den får OOM.
-
-
-Den nye koden har `0.64%` av opprinneleg minnebruk. Om det er slik at noverande VM-er treng 255 GB RAM for dette, så burde den klara tilsvarande oppgåver med `1.6 GB` RAM.
+Det tyder at nye koden har `0.64%` av opprinneleg minnebruk.
+Om det er slik at noverande VM-er treng 255 GB RAM for dette,
+så burde den klara tilsvarande oppgåver med `1.6 GB` RAM.
 
 
 ### Ekstra info
-Den nye koden OOM-er også ved store datamengder. Eg meiner grunnen til dette er at ParquetWriter-en lyt halda ein viss mengde data i minnet for å kunne skriva ferdig fila. Eg har ikkje stadfesta denne mistanken.
+Den nye koden OOM-er også ved store datamengder.
+Eg trur grunnen til dette er at ParquetWriter-en lyt halda ein viss mengde data
+i minnet for å kunne skriva ferdig fila. Eg har ikkje stadfesta denne mistanken.
+Denne begrensninga kjem ein seg ikkje unna.
 
 ### Nedside
 Ingen.
@@ -31,10 +34,10 @@ Henting av identifiers, `identifiers = data.to_table[columns=['unit_id']`, OOM-e
 Compute unique av identifiers, `compute.unique(identifiers['unit_id']`, OOM-er ved 75M rader og 2GB ram.
 
 ### Effekt
-Den nye koden klarar minst 1000M rader med 0.5 GB RAM. Eg ser ikkje (nesten) ikkje nokon grunn til at den nye koden nokon gong skal OOM-e.
+Den nye koden klarar minst 1000M rader med 0.5 GB RAM.
+Det tyder at den nye koden har `2.2%` av opprinneleg minnebruk.
 
-
-Den nye koden har altså `2.2%` av opprinneleg minnebruk.
+Eg ser (nesten) ikkje ikkje nokon grunn til at den nye koden nokon gong skal OOM-e.
 
 ### Nedside
 Ein lyt skriva logikken til/mot SQL i motsetnad til Parquet. I praksis er dette berre iterering av sorterte rader. Dette er SQL betre på enn Parquet.
