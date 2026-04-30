@@ -14,7 +14,7 @@ python3 -c 'old_mem_per_mrow = 2 / 30; new_mem_per_mrow = 0.5 / 1164; print(f"{(
 0.64 %
 ```
 
-Den nye koden brukar `0.64%` av opprinneleg minnebruk. Om det er slik at noverande VM-er treng 255 GB RAM for dette, så burde den klara tilsvarande oppgåver med 1.6 GB RAM:
+Den nye koden har `0.64%` av opprinneleg minnebruk. Om det er slik at noverande VM-er treng 255 GB RAM for dette, så burde den klara tilsvarande oppgåver med 1.6 GB RAM:
 
 ```
 python3 -c 'print(f"{0.0064 * 255:.1f} GB")'
@@ -46,7 +46,7 @@ python3 -c 'old_mem_per_mrow = 2 / 90; new_mem_per_mrow = 0.5 / 1000; print(f"{(
 2.25 %
 ```
 
-Den nye koden nyttar altså `2.2%` av opprinneleg minnebruk.
+Den nye koden har altså `2.2%` av opprinneleg minnebruk.
 
 *Nedside*
 Ein lyt skriva logikken til/mot SQL i motsetnad til Parquet. I praksis er dette berre iterering av sorterte rader. Dette er SQL betre på enn Parquet.
