@@ -1,11 +1,9 @@
 # Innleiing
 
-RAM er mest "scarce" i bruken av microdata-tools ifylgje Daniel E..
+RAM er mest "scarce" i bruken av microdata-tools ifylgje Daniel E.
 
 Det er identifisert tre plassar der den gamle koden OOM-er.
-Alle tre OOM-er kan vesentleg forbetrast.
-
-Arbeidet er gjort mykje ved hjelp av ein Linux VM med 2 GB RAM.
+Alle tre plassar kan forbetrast vesentleg.
 
 # Forslag: Streame CSV til parquet
 
