@@ -57,7 +57,16 @@ Dette er verdt å gjera dette tiltaket.
 
 ## Anna
 
-Eg målte minneevents med `sar -B 1` for å sjå på dette. Diagrammet under syner utviklinga i `major page faults / sekund` over tid. Dette var for køyringa med 1164+M rader og 0.5 GB RAM. `major page faults` tyder at minnepages (typisk 4KB eller 8KB) vert skrive til og frå disk, som igjen tyder at applikasjonen sliter med å få nok minne. Og til slutt her sa altså OS-et nei. Eg veit ikkje nøyaktig kvifor eller når ei slik grense går. Uansett var det interessant.
+Eg målte minneevents med `sar -B 1`.
+Diagrammet under syner utviklinga i `major page faults / sekund` over tid. 
+Dette var for køyringa med 1164+M rader og 0.5 GB RAM. `major page faults` tyder
+at minnepages (typisk 4KB eller 8KB) vert skrive til og frå disk, som igjen 
+tyder at applikasjonen sliter med å få nok minne.
+Det vil gjera at applikasjonen vil gå treigare og treigare di meir frekvent
+den må skrive pages til disk.
+Og til slutt her sa OS-et nei.
+Eg veit ikkje nøyaktig kvifor eller når ei slik grense går.
+Uansett var det interessant.
 
 ![diagram](plot.png)
 
