@@ -2,24 +2,16 @@
 
 Eg har sett på minnebruk i microdata-tools ved hjelp av ein linux VM med 2GB RAM.
 
-# Forslag: Streame fra CSV til parquet
+# Forslag: Streame CSV til parquet
 
 Den gamle koden les heile CSV-fila til minnet for deretter å skriva den til Parquet. Dette er den mest minnekrevjande operasjonen så langt eg kan sjå. Her OOM-er det allereie ved 30M rader og 2GB RAM.
 
 ### Effekt
 Den nye koden klarar 1164M rader med 0.5 GB RAM før den får OOM.
 
-```
-python3 -c 'old_mem_per_mrow = 2 / 30; new_mem_per_mrow = 0.5 / 1164; print(f"{(100*new_mem_per_mrow) / old_mem_per_mrow:.2f} %")'
-0.64 %
-```
 
-Den nye koden har `0.64%` av opprinneleg minnebruk. Om det er slik at noverande VM-er treng 255 GB RAM for dette, så burde den klara tilsvarande oppgåver med 1.6 GB RAM:
+Den nye koden har `0.64%` av opprinneleg minnebruk. Om det er slik at noverande VM-er treng 255 GB RAM for dette, så burde den klara tilsvarande oppgåver med `1.6 GB` RAM.
 
-```
-python3 -c 'print(f"{0.0064 * 255:.1f} GB")'
-=> 1.6 GB
-```
 
 ### Ekstra info
 Den nye koden OOM-er også ved store datamengder. Eg meiner grunnen til dette er at ParquetWriter-en lyt halda ein viss mengde data i minnet for å kunne skriva ferdig fila. Eg har ikkje stadfesta denne mistanken.
@@ -41,10 +33,6 @@ Compute unique av identifiers, `compute.unique(identifiers['unit_id']`, OOM-er v
 ### Effekt
 Den nye koden klarar minst 1000M rader med 0.5 GB RAM. Eg ser ikkje (nesten) ikkje nokon grunn til at den nye koden nokon gong skal OOM-e.
 
-```
-python3 -c 'old_mem_per_mrow = 2 / 90; new_mem_per_mrow = 0.5 / 1000; print(f"{(100*new_mem_per_mrow) / old_mem_per_mrow:.2f} %")'
-2.25 %
-```
 
 Den nye koden har altså `2.2%` av opprinneleg minnebruk.
 
@@ -71,5 +59,24 @@ Uansett var det interessant.
 ![diagram](plot.png)
 
 
+## Utrekningar
+
+### Streame frå CSV til Parquet
+
+```
+python3 -c 'old_mem_per_mrow = 2 / 30; new_mem_per_mrow = 0.5 / 1164; print(f"{(100*new_mem_per_mrow) / old_mem_per_mrow:.2f} %")'
+=> 0.64 %
+```
 
 
+```
+python3 -c 'print(f"{0.0064 * 255:.1f} GB")'
+=> 1.6 GB
+```
+
+### Tabell-wide validering med SQLite
+
+```
+python3 -c 'old_mem_per_mrow = 2 / 90; new_mem_per_mrow = 0.5 / 1000; print(f"{(100*new_mem_per_mrow) / old_mem_per_mrow:.2f} %")'
+2.25 %
+```
