@@ -64,14 +64,26 @@ Dette er verdt å gjera dette tiltaket.
 
 Eg målte minneevents med `sar -B 1`.
 Diagrammet under syner utviklinga i `major page faults / sekund` over tid. 
-Dette var for køyringa med 1164+M rader og 0.5 GB RAM. `major page faults` tyder
+Dette var for køyringa med 1164M rader og 0.5 GB RAM. 
+
+`major page faults` tyder
 at minnepages (typisk 4KB eller 8KB) vert skrive til og frå disk, som igjen 
 tyder at applikasjonen sliter med å få nok minne.
 Det vil gjera at applikasjonen vil gå treigare og treigare di meir frekvent
-den må skrive pages til disk.
-Og til slutt her sa OS-et nei.
-Eg veit ikkje nøyaktig kvifor eller når ei slik grense går.
-Uansett var det interessant.
+den lyt skriva pages til disk.
+
+Til slutt sa OS-et her nei.
+Eg veit ikkje nøyaktig kvifor eller når ei slik grense slår inn.
+Uansett var det interessant og noko ein eventuelt kan fylgja med på.
+
+`$ dmesg` sa fylgjande:
+
+```
+[17162.183287] oom-kill:constraint=CONSTRAINT_NONE,nodemask=(null),cpuset=/,mems_allowed=0,global_oom,task_memcg=/user.slice/user-0.slice/session-6.scope,task=pytest,pid=1263,uid=0
+[17162.183312] Out of memory: Killed process 1263 (pytest) total-vm:1841628kB, anon-rss:354052kB, file-rss:480kB, shmem-rss:0kB, UID:0 pgtables:1072kB oom_score_adj:0
+```
+
+Utviklina av `major page faults/second`:
 
 ![diagram](plot.png)
 
