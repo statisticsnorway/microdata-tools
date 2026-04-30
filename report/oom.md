@@ -70,7 +70,7 @@ Dette var for køyringa med 1164M rader og 0.5 GB RAM.
 at minnepages (typisk 4KB eller 8KB) vert skrive til og frå disk, som igjen 
 tyder at applikasjonen sliter med å få nok minne.
 Det vil gjera at applikasjonen vil gå treigare og treigare di meir frekvent
-den lyt skriva pages til disk.
+kjerna lyt skriva pages til disk.
 
 Til slutt sa OS-et her nei (klokka 17:20 på diagrammet).
 Eg veit ikkje nøyaktig kvifor eller når ei slik grense slår inn.
