@@ -9,8 +9,8 @@ Den gamle koden les heile CSV-fila til minnet for deretter å skriva den til Par
 ### Effekt
 Den nye koden klarar 1164M rader med 0.5 GB RAM før den får OOM.
 Det tyder at nye koden har `0.64%` av opprinneleg minnebruk.
-Om det er slik at noverande VM-er treng 255 GB RAM for dette,
-så burde den klara tilsvarande oppgåver med `1.6 GB` RAM.
+Om det er slik at noverande VM-er treng 255 GB RAM for dagens oppgåver,
+så burde den nye koden klara det same med `1.6 GB` RAM.
 
 
 ### Ekstra info
