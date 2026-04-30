@@ -3,7 +3,7 @@
 RAM er mest "scarce" i bruken av microdata-tools ifylgje Daniel E.
 
 Det er identifisert tre plassar der den gamle koden OOM-er.
-Alle tre plassar kan forbetrast vesentleg.
+Alle tre plassane kan forbetrast vesentleg.
 
 # Forslag: Streame CSV til parquet
 
@@ -43,10 +43,18 @@ Compute unique av identifiers, `compute.unique(identifiers['unit_id']`, OOM-er v
 Den nye koden klarar minst 1000M rader med 0.5 GB RAM.
 Det tyder at den nye koden har `2.2%` av opprinneleg minnebruk.
 
+### Ekstra info
+
 Eg ser (nesten) ikkje ikkje nokon grunn til at den nye koden nokon gong skal OOM-e.
+Unnataket for dette er overlapp-sjekken. Der samlar ein opp alle verdiar med
+same `unit_id`. Så dersom det vert veldeg mange med same `unit_id`, så kan
+det også truleg OOM-e. Vonleg vert ikkje dette eit problem. Det er truleg
+mogleg å løysa dette dersom det skulle verta eit problem.
 
 ### Nedside
-Ein lyt skriva logikken til/mot SQL i motsetnad til Parquet. I praksis er dette berre iterering av sorterte rader. Dette er SQL betre på enn Parquet.
+Ein lyt skriva logikken til/mot SQL i motsetnad til Parquet.
+I praksis er dette berre iterering av sorterte rader.
+Dette er SQL (rad-orientert) betre på enn Parquet (kollone-orientert).
 
 ### Konklusjon
 Dette er verdt å gjera dette tiltaket.
