@@ -1,6 +1,11 @@
-# Kontekst
+# Innleiing
 
-Eg har sett på minnebruk i microdata-tools ved hjelp av ein linux VM med 2GB RAM.
+RAM er mest "scarce" i bruken av microdata-tools ifylgje Daniel E..
+
+Det er identifisert tre plassar der den gamle koden OOM-er.
+Alle tre OOM-er kan vesentleg forbetrast.
+
+Arbeidet er gjort mykje ved hjelp av ein Linux VM med 2 GB RAM.
 
 # Forslag: Streame CSV til parquet
 
@@ -16,8 +21,9 @@ så burde den nye koden klara det same med `1.6 GB` RAM.
 ### Ekstra info
 Den nye koden OOM-er også ved store datamengder.
 Eg trur grunnen til dette er at ParquetWriter-en lyt halda ein viss mengde data
-i minnet for å kunne skriva ferdig fila. Eg har ikkje stadfesta denne mistanken.
+i minnet for å kunne skriva ferdig fila.
 Denne begrensninga kjem ein seg ikkje unna.
+Eg har ikkje stadfesta denne mistanken.
 
 ### Nedside
 Ingen.
@@ -27,7 +33,9 @@ Dette er verdt å gjera dette tiltaket.
 
 
 # Forslag: Tabell-wide validering med SQLite
-Alle fire temporalitetstypar har ein tabell-wide validering: enten unike identifiers eller sjekk av overlapp for datoar. Også her får ein OOM.
+Alle fire temporalitetstypar har ein tabell-wide validering:
+anten unike identifiers eller sjekk av overlapp for datoar.
+Også her får ein OOM.
 
 Henting av identifiers, `identifiers = data.to_table[columns=['unit_id']`, OOM-er ved 90M rader og 2GB ram.
 
