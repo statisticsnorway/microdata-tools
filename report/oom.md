@@ -72,7 +72,7 @@ tyder at applikasjonen sliter med å få nok minne.
 Det vil gjera at applikasjonen vil gå treigare og treigare di meir frekvent
 den lyt skriva pages til disk.
 
-Til slutt sa OS-et her nei.
+Til slutt sa OS-et her nei (klokka 17:20 på diagrammet).
 Eg veit ikkje nøyaktig kvifor eller når ei slik grense slår inn.
 Uansett var det interessant og noko ein eventuelt kan fylgja med på.
 
