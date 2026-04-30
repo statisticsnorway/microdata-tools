@@ -1,6 +1,6 @@
 # Innleiing
 
-RAM er mest "scarce" i bruken av microdata-tools ifylgje Daniel E.
+RAM er mest "scarce" i bruken av microdata-tools ifylgje Daniel Elisenberg.
 
 Det er identifisert tre plassar der den gamle koden OOM-er.
 Alle tre plassane kan forbetrast vesentleg.
