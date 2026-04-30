@@ -97,3 +97,4 @@ python3 -c 'print(f"{0.0064 * 255:.1f} GB")'
 python3 -c 'old_mem_per_mrow = 2 / 90; new_mem_per_mrow = 0.5 / 1000; print(f"{(100*new_mem_per_mrow) / old_mem_per_mrow:.2f} %")'
 2.25 %
 ```
+
