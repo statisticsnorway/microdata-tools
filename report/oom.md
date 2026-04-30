@@ -67,7 +67,7 @@ Diagrammet under syner utviklinga i `major page faults / sekund` over tid.
 Dette var for køyringa med 1164M rader og 0.5 GB RAM. 
 
 `major page faults` tyder
-at minnepages (typisk 4KB eller 8KB) vert skrive til og frå disk, som igjen 
+at minnepages (typisk 4KB eller 8KB) vert skrivne til og frå disk, som igjen 
 tyder at applikasjonen sliter med å få nok minne.
 Det vil gjera at applikasjonen vil gå treigare og treigare di meir frekvent
 kjerna lyt skriva pages til disk.
