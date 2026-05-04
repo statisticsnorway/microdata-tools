@@ -347,7 +347,7 @@ wheels = [
 
 [[package]]
 name = "microdata-tools"
-version = "1.12.1"
+version = "1.12.0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
