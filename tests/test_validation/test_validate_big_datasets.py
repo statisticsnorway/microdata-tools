@@ -105,7 +105,7 @@ def setup_function():
                             percent_str = f"{percent:.1f}".rjust(len("100.0"))
                             eta = f"{ms_to_eta(int(remaining_ms))}"
                             logger.info(
-                                f"Generated {cnt_str} rows. "
+                                f"Generated {cnt_str} CSV rows. "
                                 + f"{percent_str} % done. "
                                 + f"ETA: {eta}"
                             )
@@ -127,7 +127,7 @@ def teardown_function():
             os.remove(f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv")
 
 
-@pytest.mark.perf_init
+@pytest.mark.create_csv
 def test_validate_init():
     log_setup.init_logging()
 
@@ -135,11 +135,9 @@ def test_validate_init():
 @pytest.mark.perf_new
 def test_validate_big_dataset_perf():
     log_setup.init_logging()
-    logger.info(f"self pid is {os.getpid()}")
     working_directory = Path(config.work_dir() + "/" + str(uuid.uuid4()))
     os.makedirs(working_directory)
 
-    logger.info(f"Main worker pid is: {str(os.getpid())}")
     try:
         for idx, dataset_name in enumerate(VALID_DATASET_NAMES):
             start_time = current_milli_time()

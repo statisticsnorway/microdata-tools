@@ -56,6 +56,24 @@ Ein lyt skriva logikken til/mot SQL i motsetnad til Parquet.
 I praksis er dette berre iterering av sorterte rader.
 Dette er SQL (rad-orientert) betre på enn Parquet (kollone-orientert).
 
+### Alternativ
+
+Det vart føreslått å bruka `duckdb`. Diverre synte det seg å vera slik at `duckdb` OOM-er
+på:
+
+```
+handle = duckdb.sql(
+    f"SELECT unit_id, start_epoch_days, stop_epoch_days "
+    + f"FROM '{RESOURCE_DIR}/ACCUMULATED_DS/ACCUMULATED_DS.parquet' "
+    + "ORDER BY unit_id"
+)
+while row := handle.fetchone():
+    logger.info(f"yay")
+    break
+```
+
+ved 30M rader og 2GB RAM.
+
 ### Konklusjon
 Dette er verdt å gjera dette tiltaket.
 

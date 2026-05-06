@@ -186,7 +186,7 @@ def _csv_stream_to_sqlite(
     conn: sqlite3.Connection,
     writer: pyarrow.parquet.ParquetWriter,
 ) -> Dict[str, int]:
-    logger.debug("Streaming to sqlite and validating")
+    logger.info("Validating and streaming to SQLite and parquet")
     start_time = utils.current_milli_time()
     temporal_data = {}
     processed_rows = 0
@@ -275,7 +275,7 @@ def _stream_show_progress(
     mb_per_s_str = f"{mb_per_s:.1f}".rjust(len("100.0"))
     mem_str = f"{mem_mb:_}".rjust(len("123_123"))
     logger.info(
-        f"Validated and prepared {processed_rows_str} rows, "
+        f"Validated and wrote {processed_rows_str} sqlite and parquet rows, "
         + f"{mem_str} MiB RSS mem, "
         + f"{mb_per_s_str} MB/s, "
         + f"{percent_done_str} % done. "
@@ -309,7 +309,7 @@ def sanitize_and_validate_csv(
         os.remove(config.tmp_db_file())
 
     try:
-        logger.info("Validating and preparing data ...")
+        logger.info("Validating and streaming to SQLite and Parquet ...")
         temporal_data = _populate_sqlite(
             code_list,
             file_size,
@@ -323,23 +323,25 @@ def sanitize_and_validate_csv(
         spent_ms1 = utils.current_milli_time() - start_ms
         mb_per_s1 = (file_size / 1024 / 1024) / (spent_ms1 / 1000)
         logger.info(
-            f"Validating and preparing data ... Done in {spent_ms1:_} ms aka "
+            "Validating and streaming to SQLite and Parquet ... Done in "
+            + f"{spent_ms1:_} ms aka "
             + f"{utils.ms_to_eta(spent_ms1)}"
         )
         logger.debug(
-            f"Validating and preparing data speed: {mb_per_s1:.1f} MB/s"
+            "Validating and streaming to SQLite and Parquet speed: "
+            + f"{mb_per_s1:.1f} MB/s"
         )
 
         start_ms2 = utils.current_milli_time()
-        logger.info("Creating index ...")
+        logger.info("Creating SQLite index ...")
         _create_index()
         spent_ms2 = utils.current_milli_time() - start_ms2
         mb_per_s2 = (file_size / 1024 / 1024) / (spent_ms2 / 1000)
         logger.info(
-            f"Creating index ... Done in {spent_ms2:_} ms aka "
+            f"Creating SQLite index ... Done in {spent_ms2:_} ms aka "
             + f"{utils.ms_to_eta(spent_ms2)}"
         )
-        logger.debug(f"Creating index speed: {mb_per_s2:.1f} MB/s")
+        logger.debug(f"Creating SQLite index speed: {mb_per_s2:.1f} MB/s")
 
         start_ms3 = utils.current_milli_time()
         overlap_validator_worker.no_overlapping_timespans_check_worker(
@@ -347,9 +349,9 @@ def sanitize_and_validate_csv(
         )
         spent_ms3 = utils.current_milli_time() - start_ms3
         mb_per_s3 = (file_size / 1024 / 1024) / (max(spent_ms3, 1) / 1000)
-        logger.info(f"Validated rows speed: {mb_per_s3:.1f} MB/s")
+        logger.info(f"Table wide validation speed: {mb_per_s3:.1f} MB/s")
         logger.info(
-            f"Validated rows done in {spent_ms3:_} ms aka "
+            f"Table wide validation done in {spent_ms3:_} ms aka "
             + f"{utils.ms_to_eta(spent_ms3)}"
         )
 
@@ -361,13 +363,16 @@ def sanitize_and_validate_csv(
         logger.info(f"Row count: {row_count:_}")
         share1 = 100 * spent_ms1 / total_ms
         logger.debug(
-            f"Validating and preparing data: {mb_per_s1:.1f} MB/s, "
+            "Validating and streaming to SQLite and Parquet: "
+            + f"{mb_per_s1:.1f} MB/s, "
             + f"{share1:.1f} %"
         )
         share2 = 100 * spent_ms2 / total_ms
         logger.debug(f"Creating index: {mb_per_s2:.1f} MB/s, {share2:.1f} %")
         share3 = 100 * spent_ms3 / total_ms
-        logger.info(f"Validated rows: {mb_per_s3:.1f} MB/s, {share3:.1f} %")
+        logger.info(
+            f"Table wide validation: {mb_per_s3:.1f} MB/s, {share3:.1f} %"
+        )
         logger.debug(f"Total speed: {mb_per_s4:.1f} MB/s")
         logger.debug(
             f"Total spent {total_ms:_} ms aka " + f"{utils.ms_to_eta(total_ms)}"
@@ -449,5 +454,4 @@ def _populate_sqlite(
                     conn,
                     writer,
                 )
-    logger.info("returning temporal_data")
     return temporal_data

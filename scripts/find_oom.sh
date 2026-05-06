@@ -16,9 +16,10 @@ echo "git describe is '$(git describe --dirty)'" >> "${LOG_FILE}"
 set -euox pipefail
 
 TOTAL_RAM=$(cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*')
-echo "Total RAM: $((TOTAL_RAM / 1024)) MB"
+echo "Total RAM: $((TOTAL_RAM / 1024)) MB" | tee --append --ignore-interrupts "${LOG_FILE}"
 
-export MICRODATA_TOOLS_ROW_COUNT='75_000_000'
+export MICRODATA_TOOLS_WORK_DIR='.'
+export MICRODATA_TOOLS_ROW_COUNT='120_000_000'
 export MICRODATA_TOOLS_TEST_PROGRESS='quiet'
 export MICRODATA_TOOLS_DELETE_FILES='false'
 export PYTHONUNBUFFERED=1
