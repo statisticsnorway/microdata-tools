@@ -22,7 +22,8 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt)
+        datefmt = "%Y-%m-%d %H:%M:%S"
+        formatter = logging.Formatter(log_fmt, datefmt)
         return formatter.format(record)
 
 
@@ -31,7 +32,6 @@ def init_logging():
     handler.setFormatter(CustomFormatter())
     logging.basicConfig(
         level=logging.INFO,
-        datefmt="%Y-%m-%d %H:%M:%S",
         handlers=[handler],
         force=True,
     )
