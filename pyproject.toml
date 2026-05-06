@@ -1,9 +1,9 @@
 [project]
 name = "microdata-tools"
-version = "1.12.0"
+version = "1.12.1"
 description = "Tools for the microdata.no platform"
 authors = [{ name = "microdata-developers" }]
-license = { text = "MIT" }   
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
