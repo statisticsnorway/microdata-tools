@@ -1,5 +1,9 @@
+import base64
 import hashlib
 from pathlib import Path
+
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
 from microdata_tools.packaging.exceptions import (
     CsvConsistencyException,
@@ -40,3 +44,14 @@ def compare_checksum_with_file(
             raise CsvConsistencyException(
                 "MD5 checksums do not match. The csv file may be corrupted!"
             )
+
+
+def derive_fernet_key(shared_secret: bytes) -> bytes:
+    derived_key = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=None,
+        info=b"microdata-tools dataset encryption",
+    ).derive(shared_secret)
+
+    return base64.urlsafe_b64encode(derived_key)

@@ -7,7 +7,7 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cryptography>=45.0.0",
+    "cryptography>=48.0.0",
     "numpy>=2.2.0",
     "pyarrow==23.0.1",
     "pydantic>=2.11.7",

@@ -20,15 +20,15 @@ The CSV file is optional in some cases.
 ### Package dataset
 The `package_dataset()` function will encrypt and package your dataset as a tar archive. The process is as follows:
 
-1. Generate the symmetric key for a dataset.
-2. Encrypt the dataset data (CSV) using the symmetric key and store the encrypted file as `<DATASET_NAME>.csv.encr`
-3. Encrypt the symmetric key using the asymmetric RSA public key `microdata_public_key.pem` 
-   and store the encrypted file as `<DATASET_NAME>.symkey.encr`
-4. Gather the encrypted CSV, encrypted symmetric key and metadata (JSON) file in one tar file.
+1. Generate a shared secret using the asymmetric ML-KEM public key microdata_public_key.pem.
+2. Derive a symmetric encryption key from the shared secret.
+3. Encrypt the dataset data (CSV) using the symmetric key and store the encrypted file as `<DATASET_NAME>.csv.encr`
+4. Store the ML-KEM ciphertext required to reconstruct the shared secret as <DATASET_NAME>.kem.encr. 
+5. Gather the encrypted CSV, ML-KEM ciphertext file and metadata (JSON) file in one tar file.
 
 ### Unpackage dataset
 The `unpackage_dataset()` function will untar and decrypt your dataset using the `microdata_private_key.pem`
-RSA private key.
+MLKEM private key.
 
 The packaged file has to have the `<DATASET_NAME>.tar` extension. Its contents should be as follows:
 
@@ -36,25 +36,25 @@ The packaged file has to have the `<DATASET_NAME>.tar` extension. Its contents s
 
 ```<DATASET_NAME>.csv.encr``` : Optional encrypted dataset file.
 
-```<DATASET_NAME>.symkey.encr``` : Optional encrypted file containing the symmetrical key used to decrypt the dataset file. Required if the `.csv.encr` file is present.
+```<DATASET_NAME>.kem.encr``` : Optional ML-KEM ciphertext file used to reconstruct the shared secret required to decrypt the dataset file. Required if the `.csv.encr` file is present.
 
-Decryption uses the RSA private key located at ```RSA_KEY_DIR```.
+Decryption uses the MLKEM private key located at ```MLKEM_KEY_DIR``` to reconstruct the shared secret and derive the symmetric decryption key.
 
 The packaged file is then stored in `output_dir/archive/unpackaged` after a successful run or `output_dir/archive/failed` after an unsuccessful run.
 
 ## Example
-Python script that uses a RSA public key named `microdata_public_key.pem` and packages a dataset:
+Python script that uses a MLKEM public key named `microdata_public_key.pem` and packages a dataset:
 
 ```py
 from pathlib import Path
 from microdata_tools import package_dataset
 
-RSA_KEYS_DIRECTORY = Path("tests/resources/rsa_keys")
+MLKEM_KEYS_DIRECTORY = Path("tests/resources/mlkem_keys")
 DATASET_DIRECTORY = Path("tests/resources/input_package/DATASET_1")
 OUTPUT_DIRECTORY = Path("tests/resources/output")
 
 package_dataset(
-   rsa_keys_dir=RSA_KEYS_DIRECTORY,
+   mlkem_keys_dir=MLKEM_KEYS_DIRECTORY,
    dataset_dir=DATASET_DIRECTORY,
    output_dir=OUTPUT_DIRECTORY,
 )

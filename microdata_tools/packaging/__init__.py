@@ -23,14 +23,14 @@ logger = logging.getLogger()
 
 
 def package_dataset(
-    rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path
+    mlkem_keys_dir: Path, dataset_dir: Path, output_dir: Path
 ) -> None:
     """
     Packages a dataset. It will encrypt and tar the dataset using
-    the provided RSA public key. Only the CSV file will be encrypted.
+    the provided MLKEM public key. Only the CSV file will be encrypted.
     Creates a checksum file for the CSV file.
 
-    :param rsa_keys_dir:
+    :param mlkem_keys_dir:
         directory containing public key file microdata_public_key.pem
     :param dataset_dir:
         directory containing the dataset files (CSV and JSON)
@@ -59,7 +59,7 @@ def package_dataset(
         if len(csv_files) == 1:
             write_checksum_to_file(csv_files[0])
             encrypt_dataset(
-                rsa_keys_dir=rsa_keys_dir,
+                mlkem_keys_dir=mlkem_keys_dir,
                 dataset_dir=dataset_dir,
                 output_dir=output_dir,
             )
@@ -87,17 +87,17 @@ def package_dataset(
 
 def unpackage_dataset(
     packaged_file_path: Path,
-    rsa_keys_dir: Path,
+    mlkem_keys_dir: Path,
     output_dir: Path,
 ) -> None:
     """
     Unpackages a dataset. It will untar and decrypt the dataset using
-    the provided RSA private key. Only the CSV file will be decrypted.
+    the provided MLKEM private key. Only the CSV file will be decrypted.
     Validates the checksum of the CSV file.
 
     :param packaged_file_path:
         a Path to the .tar file containing the dataset files
-    :param rsa_keys_dir:
+    :param mlkem_keys_dir:
         directory containing the private key file microdata_private_key.pem
     :param output_dir:
         output directory
@@ -105,12 +105,12 @@ def unpackage_dataset(
         None
     """
     check_exists(packaged_file_path)
-    check_exists(rsa_keys_dir)
+    check_exists(mlkem_keys_dir)
 
     if not output_dir.exists():
         os.makedirs(output_dir)
 
-    private_key_path = rsa_keys_dir / "microdata_private_key.pem"
+    private_key_path = mlkem_keys_dir / "microdata_private_key.pem"
     check_exists(private_key_path)
 
     dataset_name = packaged_file_path.stem
@@ -119,7 +119,7 @@ def unpackage_dataset(
 
     try:
         untar_encrypted_dataset(packaged_file_path, dataset_name, dataset_dir)
-        decrypt(rsa_keys_dir, dataset_dir, output_dir)
+        decrypt(mlkem_keys_dir, dataset_dir, output_dir)
         _validate_csv_consistency(dataset_name, dataset_dir, output_dir)
 
         if Path(dataset_dir).exists():

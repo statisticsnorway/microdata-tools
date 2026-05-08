@@ -6,10 +6,10 @@ from pathlib import Path
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import mlkem
 
-from microdata_tools.packaging._utils import check_exists
+from microdata_tools.packaging._utils import check_exists, derive_fernet_key
 from microdata_tools.packaging.exceptions import ValidationException
 
 logger = logging.getLogger()
@@ -18,25 +18,24 @@ CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
 
 def encrypt_dataset(
-    rsa_keys_dir: Path,
+    mlkem_keys_dir: Path,
     dataset_dir: Path,
     output_dir: Path,
 ) -> None:
     """
     Encrypts a dataset as follows:
-        1. Generates the symmetric key for this dataset.
-        2. Splits the dataset into chunks.
-        3. Encrypts each chunk using the symmetric key.
-        4. Encrypts the symmetric key using the RSA public key.
+    1. Establishes a symmetric key for this dataset using the ML-KEM public key.
+    2. Splits the dataset into chunks.
+    3. Encrypts each chunk using the symmetric key.
     """
 
-    check_exists(rsa_keys_dir)
+    check_exists(mlkem_keys_dir)
     check_exists(dataset_dir)
 
     if not output_dir.exists():
         os.makedirs(output_dir)
 
-    public_key_location = rsa_keys_dir / "microdata_public_key.pem"
+    public_key_location = mlkem_keys_dir / "microdata_public_key.pem"
     check_exists(public_key_location)
 
     # Read public key from file
@@ -44,6 +43,8 @@ def encrypt_dataset(
         public_key = serialization.load_pem_public_key(
             key_file.read(), backend=default_backend()
         )
+    if not isinstance(public_key, mlkem.MLKEM768PublicKey):
+        raise TypeError("Public key is not an ML-KEM-768 public key.")
 
     csv_files = [
         file for file in dataset_dir.iterdir() if file.suffix == ".csv"
@@ -62,11 +63,12 @@ def encrypt_dataset(
     os.makedirs(dataset_output_dir)
     os.makedirs(dataset_output_dir / "chunks", exist_ok=True)
 
-    encrypted_symkey_file = dataset_output_dir / f"{dataset_name}.symkey.encr"
+    kem_ciphertext_file = dataset_output_dir / f"{dataset_name}.kem.encr"
 
-    # Generate and store symmetric key for this file
-    symkey = Fernet.generate_key()
-    fernet = Fernet(symkey)
+    #
+    shared_secret, kem_ciphertext = public_key.encapsulate()
+    fernet_key = derive_fernet_key(shared_secret)
+    fernet = Fernet(fernet_key)
 
     # Encrypt csv file
     chunk_count = 0
@@ -89,28 +91,14 @@ def encrypt_dataset(
 
     logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
-    if not isinstance(public_key, rsa.RSAPublicKey):
-        raise TypeError("Public key is not RSA. Cannot use .encrypt().")
+    with open(kem_ciphertext_file, "wb") as file:
+        file.write(kem_ciphertext)
 
-    encrypted_sym_key = public_key.encrypt(
-        symkey,
-        padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=None,
-        ),
-    )
-
-    del symkey
+    del shared_secret
+    del fernet_key
     del fernet
 
-    # Store encrypted symkey to file
-    with open(encrypted_symkey_file, "wb") as file:
-        file.write(encrypted_sym_key)
-
-    logger.debug(
-        f"Key file for {csv_file} encrypted into {encrypted_symkey_file}"
-    )
+    logger.debug(f"ML-KEM ciphertext stored in {kem_ciphertext_file}")
 
 
 def tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
@@ -151,7 +139,7 @@ def tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
 
         files_to_tar.extend(
             [
-                dataset_dir / f"{dataset_name}.symkey.encr",
+                dataset_dir / f"{dataset_name}.kem.encr",
                 dataset_dir / f"{dataset_name}.md5",
             ]
         )
