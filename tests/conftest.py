@@ -7,11 +7,20 @@ from cryptography.hazmat.primitives.asymmetric import mlkem
 
 
 @pytest.fixture
+def output_dir(tmp_path: Path) -> Path:
+    return tmp_path / "output"
+
+
+@pytest.fixture
 def mlkem_keys_dir(tmp_path: Path):
     keys_dir = tmp_path / "mlkem_keys"
-    if not keys_dir.exists():
-        os.makedirs(keys_dir)
+    write_mlkem_key_pair(keys_dir)
+    return keys_dir
 
+
+def write_mlkem_key_pair(target_dir: Path) -> None:
+    if not target_dir.exists():
+        os.makedirs(target_dir)
     private_key = mlkem.MLKEM768PrivateKey.generate()
     public_key = private_key.public_key()
 
@@ -20,11 +29,11 @@ def mlkem_keys_dir(tmp_path: Path):
         format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
 
-    public_key_location = keys_dir / "microdata_public_key.pem"
+    public_key_location = target_dir / "microdata_public_key.pem"
     with open(public_key_location, "wb") as file:
         file.write(microdata_public_key_pem)
 
-    with open(keys_dir / "microdata_private_key.pem", "wb") as file:
+    with open(target_dir / "microdata_private_key.pem", "wb") as file:
         file.write(
             private_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
@@ -32,12 +41,6 @@ def mlkem_keys_dir(tmp_path: Path):
                 encryption_algorithm=serialization.NoEncryption(),
             )
         )
-    return keys_dir
-
-
-@pytest.fixture
-def output_dir(tmp_path: Path) -> Path:
-    return tmp_path / "output"
 
 
 def pytest_addoption(parser):

@@ -10,6 +10,7 @@ from microdata_tools.packaging.exceptions import (
     InvalidTarFileContents,
     UnpackagingError,
 )
+from tests.conftest import write_mlkem_key_pair
 
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_unpackage")
 INPUT_PACKAGE_DIR = Path("tests/resources/packaging/input_package")
@@ -155,3 +156,29 @@ def test_unpackage_dataset_failed(mlkem_keys_dir, output_dir):
 
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
+
+
+def test_unpackage_dataset_with_wrong_private_key_fails(
+    tmp_path, mlkem_keys_dir
+):
+    dataset_name = "VALID"
+    dataset_dir = Path(f"{INPUT_PACKAGE_DIR}/{dataset_name}")
+    package_output_dir = tmp_path / "packaged"
+    unpackage_output_dir = tmp_path / "unpackaged"
+
+    # Keypair used for encryption
+    encryption_keys_dir = mlkem_keys_dir
+
+    # Different keypair used for decryption
+    wrong_keys_dir = tmp_path / "wrong_mlkem_keys"
+    write_mlkem_key_pair(wrong_keys_dir)
+
+    package_dataset(
+        mlkem_keys_dir=encryption_keys_dir,
+        dataset_dir=dataset_dir,
+        output_dir=package_output_dir,
+    )
+
+    tarfile_path = package_output_dir / f"{dataset_name}.tar"
+    with raises(UnpackagingError):
+        unpackage_dataset(tarfile_path, wrong_keys_dir, unpackage_output_dir)
