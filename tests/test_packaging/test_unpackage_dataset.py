@@ -15,18 +15,28 @@ from microdata_tools.packaging.exceptions import (
 )
 from tests.test_packaging.test_package_dataset import _create_rsa_public_key
 
-RSA_KEYS_DIRECTORY = Path("tests/resources/packaging/rsa_test_key")
-INPUT_DIRECTORY = Path("tests/resources/packaging/input_unpackage")
-OUTPUT_DIRECTORY = Path("tests/resources/packaging/output")
+RSA_KEYS_DIRECTORY = Path("tmp/tests/resources/packaging/rsa_test_key")
+INPUT_DIRECTORY = Path("tmp/tests/resources/packaging/input_unpackage")
+OUTPUT_DIRECTORY = Path("tmp/tests/resources/packaging/output")
 
 
 def setup_function():
-    shutil.copytree("tests/resources", "tests/resources_backup")
+    try:
+        shutil.rmtree("tmp/tests/resources")
+    except Exception:
+        pass
+    shutil.copytree(
+        "tests/resources",
+        "tmp/tests/resources",
+        ignore=shutil.ignore_patterns("*big_datasets*"),
+    )
 
 
 def teardown_function():
-    shutil.rmtree("tests/resources")
-    shutil.move("tests/resources_backup", "tests/resources")
+    try:
+        shutil.rmtree("tmp/tests/resources")
+    except Exception:
+        pass
 
 
 def test_validate_tar_contents():
@@ -106,7 +116,7 @@ def test_unpackage_dataset():
 
 def test_unpackage_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     dataset_name = "VALID"
-    rsa_key = Path("tests/resources/rsa_keys")
+    rsa_key = Path("tmp/tests/resources/rsa_keys")
 
     _create_rsa_public_key(target_dir=rsa_key)
     assert Path(rsa_key / "microdata_public_key.pem").exists()
@@ -119,7 +129,7 @@ def test_unpackage_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
     package_dataset(
         rsa_keys_dir=rsa_key,
         dataset_dir=Path(
-            f"tests/resources/packaging/input_package/{dataset_name}"
+            f"tmp/tests/resources/packaging/input_package/{dataset_name}"
         ),
         output_dir=INPUT_DIRECTORY,
     )
@@ -141,7 +151,7 @@ def test_unpackage_dataset_multiple_chunks(monkeypatch: MonkeyPatch):
 
     actual = Path(output_dataset_dir / f"{dataset_name}.csv")
     expected = Path(
-        f"tests/resources/packaging/expected_unpackage/{dataset_name}_expected.csv"
+        f"tmp/tests/resources/packaging/expected_unpackage/{dataset_name}_expected.csv"
     )
     assert filecmp.cmp(actual, expected)
 
