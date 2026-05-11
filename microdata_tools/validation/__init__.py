@@ -2,7 +2,7 @@ import string
 from pathlib import Path
 from typing import List, Union
 
-from pyarrow import dataset, parquet
+import pyarrow
 
 from microdata_tools.validation.adapter import local_storage
 from microdata_tools.validation.components import unit_id_types
@@ -87,29 +87,31 @@ def validate_dataset(
         )
 
         # Read data
-        table = data_reader.read_and_sanitize_csv(
+        parquet_path = working_directory_path / f"{dataset_name}.parquet"
+        filesystem_dataset = data_reader.read_and_sanitize_csv_write_parquet(
             input_data_path,
+            parquet_path,
             identifier_data_type,
             measure_data_type,
             temporality_type,
         )
 
         # Enrich metadata with temporal data
-        temporal_data = data_reader.get_temporal_data(table, temporality_type)
+        temporal_data = data_reader.get_temporal_data(
+            filesystem_dataset, temporality_type
+        )
         metadata_enricher.enrich_with_temporal_coverage(
             metadata_dict, temporal_data
         )
 
         # Write files to working directory
-        parquet_path = working_directory_path / f"{dataset_name}.parquet"
-        parquet.write_table(table, parquet_path)
         local_storage.write_json(
             working_directory_path / f"{dataset_name}.json", metadata_dict
         )
 
         # Validate data
         dataset_validator.validate_dataset(
-            dataset.dataset(parquet_path),
+            pyarrow.dataset.dataset(parquet_path),
             measure_data_type,
             code_list,
             sentinel_list,

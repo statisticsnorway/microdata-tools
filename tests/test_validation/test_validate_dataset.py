@@ -81,7 +81,14 @@ def test_validate_valid_dataset_delete_generated_dir():
         ]
         assert not data_errors
         for file in temp_files:
-            assert file in ["tests", "docs", "microdata_tools"]
+            assert file in [
+                "tmp",
+                "mise-tasks",
+                "scripts",
+                "tests",
+                "docs",
+                "microdata_tools",
+            ]
 
 
 def test_validate_valid_dataset_delete_working_files():

@@ -59,7 +59,7 @@ def encrypt_dataset(
         )
 
     dataset_output_dir = output_dir / dataset_name
-    os.makedirs(dataset_output_dir)
+    os.makedirs(dataset_output_dir, exist_ok=True)
     os.makedirs(dataset_output_dir / "chunks", exist_ok=True)
 
     encrypted_symkey_file = dataset_output_dir / f"{dataset_name}.symkey.encr"
