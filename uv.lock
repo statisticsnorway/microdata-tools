@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer = "2026-05-16T08:38:36.12578Z"
 exclude-newer-span = "P3D"
 
 [[package]]
@@ -347,7 +347,7 @@ wheels = [
 
 [[package]]
 name = "microdata-tools"
-version = "1.12.1"
+version = "1.13.0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
