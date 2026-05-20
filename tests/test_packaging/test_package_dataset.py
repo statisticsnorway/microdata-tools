@@ -8,11 +8,11 @@ from microdata_tools import package_dataset
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_package")
 
 
-def test_package_dataset(mlkem_keys_dir, output_dir):
+def test_package_dataset(keys_dir, output_dir):
     dataset_name = "VALID"
 
     package_dataset(
-        mlkem_keys_dir=mlkem_keys_dir,
+        public_key_dir=keys_dir,
         dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=output_dir,
     )
@@ -37,7 +37,7 @@ def test_package_dataset(mlkem_keys_dir, output_dir):
 
 
 def test_package_dataset_multiple_chunks(
-    monkeypatch: MonkeyPatch, mlkem_keys_dir, output_dir
+    monkeypatch: MonkeyPatch, keys_dir, output_dir
 ):
     dataset_name = "VALID"
 
@@ -46,7 +46,7 @@ def test_package_dataset_multiple_chunks(
     )
 
     package_dataset(
-        mlkem_keys_dir=mlkem_keys_dir,
+        public_key_dir=keys_dir,
         dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=output_dir,
     )
@@ -72,11 +72,11 @@ def test_package_dataset_multiple_chunks(
         assert f"{dataset_name}.md5" in tarred_files
 
 
-def test_package_dataset_just_json(mlkem_keys_dir, output_dir):
+def test_package_dataset_just_json(keys_dir, output_dir):
     dataset_name = "ONLY_JSON"
 
     package_dataset(
-        mlkem_keys_dir=mlkem_keys_dir,
+        public_key_dir=keys_dir,
         dataset_dir=Path(f"{INPUT_DIRECTORY}/{dataset_name}"),
         output_dir=output_dir,
     )

@@ -7,10 +7,11 @@ from pytest import MonkeyPatch, fail, raises
 from microdata_tools import package_dataset, unpackage_dataset
 from microdata_tools.packaging._decrypt import _validate_tar_contents
 from microdata_tools.packaging.exceptions import (
+    InvalidKeyError,
     InvalidTarFileContents,
     UnpackagingError,
 )
-from tests.conftest import write_mlkem_key_pair
+from tests.conftest import write_combined_mlkem_x25519_key_files
 
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_unpackage")
 INPUT_PACKAGE_DIR = Path("tests/resources/packaging/input_package")
@@ -68,19 +69,19 @@ def test_validate_tar_contents_missing_chunk():
     )
 
 
-def test_unpackage_dataset(mlkem_keys_dir, tmp_path):
+def test_unpackage_dataset(keys_dir, tmp_path):
     dataset_name = "VALID"
     dataset_dir = Path(f"{INPUT_PACKAGE_DIR}/{dataset_name}")
     package_output_dir = tmp_path / "packaged"
     unpackage_output_dir = tmp_path / "unpackaged"
     package_dataset(
-        mlkem_keys_dir=mlkem_keys_dir,
+        public_key_dir=keys_dir,
         dataset_dir=dataset_dir,
         output_dir=package_output_dir,
     )
     tarfile_path = package_output_dir / f"{dataset_name}.tar"
 
-    unpackage_dataset(tarfile_path, mlkem_keys_dir, unpackage_output_dir)
+    unpackage_dataset(tarfile_path, keys_dir, unpackage_output_dir)
 
     output_dataset_dir = unpackage_output_dir / dataset_name
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
@@ -96,7 +97,7 @@ def test_unpackage_dataset(mlkem_keys_dir, tmp_path):
 
 
 def test_unpackage_dataset_multiple_chunks(
-    monkeypatch: MonkeyPatch, mlkem_keys_dir, tmp_path
+    monkeypatch: MonkeyPatch, keys_dir, tmp_path
 ):
     dataset_name = "VALID"
     dataset_dir = Path(f"{INPUT_PACKAGE_DIR}/{dataset_name}")
@@ -108,7 +109,7 @@ def test_unpackage_dataset_multiple_chunks(
     )
 
     package_dataset(
-        mlkem_keys_dir=mlkem_keys_dir,
+        public_key_dir=keys_dir,
         dataset_dir=dataset_dir,
         output_dir=package_output_dir,
     )
@@ -116,7 +117,7 @@ def test_unpackage_dataset_multiple_chunks(
     result_file = package_output_dir / f"{dataset_name}.tar"
     assert result_file.exists()
 
-    unpackage_dataset(result_file, mlkem_keys_dir, unpackage_output_dir)
+    unpackage_dataset(result_file, keys_dir, unpackage_output_dir)
 
     output_dataset_dir = unpackage_output_dir / dataset_name
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
@@ -133,11 +134,11 @@ def test_unpackage_dataset_multiple_chunks(
     assert filecmp.cmp(actual, expected)
 
 
-def test_unpackage_dataset_just_json(mlkem_keys_dir, output_dir):
+def test_unpackage_dataset_just_json(keys_dir, output_dir):
     dataset_name = "ONLY_JSON"
     packaged_file_path = INPUT_DIRECTORY / f"{dataset_name}.tar"
 
-    unpackage_dataset(packaged_file_path, mlkem_keys_dir, output_dir)
+    unpackage_dataset(packaged_file_path, keys_dir, output_dir)
 
     output_dataset_dir = output_dir / dataset_name
     assert Path(output_dataset_dir / f"{dataset_name}.json").exists()
@@ -148,37 +149,36 @@ def test_unpackage_dataset_just_json(mlkem_keys_dir, output_dir):
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
 
 
-def test_unpackage_dataset_failed(mlkem_keys_dir, output_dir):
+def test_unpackage_dataset_failed(keys_dir, output_dir):
     dataset_name = "MISSING_CHUNK"
     packaged_file_path = INPUT_DIRECTORY / f"{dataset_name}.tar"
     with raises(UnpackagingError):
-        unpackage_dataset(packaged_file_path, mlkem_keys_dir, output_dir)
+        unpackage_dataset(packaged_file_path, keys_dir, output_dir)
 
     assert Path(INPUT_DIRECTORY / f"{dataset_name}.tar").exists()
     assert not Path(INPUT_DIRECTORY / dataset_name).exists()
 
 
-def test_unpackage_dataset_with_wrong_private_key_fails(
-    tmp_path, mlkem_keys_dir
-):
+def test_unpackage_dataset_with_wrong_private_key_fails(tmp_path, keys_dir):
     dataset_name = "VALID"
     dataset_dir = Path(f"{INPUT_PACKAGE_DIR}/{dataset_name}")
     package_output_dir = tmp_path / "packaged"
     unpackage_output_dir = tmp_path / "unpackaged"
 
     # Keypair used for encryption
-    encryption_keys_dir = mlkem_keys_dir
+    encryption_keys_dir = keys_dir
 
     # Different keypair used for decryption
-    wrong_keys_dir = tmp_path / "wrong_mlkem_keys"
-    write_mlkem_key_pair(wrong_keys_dir)
+    wrong_keys_dir = tmp_path / "wrong_keys"
+    write_combined_mlkem_x25519_key_files(wrong_keys_dir)
 
     package_dataset(
-        mlkem_keys_dir=encryption_keys_dir,
+        public_key_dir=encryption_keys_dir,
         dataset_dir=dataset_dir,
         output_dir=package_output_dir,
     )
 
     tarfile_path = package_output_dir / f"{dataset_name}.tar"
-    with raises(UnpackagingError):
+    with raises(UnpackagingError) as e:
         unpackage_dataset(tarfile_path, wrong_keys_dir, unpackage_output_dir)
+    assert isinstance(e.value.__cause__, InvalidKeyError)

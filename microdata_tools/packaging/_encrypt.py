@@ -5,51 +5,61 @@ import tarfile
 from pathlib import Path
 
 from cryptography.fernet import Fernet
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import mlkem
+from cryptography.hazmat.primitives.hpke import (
+    AEAD,
+    KDF,
+    KEM,
+    MLKEM768X25519PublicKey,
+    Suite,
+)
 
-from microdata_tools.packaging._utils import check_exists, derive_fernet_key
+from microdata_tools.packaging._utils import (
+    check_exists,
+    load_hybrid_public_key,
+)
 from microdata_tools.packaging.exceptions import ValidationException
 
 logger = logging.getLogger()
 
 CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
+SUITE = Suite(KEM.MLKEM768_X25519, KDF.HKDF_SHA256, AEAD.AES_256_GCM)
+INFO = b"microdata-tools symmetric-key encryption"
+
 
 def encrypt_dataset(
-    mlkem_keys_dir: Path,
+    public_key_dir: Path,
     dataset_dir: Path,
     output_dir: Path,
 ) -> None:
     """
     Encrypts a dataset as follows:
-    1. Establishes a symmetric key for this dataset using the ML-KEM public key.
-    2. Splits the dataset into chunks.
-    3. Encrypts each chunk using the symmetric key.
+        1. Generates the symmetric key for this dataset.
+        2. Splits the dataset into chunks.
+        3. Encrypts each chunk using the symmetric key.
+        4. Uses HPKE with a hybrid ML-KEM-768/X25519 public key to encrypt the
+           symmetric key and stores the resulting encapsulated ciphertext.
     """
 
-    check_exists(mlkem_keys_dir)
+    check_exists(public_key_dir)
     check_exists(dataset_dir)
 
     if not output_dir.exists():
         os.makedirs(output_dir)
 
-    public_key_location = mlkem_keys_dir / "microdata_public_key.pem"
+    public_key_location = public_key_dir / "microdata_public_key.pem"
     check_exists(public_key_location)
 
     # Read public key from file
-    with open(public_key_location, "rb") as key_file:
-        public_key = serialization.load_pem_public_key(
-            key_file.read(), backend=default_backend()
-        )
-    if not isinstance(public_key, mlkem.MLKEM768PublicKey):
-        raise TypeError("Public key is not an ML-KEM-768 public key.")
+    public_key = load_hybrid_public_key(public_key_location)
 
+    if not isinstance(public_key, MLKEM768X25519PublicKey):
+        raise TypeError(
+            "Public key is not a hybrid ML-KEM-768-X25519 public key."
+        )
     csv_files = [
         file for file in dataset_dir.iterdir() if file.suffix == ".csv"
     ]
-
     csv_file = csv_files[0]
     dataset_name = csv_file.stem
 
@@ -65,10 +75,8 @@ def encrypt_dataset(
 
     kem_ciphertext_file = dataset_output_dir / f"{dataset_name}.kem.encr"
 
-    #
-    shared_secret, kem_ciphertext = public_key.encapsulate()
-    fernet_key = derive_fernet_key(shared_secret)
-    fernet = Fernet(fernet_key)
+    symkey = Fernet.generate_key()
+    fernet = Fernet(symkey)
 
     # Encrypt csv file
     chunk_count = 0
@@ -91,14 +99,24 @@ def encrypt_dataset(
 
     logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
+    # Encrypt symmetric key using HPKE and store the ciphertext
+    try:
+        kem_ciphertext = SUITE.encrypt(symkey, public_key, info=INFO)
+    except Exception as e:
+        raise ValidationException(
+            "Failed to encrypt the dataset key using HPKE. "
+            "Please check that the public key is valid and try again."
+        ) from e
+
     with open(kem_ciphertext_file, "wb") as file:
         file.write(kem_ciphertext)
 
-    del shared_secret
-    del fernet_key
+    del symkey
     del fernet
 
-    logger.debug(f"ML-KEM ciphertext stored in {kem_ciphertext_file}")
+    logger.debug(
+        f"HPKE-encrypted key ciphertext stored in {kem_ciphertext_file}"
+    )
 
 
 def tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:

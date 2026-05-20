@@ -6,23 +6,34 @@ from pathlib import Path
 from typing import List, Tuple
 
 from cryptography.fernet import Fernet, InvalidToken
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import mlkem
+from cryptography.hazmat.primitives.hpke import (
+    AEAD,
+    KDF,
+    KEM,
+    MLKEM768X25519PrivateKey,
+    Suite,
+)
 
-from microdata_tools.packaging._utils import check_exists, derive_fernet_key
+from microdata_tools.packaging._utils import (
+    check_exists,
+    load_hybrid_private_key,
+)
 from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
 )
 
+SUITE = Suite(KEM.MLKEM768_X25519, KDF.HKDF_SHA256, AEAD.AES_256_GCM)
+INFO = b"microdata-tools symmetric-key encryption"
+
 logger = logging.getLogger()
 
 
-def decrypt(mlkem_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
+def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
     """
     Decrypts a dataset as follows:
-        1. Recovers the symmetric key using the ML-KEM private key.
+        1. Recovers the symmetric key using the hybrid private key
+           (HPKE with ML-KEM-768 + X25519).
         2. Decrypts each chunk using the symmetric key.
         3. Merges the decrypted chunks into a single file.
     """
@@ -39,30 +50,35 @@ def decrypt(mlkem_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
     decrypted_dir = output_dataset_dir / "decrypted"
     os.makedirs(decrypted_dir, exist_ok=True)
 
-    if not output_dataset_dir.exists():
-        os.makedirs(output_dataset_dir)
-
     if chunk_dir.exists() and first_encrypted_chunk.exists():
         logger.info(f"Encrypted file found in {dataset_dir}")
 
-        with open(
-            Path(mlkem_keys_dir / "microdata_private_key.pem"), "rb"
-        ) as key_file:
-            private_key = serialization.load_pem_private_key(
-                key_file.read(), password=None, backend=default_backend()
+        # Read private key from file
+        private_key = load_hybrid_private_key(
+            Path(private_key_dir / "microdata_private_key.pem")
+        )
+
+        if not isinstance(private_key, MLKEM768X25519PrivateKey):
+            raise TypeError(
+                "Private key is not a hybrid ML-KEM-768-X25519 private key."
             )
-
-        if not isinstance(private_key, mlkem.MLKEM768PrivateKey):
-            raise TypeError("Private key is not an ML-KEM-768 private key.")
-
+        # Read the kem ciphertext from file and recover the symmetric key
         kem_ciphertext_path = Path(dataset_dir / f"{dataset_name}.kem.encr")
         check_exists(kem_ciphertext_path)
 
         with open(kem_ciphertext_path, "rb") as f:
             kem_ciphertext = f.read()
-            shared_secret = private_key.decapsulate(kem_ciphertext)
-            fernet_key = derive_fernet_key(shared_secret)
-            fernet = Fernet(fernet_key)
+
+        try:
+            decrypted_symkey = SUITE.decrypt(
+                kem_ciphertext, private_key, info=INFO
+            )
+        except Exception as e:
+            raise InvalidKeyError(
+                "Unable to recover symmetric key. Is the private key correct?"
+            ) from e
+
+        fernet = Fernet(decrypted_symkey)
 
         # Decrypt all the encrypted csv files in the directory
         for encrypted_file in chunk_dir.iterdir():
@@ -87,7 +103,7 @@ def decrypt(mlkem_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
 
                 logger.debug(f"Decrypted {encrypted_file}")
 
-        del fernet_key
+        del decrypted_symkey
         del fernet
 
         # Merges the decrypted csv files into a single file
