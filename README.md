@@ -21,7 +21,7 @@ The CSV file is optional in some cases.
 The `package_dataset()` function will encrypt and package your dataset as a tar archive. The process is as follows:
 
 1. Generate the symmetric key for a dataset.
-2. Encrypt the dataset data (CSV) using the symmetric key and store the encrypted file as `<DATASET_NAME>.csv.encr`
+2. Encrypt the dataset data (CSV) using an AES-256-GCM symmetric key and store the encrypted file as `<DATASET_NAME>.csv.encr`
 3. Encrypt the symmetric key using HPKE with the combined ML-KEM-768/X25519 public key from `microdata_public_key.pem` and store the resulting HPKE ciphertext as <DATASET_NAME>.kem.encr
 4. Gather the encrypted CSV, ciphertext file and metadata (JSON) file in one tar file.
 

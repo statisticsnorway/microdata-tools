@@ -4,7 +4,7 @@ import shutil
 import tarfile
 from pathlib import Path
 
-from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.hpke import (
     AEAD,
     KDF,
@@ -22,7 +22,7 @@ from microdata_tools.packaging.exceptions import ValidationException
 logger = logging.getLogger()
 
 CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
-
+NONCE_SIZE_BYTES = 12
 SUITE = Suite(KEM.MLKEM768_X25519, KDF.HKDF_SHA256, AEAD.AES_256_GCM)
 INFO = b"microdata-tools symmetric-key encryption"
 
@@ -73,10 +73,10 @@ def encrypt_dataset(
     os.makedirs(dataset_output_dir)
     os.makedirs(dataset_output_dir / "chunks", exist_ok=True)
 
-    kem_ciphertext_file = dataset_output_dir / f"{dataset_name}.kem.encr"
+    hpke_ciphertext_file = dataset_output_dir / f"{dataset_name}.kem.encr"
 
-    symkey = Fernet.generate_key()
-    fernet = Fernet(symkey)
+    symkey = AESGCM.generate_key(bit_length=256)
+    aesgcm = AESGCM(symkey)
 
     # Encrypt csv file
     chunk_count = 0
@@ -89,7 +89,9 @@ def encrypt_dataset(
                 break
 
             chunk_count += 1
-            encrypted = fernet.encrypt(data)
+            nonce = os.urandom(NONCE_SIZE_BYTES)
+            # The nonce is stored along with the ciphertext to decrypt later
+            encrypted = nonce + aesgcm.encrypt(nonce, data, None)
 
             chunk_file = (
                 dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
@@ -101,21 +103,21 @@ def encrypt_dataset(
 
     # Encrypt symmetric key using HPKE and store the ciphertext
     try:
-        kem_ciphertext = SUITE.encrypt(symkey, public_key, info=INFO)
+        hpke_ciphertext = SUITE.encrypt(symkey, public_key, info=INFO)
     except Exception as e:
         raise ValidationException(
             "Failed to encrypt the dataset key using HPKE. "
             "Please check that the public key is valid and try again."
         ) from e
 
-    with open(kem_ciphertext_file, "wb") as file:
-        file.write(kem_ciphertext)
+    with open(hpke_ciphertext_file, "wb") as file:
+        file.write(hpke_ciphertext)
 
     del symkey
-    del fernet
+    del aesgcm
 
     logger.debug(
-        f"HPKE-encrypted key ciphertext stored in {kem_ciphertext_file}"
+        f"HPKE-encrypted key ciphertext stored in {hpke_ciphertext_file}"
     )
 
 

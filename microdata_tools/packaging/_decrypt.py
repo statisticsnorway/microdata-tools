@@ -5,7 +5,8 @@ import tarfile
 from pathlib import Path
 from typing import List, Tuple
 
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.exceptions import InvalidTag
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.hpke import (
     AEAD,
     KDF,
@@ -23,6 +24,7 @@ from microdata_tools.packaging.exceptions import (
     InvalidTarFileContents,
 )
 
+NONCE_SIZE_BYTES = 12
 SUITE = Suite(KEM.MLKEM768_X25519, KDF.HKDF_SHA256, AEAD.AES_256_GCM)
 INFO = b"microdata-tools symmetric-key encryption"
 
@@ -62,23 +64,23 @@ def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
             raise TypeError(
                 "Private key is not a hybrid ML-KEM-768-X25519 private key."
             )
-        # Read the kem ciphertext from file and recover the symmetric key
-        kem_ciphertext_path = Path(dataset_dir / f"{dataset_name}.kem.encr")
-        check_exists(kem_ciphertext_path)
+        # Read the hpke ciphertext from file and recover the symmetric key
+        hpke_ciphertext_path = Path(dataset_dir / f"{dataset_name}.kem.encr")
+        check_exists(hpke_ciphertext_path)
 
-        with open(kem_ciphertext_path, "rb") as f:
-            kem_ciphertext = f.read()
+        with open(hpke_ciphertext_path, "rb") as f:
+            hpke_ciphertext = f.read()
 
         try:
             decrypted_symkey = SUITE.decrypt(
-                kem_ciphertext, private_key, info=INFO
+                hpke_ciphertext, private_key, info=INFO
             )
         except Exception as e:
             raise InvalidKeyError(
                 "Unable to recover symmetric key. Is the private key correct?"
             ) from e
 
-        fernet = Fernet(decrypted_symkey)
+        aesgcm = AESGCM(decrypted_symkey)
 
         # Decrypt all the encrypted csv files in the directory
         for encrypted_file in chunk_dir.iterdir():
@@ -88,14 +90,18 @@ def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
                 # Decrypt csv file
                 with open(encrypted_file, "rb") as file:
                     data = file.read()
+                    nonce, ciphertext = (
+                        data[:NONCE_SIZE_BYTES],
+                        data[NONCE_SIZE_BYTES:],
+                    )
 
                 try:
-                    decrypted_data = fernet.decrypt(data)
+                    decrypted_data = aesgcm.decrypt(nonce, ciphertext, None)
 
                     with open(decrypted_dir / f"{csv_file}", "wb") as file:
                         file.write(decrypted_data)
 
-                except InvalidToken as exc:
+                except InvalidTag as exc:
                     raise InvalidKeyError(
                         f"Not able to decrypt {encrypted_file}, "
                         f"is symkey correct?"
@@ -104,7 +110,7 @@ def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
                 logger.debug(f"Decrypted {encrypted_file}")
 
         del decrypted_symkey
-        del fernet
+        del aesgcm
 
         # Merges the decrypted csv files into a single file
         _combine_csv_files(decrypted_dir, dataset_dir / f"{dataset_name}.csv")
