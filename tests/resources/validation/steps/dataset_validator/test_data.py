@@ -195,6 +195,10 @@ _EVENT_VALID_DICT = {
     "stop_epoch_days": [18670, 18680, 18627, None],
 }
 EVENT_VALID_DS = _dataset_from_dict("EVENT_VALID_DS", _EVENT_VALID_DICT)
+EVENT_INVALID_OVERLAP_DS = _dataset_from_dict(
+    "EVENT_INVALID_OVERLAP_DS",
+    {**_EVENT_VALID_DICT, "start_epoch_days": [18626, 18670, 18626, 18626]},
+)
 EVENT_INVALID_START_DS = _dataset_from_dict(
     "EVENT_INVALID_START_DS",
     {**_EVENT_VALID_DICT, "start_epoch_days": [None, 18271, 18626, 18626]},

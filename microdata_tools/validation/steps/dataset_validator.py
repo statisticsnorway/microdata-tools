@@ -291,7 +291,7 @@ def _no_overlapping_timespans_check(data: FileSystemDataset) -> None:
                     f"({from_epoch_days_to_date(start_list[i + 1])} - "
                     f"{from_epoch_days_to_date(stop_list[i + 1])})"
                 )
-            if stop_list[i] > start_list[i + 1]:
+            if stop_list[i] >= start_list[i + 1]:
                 return (
                     f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
                     f"{from_epoch_days_to_date(stop_list[i])}) "
