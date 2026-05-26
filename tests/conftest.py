@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 
 import pytest
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import mlkem, x25519
+
+from microdata_tools.keys import PrivateKey
 
 
 @pytest.fixture
@@ -12,45 +12,18 @@ def output_dir(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def keys_dir(tmp_path: Path):
+def keys_dir(tmp_path: Path) -> Path:
     keys_dir = tmp_path / "keys_dir"
-    write_combined_mlkem_x25519_key_files(keys_dir)
+    generate_keys(keys_dir)
     return keys_dir
 
 
-def write_combined_mlkem_x25519_key_files(target_dir: Path) -> None:
-    if not target_dir.exists():
-        os.makedirs(target_dir)
-    mlkem_private_key = mlkem.MLKEM768PrivateKey.generate()
-    x25519_private_key = x25519.X25519PrivateKey.generate()
-
-    mlkem_priv_pem = mlkem_private_key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
-    x25519_priv_pem = x25519_private_key.private_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption(),
-    )
-
-    mlkem_pub_pem = mlkem_private_key.public_key().public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    )
-    x25519_pub_pem = x25519_private_key.public_key().public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo,
-    )
-
-    with open(target_dir / "microdata_public_key.pem", "wb") as file:
-        file.write(mlkem_pub_pem)
-        file.write(x25519_pub_pem)
-
-    with open(target_dir / "microdata_private_key.pem", "wb") as file:
-        file.write(mlkem_priv_pem)
-        file.write(x25519_priv_pem)
+def generate_keys(keys_dir: Path) -> None:
+    if not keys_dir.exists():
+        os.makedirs(keys_dir)
+    private_key = PrivateKey.generate()
+    private_key.write_to_file(keys_dir)
+    private_key.public_key().write_to_file(keys_dir)
 
 
 def pytest_addoption(parser):

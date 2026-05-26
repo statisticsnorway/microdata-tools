@@ -11,7 +11,7 @@ from microdata_tools.packaging.exceptions import (
     InvalidTarFileContents,
     UnpackagingError,
 )
-from tests.conftest import write_combined_mlkem_x25519_key_files
+from tests.conftest import generate_keys
 
 INPUT_DIRECTORY = Path("tests/resources/packaging/input_unpackage")
 INPUT_PACKAGE_DIR = Path("tests/resources/packaging/input_package")
@@ -170,7 +170,7 @@ def test_unpackage_dataset_with_wrong_private_key_fails(tmp_path, keys_dir):
 
     # Different keypair used for decryption
     wrong_keys_dir = tmp_path / "wrong_keys"
-    write_combined_mlkem_x25519_key_files(wrong_keys_dir)
+    generate_keys(wrong_keys_dir)
 
     package_dataset(
         public_key_dir=encryption_keys_dir,

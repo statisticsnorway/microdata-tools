@@ -13,9 +13,9 @@ from cryptography.hazmat.primitives.hpke import (
     Suite,
 )
 
+from microdata_tools.keys import PublicKey
 from microdata_tools.packaging._utils import (
     check_exists,
-    load_hybrid_public_key,
 )
 from microdata_tools.packaging.exceptions import ValidationException
 
@@ -51,7 +51,7 @@ def encrypt_dataset(
     check_exists(public_key_location)
 
     # Read public key from file
-    public_key = load_hybrid_public_key(public_key_location)
+    public_key = PublicKey.load_from_file(public_key_location).to_hpke_key()
 
     if not isinstance(public_key, MLKEM768X25519PublicKey):
         raise TypeError(

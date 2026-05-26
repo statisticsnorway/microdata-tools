@@ -15,9 +15,9 @@ from cryptography.hazmat.primitives.hpke import (
     Suite,
 )
 
+from microdata_tools.keys import PrivateKey
 from microdata_tools.packaging._utils import (
     check_exists,
-    load_hybrid_private_key,
 )
 from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
@@ -56,9 +56,9 @@ def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
         logger.info(f"Encrypted file found in {dataset_dir}")
 
         # Read private key from file
-        private_key = load_hybrid_private_key(
+        private_key = PrivateKey.load_from_file(
             Path(private_key_dir / "microdata_private_key.pem")
-        )
+        ).to_hpke_key()
 
         if not isinstance(private_key, MLKEM768X25519PrivateKey):
             raise TypeError(
