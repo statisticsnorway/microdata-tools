@@ -130,7 +130,13 @@ class PublicKey:
     def load_from_file(cls, path: Path) -> "PublicKey":
         """Loads a hybrid public key from a PEM file containing one
         ML-KEM-768 and one X25519 PUBLIC KEY block, in any order."""
-        blocks = PEM_PUBLIC_BLOCK.findall(path.read_bytes())
+        return cls.from_pem(path.read_bytes())
+
+    @classmethod
+    def from_pem(cls, pem_data: bytes) -> "PublicKey":
+        """Loads a hybrid public key from PEM data containing one
+        ML-KEM-768 and one X25519 PUBLIC KEY block, in any order."""
+        blocks = PEM_PUBLIC_BLOCK.findall(pem_data)
         if len(blocks) != 2:
             raise ValueError(
                 "Expected 2 PEM blocks in hybrid public key file, "
