@@ -8,14 +8,15 @@ from typing import List, Tuple
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.hpke import (
-    AEAD,
-    KDF,
-    KEM,
     MLKEM768X25519PrivateKey,
-    Suite,
 )
 
 from microdata_tools.keys import PrivateKey
+from microdata_tools.packaging._crypto_config import (
+    HPKE_INFO,
+    HPKE_SUITE,
+    NONCE_SIZE_BYTES,
+)
 from microdata_tools.packaging._utils import (
     check_exists,
 )
@@ -23,10 +24,6 @@ from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
 )
-
-NONCE_SIZE_BYTES = 12
-SUITE = Suite(KEM.MLKEM768_X25519, KDF.HKDF_SHA256, AEAD.AES_256_GCM)
-INFO = b"microdata-tools symmetric-key encryption"
 
 logger = logging.getLogger()
 
@@ -72,8 +69,8 @@ def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
             hpke_ciphertext = f.read()
 
         try:
-            decrypted_symkey = SUITE.decrypt(
-                hpke_ciphertext, private_key, info=INFO
+            decrypted_symkey = HPKE_SUITE.decrypt(
+                hpke_ciphertext, private_key, info=HPKE_INFO
             )
         except Exception as e:
             raise InvalidKeyError(

@@ -6,14 +6,15 @@ from pathlib import Path
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.hpke import (
-    AEAD,
-    KDF,
-    KEM,
     MLKEM768X25519PublicKey,
-    Suite,
 )
 
 from microdata_tools.keys import PublicKey
+from microdata_tools.packaging._crypto_config import (
+    HPKE_INFO,
+    HPKE_SUITE,
+    NONCE_SIZE_BYTES,
+)
 from microdata_tools.packaging._utils import (
     check_exists,
 )
@@ -22,9 +23,6 @@ from microdata_tools.packaging.exceptions import ValidationException
 logger = logging.getLogger()
 
 CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
-NONCE_SIZE_BYTES = 12
-SUITE = Suite(KEM.MLKEM768_X25519, KDF.HKDF_SHA256, AEAD.AES_256_GCM)
-INFO = b"microdata-tools symmetric-key encryption"
 
 
 def encrypt_dataset(
@@ -103,7 +101,7 @@ def encrypt_dataset(
 
     # Encrypt symmetric key using HPKE and store the ciphertext
     try:
-        hpke_ciphertext = SUITE.encrypt(symkey, public_key, info=INFO)
+        hpke_ciphertext = HPKE_SUITE.encrypt(symkey, public_key, info=HPKE_INFO)
     except Exception as e:
         raise ValidationException(
             "Failed to encrypt the dataset key using HPKE. "
