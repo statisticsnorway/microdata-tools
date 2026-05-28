@@ -200,6 +200,22 @@ def test_temporality_event():
     ]
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
+            test_data.EVENT_INVALID_OVERLAP_DS,
+            "STRING",
+            None,
+            None,
+            "EVENT",
+        )
+    assert e.value.errors == [
+        (
+            'Invalid overlapping timespans for identifier "1": '
+            "timespan: (2020-12-30 - 2021-02-12) overlaps with "
+            "timespan: (2021-02-12 - 2021-02-22)"
+        )
+    ]
+
+    with pytest.raises(ValidationError) as e:
+        dataset_validator.validate_dataset(
             test_data.EVENT_INVALID_TIMESPANS_DS,
             "STRING",
             None,

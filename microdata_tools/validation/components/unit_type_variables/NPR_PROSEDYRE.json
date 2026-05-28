@@ -1,0 +1,62 @@
+{
+    "shortName": "NPR_PROSEDYREID",
+    "name": [
+      {
+        "languageCode": "no",
+        "value": "Prosedyreidentifikator"
+      },
+      {
+        "languageCode": "en",
+        "value": "Procedure identifier"
+      }
+    ],
+    "description": [
+      {
+        "languageCode": "no",
+        "value": "Identifikator for NPR-prosedyre"
+      },
+      {
+        "languageCode": "en",
+        "value": "Identifier for NPR procedure"
+      }
+    ],
+    "dataType": "STRING",
+    "unitType": {
+      "shortName": "NPR_PROSEDYRE",
+      "requiresPseudonymization": true,
+      "name": [
+        {
+          "languageCode": "no",
+          "value": "Prosedyre NPR"
+        },
+        {
+          "languageCode": "en",
+          "value": "Procedure NPR"
+        }
+      ],
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pasientrettet tiltak kategorisert etter en normgivende beskrivelse eller et kodeverk."
+        },
+        {
+          "languageCode": "en",
+          "value": "A patient‑oriented intervention categorized according to a normative description or coding classification."
+        }
+      ]
+    },
+    "format": "RandomUInt48",
+    "valueDomain": {
+      "description": [
+        {
+          "languageCode": "no",
+          "value": "Pseudonymisert prosedyreidentifikator"
+        },
+        {
+          "languageCode": "en",
+          "value": "Pseudonomized procedure identifier"
+        }
+      ]
+    }
+  }
+ 
