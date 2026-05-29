@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.hpke import (
     MLKEM768X25519PublicKey,
 )
 
-from microdata_tools.keys import PrivateKey, PublicKey
+from microdata_tools.packaging.keys import PrivateKey, PublicKey
 
 
 def test_generate_and_serialize_keys(tmp_path: Path):

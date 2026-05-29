@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from microdata_tools.keys import PrivateKey
+from microdata_tools.packaging.keys import PrivateKey
 
 
 @pytest.fixture

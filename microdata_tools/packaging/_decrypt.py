@@ -11,7 +11,6 @@ from cryptography.hazmat.primitives.hpke import (
     MLKEM768X25519PrivateKey,
 )
 
-from microdata_tools.keys import PrivateKey
 from microdata_tools.packaging._crypto_config import (
     HPKE_INFO,
     HPKE_SUITE,
@@ -24,6 +23,7 @@ from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
 )
+from microdata_tools.packaging.keys import PrivateKey
 
 logger = logging.getLogger()
 

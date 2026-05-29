@@ -9,7 +9,6 @@ from cryptography.hazmat.primitives.hpke import (
     MLKEM768X25519PublicKey,
 )
 
-from microdata_tools.keys import PublicKey
 from microdata_tools.packaging._crypto_config import (
     HPKE_INFO,
     HPKE_SUITE,
@@ -19,6 +18,7 @@ from microdata_tools.packaging._utils import (
     check_exists,
 )
 from microdata_tools.packaging.exceptions import ValidationException
+from microdata_tools.packaging.keys import PublicKey
 
 logger = logging.getLogger()
 
