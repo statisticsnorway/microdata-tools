@@ -4,13 +4,21 @@ import shutil
 import tarfile
 from pathlib import Path
 
-from cryptography.fernet import Fernet
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.hpke import (
+    MLKEM768X25519PublicKey,
+)
 
-from microdata_tools.packaging._utils import check_exists
+from microdata_tools.packaging._crypto_config import (
+    HPKE_INFO,
+    HPKE_SUITE,
+    NONCE_SIZE_BYTES,
+)
+from microdata_tools.packaging._utils import (
+    check_exists,
+)
 from microdata_tools.packaging.exceptions import ValidationException
+from microdata_tools.packaging.keys import PublicKey
 
 logger = logging.getLogger()
 
@@ -18,7 +26,7 @@ CHUNK_SIZE_BYTES = 250_000_000  # 250 MB per chunk
 
 
 def encrypt_dataset(
-    rsa_keys_dir: Path,
+    public_key_dir: Path,
     dataset_dir: Path,
     output_dir: Path,
 ) -> None:
@@ -27,28 +35,29 @@ def encrypt_dataset(
         1. Generates the symmetric key for this dataset.
         2. Splits the dataset into chunks.
         3. Encrypts each chunk using the symmetric key.
-        4. Encrypts the symmetric key using the RSA public key.
+        4. Uses HPKE with a hybrid ML-KEM-768/X25519 public key to encrypt the
+           symmetric key and stores the resulting encapsulated ciphertext.
     """
 
-    check_exists(rsa_keys_dir)
+    check_exists(public_key_dir)
     check_exists(dataset_dir)
 
     if not output_dir.exists():
         os.makedirs(output_dir)
 
-    public_key_location = rsa_keys_dir / "microdata_public_key.pem"
+    public_key_location = public_key_dir / "microdata_public_key.pem"
     check_exists(public_key_location)
 
     # Read public key from file
-    with open(public_key_location, "rb") as key_file:
-        public_key = serialization.load_pem_public_key(
-            key_file.read(), backend=default_backend()
-        )
+    public_key = PublicKey.load_from_file(public_key_location).to_hpke_key()
 
+    if not isinstance(public_key, MLKEM768X25519PublicKey):
+        raise TypeError(
+            "Public key is not a hybrid ML-KEM-768-X25519 public key."
+        )
     csv_files = [
         file for file in dataset_dir.iterdir() if file.suffix == ".csv"
     ]
-
     csv_file = csv_files[0]
     dataset_name = csv_file.stem
 
@@ -62,11 +71,10 @@ def encrypt_dataset(
     os.makedirs(dataset_output_dir)
     os.makedirs(dataset_output_dir / "chunks", exist_ok=True)
 
-    encrypted_symkey_file = dataset_output_dir / f"{dataset_name}.symkey.encr"
+    hpke_ciphertext_file = dataset_output_dir / f"{dataset_name}.kem.encr"
 
-    # Generate and store symmetric key for this file
-    symkey = Fernet.generate_key()
-    fernet = Fernet(symkey)
+    symkey = AESGCM.generate_key(bit_length=256)
+    aesgcm = AESGCM(symkey)
 
     # Encrypt csv file
     chunk_count = 0
@@ -79,7 +87,9 @@ def encrypt_dataset(
                 break
 
             chunk_count += 1
-            encrypted = fernet.encrypt(data)
+            nonce = os.urandom(NONCE_SIZE_BYTES)
+            # The nonce is stored along with the ciphertext to decrypt later
+            encrypted = nonce + aesgcm.encrypt(nonce, data, None)
 
             chunk_file = (
                 dataset_output_dir / "chunks" / f"{chunk_count}.csv.encr"
@@ -89,27 +99,23 @@ def encrypt_dataset(
 
     logger.debug(f"Csv file {csv_file} encrypted into {chunk_count} chunks")
 
-    if not isinstance(public_key, rsa.RSAPublicKey):
-        raise TypeError("Public key is not RSA. Cannot use .encrypt().")
+    # Encrypt symmetric key using HPKE and store the ciphertext
+    try:
+        hpke_ciphertext = HPKE_SUITE.encrypt(symkey, public_key, info=HPKE_INFO)
+    except Exception as e:
+        raise ValidationException(
+            "Failed to encrypt the dataset key using HPKE. "
+            "Please check that the public key is valid and try again."
+        ) from e
 
-    encrypted_sym_key = public_key.encrypt(
-        symkey,
-        padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=None,
-        ),
-    )
+    with open(hpke_ciphertext_file, "wb") as file:
+        file.write(hpke_ciphertext)
 
     del symkey
-    del fernet
-
-    # Store encrypted symkey to file
-    with open(encrypted_symkey_file, "wb") as file:
-        file.write(encrypted_sym_key)
+    del aesgcm
 
     logger.debug(
-        f"Key file for {csv_file} encrypted into {encrypted_symkey_file}"
+        f"HPKE-encrypted key ciphertext stored in {hpke_ciphertext_file}"
     )
 
 
@@ -151,7 +157,7 @@ def tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
 
         files_to_tar.extend(
             [
-                dataset_dir / f"{dataset_name}.symkey.encr",
+                dataset_dir / f"{dataset_name}.kem.encr",
                 dataset_dir / f"{dataset_name}.md5",
             ]
         )
