@@ -46,3 +46,10 @@ jobs:
 
     - name: Run tests
       run: uv run pytest --cov=microdata_tools
+
+    - uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+      with:
+        inputs: .github/
+        advanced-security: false
+        min-severity: low
+        min-confidence: low
