@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions: {}
+
 jobs:
   test:
     name: Test
@@ -17,6 +23,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -25,7 +33,7 @@ jobs:
 
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-    
+
     - name: Sync dependencies
       run: uv sync
 
@@ -39,12 +47,14 @@ jobs:
       name: pypi
       url: https://pypi.org/p/microdata-tools
     permissions:
-      id-token: write
+      id-token: write # Required for PyPI trusted publishing (OIDC) via pypa/gh-action-pypi-publish
     needs: test
     if: success()
     steps:
     - name: Checkout code
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
 
     - name: Set up Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -53,7 +63,9 @@ jobs:
 
     - name: Install the latest version of uv
       uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-    
+      with:
+        enable-cache: false
+
     - name: Sync dependencies
       run: uv sync
 
@@ -68,14 +80,14 @@ jobs:
     name: Release pushed tag
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: write
-      pull-requests: read
+      contents: write # Required to push the git tag and let release-drafter create/publish the release
+      pull-requests: read # Required for release-drafter to read merged PRs when building release notes
     steps:
       - name: Check out the repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 2
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -84,7 +96,9 @@ jobs:
 
       - name: Install the latest version of uv
         uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-    
+        with:
+          enable-cache: false
+
       - name: Sync dependencies
         run: uv sync
 
