@@ -53,3 +53,4 @@ jobs:
         advanced-security: false
         min-severity: low
         min-confidence: low
+        online-audits: false
