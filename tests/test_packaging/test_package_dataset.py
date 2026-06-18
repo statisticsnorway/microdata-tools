@@ -10,18 +10,24 @@ from pytest import MonkeyPatch
 
 from microdata_tools import package_dataset
 
-RSA_KEYS_DIRECTORY = Path("tests/resources/packaging/rsa_keys")
-INPUT_DIRECTORY = Path("tests/resources/packaging/input_package")
-OUTPUT_DIRECTORY = Path("tests/resources/packaging/output")
+RSA_KEYS_DIRECTORY = Path("tmp/tests/resources/packaging/rsa_keys")
+INPUT_DIRECTORY = Path("tmp/tests/resources/packaging/input_package")
+OUTPUT_DIRECTORY = Path("tmp/tests/resources/packaging/output")
 
 
 def setup_function():
-    shutil.copytree("tests/resources", "tests/resources_backup")
+    if os.path.exists("tmp/tests/resources"):
+        shutil.rmtree("tmp/tests/resources")
+    shutil.copytree(
+        "tests/resources",
+        "tmp/tests/resources",
+        ignore=shutil.ignore_patterns("*big_datasets*"),
+    )
 
 
 def teardown_function():
-    shutil.rmtree("tests/resources")
-    shutil.move("tests/resources_backup", "tests/resources")
+    if os.path.exists("tmp/tests/resources"):
+        shutil.rmtree("tmp/tests/resources")
 
 
 def test_package_dataset():
