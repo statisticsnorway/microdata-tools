@@ -1,9 +1,12 @@
 # pyright: reportAttributeAccessIssue=false
 import logging
+import os.path
+import sqlite3
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Tuple
 
+import adbc_driver_sqlite.dbapi
 import pyarrow
 import pyarrow.dataset
 import pyarrow.dataset as ds
@@ -74,40 +77,57 @@ def _get_csv_convert_options(
     )
 
 
-def _csv_stream_to_parquet(
+def _csv_stream_to_sqlite_and_parquet(
     identifier_data_type: str,
     measure_data_type: str,
     temporality_type: str,
     reader: pyarrow.csv.CSVStreamingReader,
     writer: pyarrow.parquet.ParquetWriter,
+    conn: sqlite3.Connection,
 ) -> None:
-    while True:
-        try:
-            batch = reader.read_next_batch()
-        except StopIteration:
-            break
-        table = pyarrow.Table.from_batches([batch])
-        unit_id = _sanitize_unit_id(table, identifier_data_type)
-        value = _sanitize_value(table, measure_data_type)
-        epoch_start = _cast_to_epoch_date(table, "start")
-        epoch_stop = _cast_to_epoch_date(table, "stop")
-        columns = [unit_id, value, epoch_start, epoch_stop]
-        column_names = [
-            "unit_id",
-            "value",
-            "start_epoch_days",
-            "stop_epoch_days",
-        ]
-        if temporality_type in ["STATUS", "ACCUMULATED"]:
-            columns.append(_generate_start_year(table))
-            column_names.append("start_year")
-        table = pyarrow.Table.from_arrays(columns, column_names)
-        writer.write_table(table)
+    with conn.cursor() as cursor:
+        while True:
+            try:
+                batch = reader.read_next_batch()
+            except StopIteration:
+                logger.debug("End of file reached for CSV file")
+                break
+            table = pyarrow.Table.from_batches([batch])
+            unit_id = _sanitize_unit_id(table, identifier_data_type)
+            value = _sanitize_value(table, measure_data_type)
+            epoch_start = _cast_to_epoch_date(table, "start")
+            epoch_stop = _cast_to_epoch_date(table, "stop")
+            columns = [unit_id, value, epoch_start, epoch_stop]
+            column_names = [
+                "unit_id",
+                "value",
+                "start_epoch_days",
+                "stop_epoch_days",
+            ]
+            if temporality_type in ["STATUS", "ACCUMULATED"]:
+                columns.append(_generate_start_year(table))
+                column_names.append("start_year")
+            table = pyarrow.Table.from_arrays(columns, column_names)
+            writer.write_table(table)
+
+            column_names2 = [
+                "unit_id",
+                "start_epoch_days",
+                "stop_epoch_days",
+            ]
+            columns2 = [unit_id, epoch_start, epoch_stop]
+            cursor.adbc_ingest(
+                "dataset",
+                pyarrow.Table.from_arrays(columns2, column_names2),
+                mode="append",
+            )
+            conn.commit()
 
 
-def _csv_to_parquet(
+def _csv_to_sqlite_and_parquet(
     input_csv_path: Path,
-    output_parquet_path: str,
+    output_parquet_path: Path,
+    conn: sqlite3.Connection,
     identifier_data_type: str,
     measure_data_type: str,
     temporality_type: str,
@@ -141,13 +161,20 @@ def _csv_to_parquet(
                 schema_list.append(("start_year", pyarrow.string()))
             schema = pyarrow.schema(schema_list)
             with parquet.ParquetWriter(output_parquet_path, schema) as writer:
-                _csv_stream_to_parquet(
+                _csv_stream_to_sqlite_and_parquet(
                     identifier_data_type,
                     measure_data_type,
                     temporality_type,
                     reader,
                     writer,
+                    conn,
                 )
+                logger.debug("Done streaming, writing parquet metadata")
+        logger.debug("Creating sqlite index ...")
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS index_unit_id ON dataset(unit_id)"
+        )
+        conn.commit()
         return pyarrow.dataset.dataset(output_parquet_path)
     except ArrowInvalid as e:
         raise ValidationError(
@@ -200,9 +227,10 @@ def _generate_start_year(table: pyarrow.Table) -> pyarrow.Array:
     )
 
 
-def read_and_sanitize_csv_write_parquet(
+def read_and_sanitize_csv_write_sqlite_and_parquet(
     input_data_path: Path,
     output_parquet_path: Path,
+    sqlite_path: Path,
     identifier_data_type: str,
     measure_data_type: str,
     temporality_type: str,
@@ -212,13 +240,32 @@ def read_and_sanitize_csv_write_parquet(
     ensures the input csv data follows the requirements for the
     microdata data model.
     """
-    return _csv_to_parquet(
-        input_data_path,
-        output_parquet_path,
-        identifier_data_type,
-        measure_data_type,
-        temporality_type,
-    )
+    if os.path.exists(sqlite_path):
+        os.remove(sqlite_path)
+    with adbc_driver_sqlite.dbapi.connect(
+        sqlite_path, autocommit=False
+    ) as conn:
+        conn.execute(
+            """CREATE TABLE dataset
+               (
+                   unit_id          VARCHAR,
+                   start_epoch_days INTEGER,
+                   stop_epoch_days  INTEGER
+               )"""
+        )
+        conn.commit()
+        # row_count = get_row_count(input_data_path, show_progress)
+        logger.debug("Streaming to sqlite and parquet ...")
+        filesystem_dataset = _csv_to_sqlite_and_parquet(
+            input_data_path,
+            output_parquet_path,
+            conn,
+            identifier_data_type,
+            measure_data_type,
+            temporality_type,
+        )
+        logger.debug("Returning FileSystemDataset")
+        return filesystem_dataset
 
 
 def _min_max(

@@ -1,30 +1,4 @@
-import os
 from itertools import chain
-from pathlib import Path
-from typing import Dict
-
-from pyarrow import Table, dataset, parquet
-
-PARQUET_DIR = Path(
-    "tmp/tests/resources/validation/steps/dataset_validator/parquet"
-)
-
-
-def _dataset_from_dict(name: str, table_dict: Dict):
-    os.makedirs(PARQUET_DIR, exist_ok=True)
-    parquet_path = PARQUET_DIR / f"{name}.parquet"
-    parquet.write_table(Table.from_pydict(table_dict), parquet_path)
-    return dataset.dataset(parquet_path)
-
-
-def _delete_parquet_files():
-    parquet_files = [f for f in os.listdir(PARQUET_DIR) if "parquet" in f]
-    for f in parquet_files:
-        try:
-            os.remove(PARQUET_DIR / f)
-        except Exception:
-            ...
-
 
 # ------------------
 # MEASURE: CODE LIST
@@ -50,29 +24,23 @@ FIXED_STRING_CODELIST_SENTINEL = [
 
 
 def FIXED_STRING_CODELIST_DS():
-    return _dataset_from_dict(
-        "FIXED_STRING_CODELIST_DS",
-        {
-            "unit_id": ["1", "2", "3", "4"],
-            "value": ["0", "1", "2", "1"],
-            "start_year": [None] * 4,
-            "start_epoch_days": [None] * 4,
-            "stop_epoch_days": [18262] * 4,
-        },
-    )
+    return {
+        "unit_id": ["1", "2", "3", "4"],
+        "value": ["0", "1", "2", "1"],
+        "start_year": [None] * 4,
+        "start_epoch_days": [None] * 4,
+        "stop_epoch_days": [18262] * 4,
+    }
 
 
 def FIXED_STRING_CODELIST_INVALID_DS():
-    return _dataset_from_dict(
-        "FIXED_STRING_CODELIST_INVALID_DS",
-        {
-            "unit_id": ["1", "2", "3", "4"],
-            "value": ["0", "1", "2", "3"],
-            "start_year": [None] * 4,
-            "start_epoch_days": [None] * 4,
-            "stop_epoch_days": [18262] * 4,
-        },
-    )
+    return {
+        "unit_id": ["1", "2", "3", "4"],
+        "value": ["0", "1", "2", "3"],
+        "start_year": [None] * 4,
+        "start_epoch_days": [None] * 4,
+        "stop_epoch_days": [18262] * 4,
+    }
 
 
 # -------------------
@@ -87,83 +55,59 @@ _FIXED_DS_TEMPLATE = {
 
 
 def FIXED_STRING_DS():
-    return _dataset_from_dict(
-        "FIXED_STRING_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": ["0", "b", "2c", "3"],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": ["0", "b", "2c", "3"],
+    }
 
 
 def FIXED_STRING_INVALID_DS():
-    return _dataset_from_dict(
-        "FIXED_STRING_INVALID_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": ["ab", "", None, "3"],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": ["ab", "", None, "3"],
+    }
 
 
 def FIXED_LONG_DS():
-    return _dataset_from_dict(
-        "FIXED_LONG_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": [0, -1, 1, 2],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": [0, -1, 1, 2],
+    }
 
 
 def FIXED_LONG_INVALID_DS():
-    return _dataset_from_dict(
-        "FIXED_LONG_INVALID_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": [0, -1, 1, None],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": [0, -1, 1, None],
+    }
 
 
 def FIXED_DOUBLE_DS():
-    return _dataset_from_dict(
-        "FIXED_DOUBLE_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": [0.1, -0.32, 0.003, -0.1],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": [0.1, -0.32, 0.003, -0.1],
+    }
 
 
 def FIXED_DOUBLE_INVALID_DS():
-    return _dataset_from_dict(
-        "FIXED_DOUBLE_INVALID_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": [0.1, -0.32, 0.003, None],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": [0.1, -0.32, 0.003, None],
+    }
 
 
 def FIXED_DATE_DS():
-    return _dataset_from_dict(
-        "FIXED_DATE_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": [18626, 18626, 18626, 18626],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": [18626, 18626, 18626, 18626],
+    }
 
 
 def FIXED_DATE_INVALID_DS():
-    return _dataset_from_dict(
-        "FIXED_DATE_INVALID_DS",
-        {
-            **_FIXED_DS_TEMPLATE,
-            "value": [18626, 18626, 18626, None],
-        },
-    )
+    return {
+        **_FIXED_DS_TEMPLATE,
+        "value": [18626, 18626, 18626, None],
+    }
 
 
 # -------------------------
@@ -179,25 +123,19 @@ _FIXED_VALID_DICT = {
 
 
 def FIXED_VALID_DS():
-    return _dataset_from_dict("FIXED_VALID_DS", _FIXED_VALID_DICT)
+    return _FIXED_VALID_DICT
 
 
 def FIXED_INVALID_START_DS():
-    return _dataset_from_dict(
-        "FIXED_INVALID_START_DS",
-        {
-            **_FIXED_VALID_DICT,
-            "start_year": ["2020"] * 4,
-            "start_epoch_days": [18626] * 4,
-        },
-    )
+    return {
+        **_FIXED_VALID_DICT,
+        "start_year": ["2020"] * 4,
+        "start_epoch_days": [18626] * 4,
+    }
 
 
 def FIXED_INVALID_DUPLICATES_DS():
-    return _dataset_from_dict(
-        "FIXED_INVALID_DUPLICATES_DS",
-        {**_FIXED_VALID_DICT, "unit_id": ["1", "2", "3", "3"]},
-    )
+    return {**_FIXED_VALID_DICT, "unit_id": ["1", "2", "3", "3"]}
 
 
 # -------------------------
@@ -213,21 +151,15 @@ _STATUS_VALID_DICT = {
 
 
 def STATUS_VALID_DS():
-    return _dataset_from_dict("STATUS_VALID_DS", _STATUS_VALID_DICT)
+    return _STATUS_VALID_DICT
 
 
 def STATUS_INVALID_START_STOP_DS():
-    return _dataset_from_dict(
-        "STATUS_INVALID_START_STOP_DS",
-        {**_STATUS_VALID_DICT, "start_epoch_days": [18727] * 4},
-    )
+    return {**_STATUS_VALID_DICT, "start_epoch_days": [18727] * 4}
 
 
 def STATUS_INVALID_DUPLICATES_DS():
-    return _dataset_from_dict(
-        "STATUS_INVALID_DUPLICATES_DS",
-        {**_STATUS_VALID_DICT, "unit_id": ["1", "2", "3", "3"]},
-    )
+    return {**_STATUS_VALID_DICT, "unit_id": ["1", "2", "3", "3"]}
 
 
 # -------------------------
@@ -243,43 +175,40 @@ _EVENT_VALID_DICT = {
 
 
 def EVENT_VALID_DS():
-    return _dataset_from_dict("EVENT_VALID_DS", _EVENT_VALID_DICT)
+    return _EVENT_VALID_DICT
 
 
 def EVENT_INVALID_OVERLAP_DS():
-    return _dataset_from_dict(
-        "EVENT_INVALID_OVERLAP_DS",
-        {**_EVENT_VALID_DICT, "start_epoch_days": [18626, 18670, 18626, 18626]},
-    )
+    return {
+        **_EVENT_VALID_DICT,
+        "start_epoch_days": [18626, 18670, 18626, 18626],
+    }
 
 
 def EVENT_INVALID_START_DS():
-    return _dataset_from_dict(
-        "EVENT_INVALID_START_DS",
-        {**_EVENT_VALID_DICT, "start_epoch_days": [None, 18271, 18626, 18626]},
-    )
+    return {
+        **_EVENT_VALID_DICT,
+        "start_epoch_days": [None, 18271, 18626, 18626],
+    }
 
 
 def EVENT_INVALID_TIMESPANS_DS():
-    return _dataset_from_dict(
-        "EVENT_INVALID_TIMESPANS_DS",
-        {**_EVENT_VALID_DICT, "start_epoch_days": [18626, 18627, 18626, 18626]},
-    )
+    return {
+        **_EVENT_VALID_DICT,
+        "start_epoch_days": [18626, 18627, 18626, 18626],
+    }
 
 
 def EVENT_TOO_MANY_ERRORS_DS():
-    return _dataset_from_dict(
-        "EVENT_TOO_MANY_ERRORS_DS",
-        {
-            "unit_id": list(
-                chain.from_iterable([str(i), str(i)] for i in range(100))
-            ),
-            "value": [str(i) for i in range(200)],
-            "start_year": ["2020"] * 200,
-            "start_epoch_days": [18626] * 200,
-            "stop_epoch_days": [None] * 200,
-        },
-    )
+    return {
+        "unit_id": list(
+            chain.from_iterable([str(i), str(i)] for i in range(100))
+        ),
+        "value": [str(i) for i in range(200)],
+        "start_year": ["2020"] * 200,
+        "start_epoch_days": [18626] * 200,
+        "stop_epoch_days": [None] * 200,
+    }
 
 
 # -------------------------
@@ -295,28 +224,22 @@ _ACCUMULATED_VALID_DICT = {
 
 
 def ACCUMULATED_VALID_DS():
-    return _dataset_from_dict("ACCUMULATED_VALID_DS", _ACCUMULATED_VALID_DICT)
+    return _ACCUMULATED_VALID_DICT
 
 
 def ACCUMULATED_INVALID_START_STOP_DS():
-    return _dataset_from_dict(
-        "ACCUMULATED_INVALID_START_STOP_DS",
-        {
-            **_ACCUMULATED_VALID_DICT,
-            "start_epoch_days": [18626, None, 18264, 18262],
-            "stop_epoch_days": [None, 18280, 18263, 18263],
-        },
-    )
+    return {
+        **_ACCUMULATED_VALID_DICT,
+        "start_epoch_days": [18626, None, 18264, 18262],
+        "stop_epoch_days": [None, 18280, 18263, 18263],
+    }
 
 
 def ACCUMULATED_INVALID_TIMESPANS_DS():
-    return _dataset_from_dict(
-        "ACCUMULATED_INVALID_TIMESPANS_DS",
-        {
-            **_ACCUMULATED_VALID_DICT,
-            "start_epoch_days": [18626, 18627, 18626, 18626],
-        },
-    )
+    return {
+        **_ACCUMULATED_VALID_DICT,
+        "start_epoch_days": [18626, 18627, 18626, 18626],
+    }
 
 
 # ----------------------
@@ -340,4 +263,4 @@ _TOO_MANY_ERRORS_DICT = {
 
 
 def TOO_MANY_ERRORS_DS():
-    return _dataset_from_dict("TOO_MANY_ERRORS_DS", _TOO_MANY_ERRORS_DICT)
+    return _TOO_MANY_ERRORS_DICT
