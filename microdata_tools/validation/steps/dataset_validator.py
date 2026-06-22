@@ -1,8 +1,11 @@
 # pyright: reportAttributeAccessIssue=false
+import os.path
+import sqlite3
 from datetime import datetime
-from typing import Iterator, List, Sequence, Union
+from pathlib import Path
+from typing import List, Union
 
-from pyarrow import Table, compute, dataset
+from pyarrow import Table, dataset
 from pyarrow.dataset import FileSystemDataset
 
 from microdata_tools.validation.exceptions import ValidationError
@@ -208,49 +211,35 @@ def _accumulated_temporal_variables_check(data: FileSystemDataset) -> None:
         )
 
 
-def _only_unique_identifiers_check(data: FileSystemDataset) -> None:
+def _only_unique_identifiers_check(conn: sqlite3.Connection) -> None:
     """
     A table with temporalityType=FIXED is only valid if all
     cells in the unit_id column are unique.
     """
-    identifiers = data.to_table(columns=["unit_id"])
-    identifiers = Table.from_arrays(
-        [
-            compute.utf8_slice_codeunits(
-                identifiers["unit_id"], start=0, stop=1
-            ),
-            identifiers["unit_id"],
-        ],
-        names=["bucket", "unit_id"],
-    )
-    unique_buckets = compute.unique(identifiers["bucket"])
-    for unique_bucket in unique_buckets:
-        bucket_table = identifiers.filter(
-            dataset.field("bucket") == unique_bucket
-        )
-        bucket_row_count = len(bucket_table)
-        unique_identifiers_count = len(compute.unique(bucket_table["unit_id"]))
-        if unique_identifiers_count != bucket_row_count:
+    prev_unit_id = None
+    for (unit_id,) in conn.execute(
+        "SELECT unit_id FROM dataset ORDER BY unit_id ASC"
+    ):
+        if unit_id == prev_unit_id:
             raise ValidationError(
                 "#1 column",
                 errors=["Duplicate identifiers in #1 column"],
             )
+        else:
+            prev_unit_id = unit_id
 
 
-def _status_uniquesness_check(data: FileSystemDataset) -> None:
+def _status_uniquesness_check(conn: sqlite3.Connection) -> None:
     """
     A table with temporalityType=STATUS is valid only if all
     cells in the unit_id column are unique per status date.
     """
-    all_status_dates = data.to_table(columns=["start_epoch_days"])
-    unique_status_dates = compute.unique(all_status_dates["start_epoch_days"])
-    for status_date in unique_status_dates:
-        status_table = data.to_table(
-            columns=["unit_id"],
-            filter=dataset.field("start_epoch_days") == status_date,
-        )
-        unique_identifiers = compute.unique(status_table["unit_id"])
-        if len(unique_identifiers) != len(status_table):
+    prev = None, None
+    for curr in conn.execute(
+        "SELECT unit_id, start_epoch_days FROM dataset "
+        + "ORDER BY unit_id ASC, start_epoch_days ASC"
+    ):
+        if curr == prev:
             raise ValidationError(
                 "#1, #3 and #4 columns",
                 errors=[
@@ -258,110 +247,137 @@ def _status_uniquesness_check(data: FileSystemDataset) -> None:
                     "(#3 and #4 column)"
                 ],
             )
+        else:
+            prev = curr
 
 
-def _no_overlapping_timespans_check(data: FileSystemDataset) -> None:
+def _from_epoch_days_to_date(epoch_days: Union[int, None]) -> str:
+    return (
+        ""
+        if epoch_days is None
+        else datetime.fromtimestamp(epoch_days * 24 * 60 * 60).strftime(
+            "%Y-%m-%d"
+        )
+    )
+
+
+def _find_overlap(start_list: list, stop_list: list) -> Union[str, None]:
     """
-    A table with temporalityType=(EVENT|ACCUMULATED) is valid
-    only if all rows for a given identifier contains no overlapping
-    timespans in the start_epoch_days and stop_epoch_days columns.
+    Looks for overlapping timespans where each timespan
+    is defined by a start_date at an index from the start_list,
+    and a stop_date at the same index from the stop_list.
     """
+    for i in range(len(start_list) - 1):
+        if stop_list[i] is None:
+            return (
+                f"timespan: ({_from_epoch_days_to_date(start_list[i])} - "
+                ") overlaps with "
+                f"timespan: "
+                f"({_from_epoch_days_to_date(start_list[i + 1])} - "
+                f"{_from_epoch_days_to_date(stop_list[i + 1])})"
+            )
+        if stop_list[i] >= start_list[i + 1]:
+            return (
+                f"timespan: ({_from_epoch_days_to_date(start_list[i])} - "
+                f"{_from_epoch_days_to_date(stop_list[i])}) "
+                f"overlaps with timespan: "
+                f"({_from_epoch_days_to_date(start_list[i + 1])} - "
+                f"{_from_epoch_days_to_date(stop_list[i + 1])})"
+            )
+    return None
 
-    def from_epoch_days_to_date(epoch_days: Union[int, None]) -> str:
-        return (
-            ""
-            if epoch_days is None
-            else datetime.fromtimestamp(epoch_days * 24 * 60 * 60).strftime(
-                "%Y-%m-%d"
+
+def _check_overlap(
+    error_list: list[str], unit_id: str, start_list: list, stop_list: list
+) -> None:
+    overlap_message = _find_overlap(start_list, stop_list)
+    if overlap_message is not None:
+        error_list.append(
+            (
+                "Invalid overlapping timespans for identifier"
+                f' "{unit_id}":'
+                f" {overlap_message}"
             )
         )
-
-    def find_overlap(start_list: list, stop_list: list) -> Union[str, None]:
-        """
-        Looks for overlapping timespans where each timespan
-        is defined by a start_date at an index from the start_list,
-        and a stop_date at the same index from the stop_list.
-        """
-        for i in range(len(start_list) - 1):
-            if stop_list[i] is None:
-                return (
-                    f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
-                    ") overlaps with "
-                    f"timespan: "
-                    f"({from_epoch_days_to_date(start_list[i + 1])} - "
-                    f"{from_epoch_days_to_date(stop_list[i + 1])})"
-                )
-            if stop_list[i] >= start_list[i + 1]:
-                return (
-                    f"timespan: ({from_epoch_days_to_date(start_list[i])} - "
-                    f"{from_epoch_days_to_date(stop_list[i])}) "
-                    f"overlaps with timespan: "
-                    f"({from_epoch_days_to_date(start_list[i + 1])} - "
-                    f"{from_epoch_days_to_date(stop_list[i + 1])})"
-                )
-        return None
-
-    def batch(iterable: Sequence, batch_size: int) -> Iterator:
-        for index in range(0, len(iterable), batch_size):
-            yield iterable[index : index + batch_size]
-
-    identifiers = data.to_table(columns=["unit_id"])
-    unique_identifiers = compute.unique(identifiers["unit_id"])
-    error_list = []
-    for identifier_batch in batch(unique_identifiers, 500_000):
-        identifier_time_spans = data.to_table(
-            filter=dataset.field("unit_id").isin(identifier_batch),
-            columns=["unit_id", "start_epoch_days", "stop_epoch_days"],
-        )
-        identifier_time_spans = identifier_time_spans.sort_by(
-            [("start_epoch_days", "ascending")]
-        )
-        identifier_time_spans = identifier_time_spans.group_by(
-            "unit_id", use_threads=False
-        ).aggregate([("start_epoch_days", "list"), ("stop_epoch_days", "list")])
-        for i in range(len(identifier_time_spans)):
-            overlap_message = find_overlap(
-                identifier_time_spans["start_epoch_days_list"][i].as_py(),
-                identifier_time_spans["stop_epoch_days_list"][i].as_py(),
-            )
-            if overlap_message is not None:
-                error_list.append(
-                    (
-                        "Invalid overlapping timespans for identifier"
-                        f' "{identifier_time_spans["unit_id"][i]}":'
-                        f" {overlap_message}"
-                    )
-                )
-            if len(error_list) > 49:
-                raise ValidationError(
-                    "#1, #3 and #4 columns",
-                    errors=error_list,
-                )
-        if error_list:
+        if len(error_list) > 49:
             raise ValidationError(
                 "#1, #3 and #4 columns",
                 errors=error_list,
             )
 
 
+def _no_overlapping_timespans_check(
+    conn: sqlite3.Connection,
+) -> None:
+    """
+    A table with temporalityType=(EVENT|ACCUMULATED) is valid
+    only if all rows for a given identifier contains no overlapping
+    timespans in the start_epoch_days and stop_epoch_days columns.
+    """
+    error_list = []
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT unit_id, start_epoch_days, stop_epoch_days "
+        + "FROM dataset "
+        + "ORDER BY unit_id, start_epoch_days"
+    )
+    curr_unit_id = None
+    start_list = []
+    stop_list = []
+    while True:
+        res = cursor.fetchone()
+        if res is None:
+            if curr_unit_id is not None:
+                _check_overlap(error_list, curr_unit_id, start_list, stop_list)
+            break
+        else:
+            unit_id, start_epoch_days, stop_epoch_days = res
+            if curr_unit_id is None:
+                curr_unit_id = unit_id
+                start_list.append(start_epoch_days)
+                stop_list.append(stop_epoch_days)
+            elif curr_unit_id == unit_id:
+                start_list.append(start_epoch_days)
+                stop_list.append(stop_epoch_days)
+            elif curr_unit_id != unit_id:
+                _check_overlap(error_list, curr_unit_id, start_list, stop_list)
+                curr_unit_id = unit_id
+                start_list = [start_epoch_days]
+                stop_list = [stop_epoch_days]
+            else:
+                raise RuntimeError("Unhandled state!")
+    if error_list:
+        raise ValidationError(
+            "#1, #3 and #4 columns",
+            errors=error_list,
+        )
+
+
 def validate_dataset(
     data: FileSystemDataset,
+    sqlite_path: Path,
     measure_data_type: str,
     code_list: Union[List, None],
     sentinel_list: Union[List, None],
     temporality_type: str,
 ) -> None:
-    _valid_unit_id_check(data)
-    _valid_value_column_check(data, measure_data_type, code_list, sentinel_list)
-    if temporality_type == "FIXED":
-        _fixed_temporal_variables_check(data)
-        _only_unique_identifiers_check(data)
-    elif temporality_type == "STATUS":
-        _status_temporal_variables_check(data)
-        _status_uniquesness_check(data)
-    elif temporality_type == "ACCUMULATED":
-        _accumulated_temporal_variables_check(data)
-        _no_overlapping_timespans_check(data)
-    elif temporality_type == "EVENT":
-        _event_temporal_variables_check(data)
-        _no_overlapping_timespans_check(data)
+    assert os.path.exists(sqlite_path)
+    with sqlite3.connect(sqlite_path) as conn:
+        _valid_unit_id_check(data)
+        _valid_value_column_check(
+            data, measure_data_type, code_list, sentinel_list
+        )
+        if temporality_type == "FIXED":
+            _fixed_temporal_variables_check(data)
+            _only_unique_identifiers_check(conn)
+        elif temporality_type == "STATUS":
+            _status_temporal_variables_check(data)
+            _status_uniquesness_check(conn)
+        elif temporality_type == "ACCUMULATED":
+            _accumulated_temporal_variables_check(data)
+            _no_overlapping_timespans_check(conn)
+        elif temporality_type == "EVENT":
+            _event_temporal_variables_check(data)
+            _no_overlapping_timespans_check(conn)
+        else:
+            raise RuntimeError(f"Unknown temporality type '{temporality_type}'")
