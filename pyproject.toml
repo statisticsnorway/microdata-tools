@@ -11,6 +11,10 @@ dependencies = [
     "numpy>=2.2.0",
     "pyarrow==23.0.1",
     "pydantic>=2.11.7",
+    "adbc-driver-manager==1.10.0",
+    "adbc-driver-sqlite==1.10.0",
+    "importlib-resources==6.5.2",
+    "matplotlib==3.10.9",
 ]
 
 [dependency-groups]
@@ -27,30 +31,30 @@ exclude-newer = "7 days"
 required-version = ">=0.7.0"
 
 [build-system]
-build-backend  = 'hatchling.build'
-requires       = ['hatchling']
+build-backend = 'hatchling.build'
+requires = ['hatchling']
 
 [tool.hatch.build.targets.sdist]
 packages = ["microdata_tools"]
 include = [
-  "microdata_tools/validation/components/unit_type_variables/*.json"
+    "microdata_tools/validation/components/unit_type_variables/*.json"
 ]
 
 [tool.hatch.build.targets.wheel]
 packages = ["microdata_tools"]
 include = [
-  "microdata_tools/validation/components/unit_type_variables/*.json"
+    "microdata_tools/validation/components/unit_type_variables/*.json"
 ]
 
 [tool.ruff]
 line-length = 80
 target-version = "py313"
 lint.select = [
-    "F",   # Pyflakes errors (including unused imports, undefined names)
-    "T",   # flake8-type-checking (imports used only for typing)
-    "E",   # pycodestyle errors (style errors)
-    "W",   # pycodestyle warnings
-    "I",   # isort import ordering
+    "F", # Pyflakes errors (including unused imports, undefined names)
+    "T", # flake8-type-checking (imports used only for typing)
+    "E", # pycodestyle errors (style errors)
+    "W", # pycodestyle warnings
+    "I", # isort import ordering
     "ANN", # type annotation related rules
 ]
 

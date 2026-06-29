@@ -73,6 +73,7 @@ def clean_up_temporary_files(
 ) -> None:
     generated_files = [
         f"{dataset_name}.parquet",
+        f"{dataset_name}.sqlite3.db",
         f"{dataset_name}.json",
     ]
     if delete_working_directory:
