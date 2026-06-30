@@ -22,7 +22,7 @@ def test_package_dataset(keys_dir, output_dir):
 
     assert not Path(output_dir / f"{dataset_name}").exists()
     assert not Path(
-        INPUT_DIRECTORY / f"{dataset_name}" / f"{dataset_name}.md5"
+        INPUT_DIRECTORY / f"{dataset_name}" / f"{dataset_name}.sha256"
     ).exists()
 
     with tarfile.open(result_file, "r:") as tar:
@@ -33,7 +33,7 @@ def test_package_dataset(keys_dir, output_dir):
         assert "chunks/1.csv.encr" in tarred_files
         assert f"{dataset_name}.kem.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
-        assert f"{dataset_name}.md5" in tarred_files
+        assert f"{dataset_name}.sha256" in tarred_files
 
 
 def test_package_dataset_multiple_chunks(
@@ -56,7 +56,7 @@ def test_package_dataset_multiple_chunks(
 
     assert not Path(output_dir / f"{dataset_name}").exists()
     assert not Path(
-        INPUT_DIRECTORY / f"{dataset_name}" / f"{dataset_name}.md5"
+        INPUT_DIRECTORY / f"{dataset_name}" / f"{dataset_name}.sha256"
     ).exists()
 
     with tarfile.open(result_file, "r:") as tar:
@@ -69,7 +69,7 @@ def test_package_dataset_multiple_chunks(
         assert "chunks/3.csv.encr" in tarred_files
         assert f"{dataset_name}.kem.encr" in tarred_files
         assert f"{dataset_name}.json" in tarred_files
-        assert f"{dataset_name}.md5" in tarred_files
+        assert f"{dataset_name}.sha256" in tarred_files
 
 
 def test_package_dataset_just_json(keys_dir, output_dir):
