@@ -2,7 +2,7 @@ import pytest
 
 from microdata_tools.validation.exceptions import ValidationError
 from microdata_tools.validation.steps import dataset_validator
-from tests.resources.validation.steps.dataset_validator import test_data
+from tests import test_data
 
 
 def teardown_module():
@@ -13,7 +13,7 @@ def test_measure_code_list_validation():
     code_list = test_data.FIXED_STRING_CODELIST
     sentinel_list = test_data.FIXED_STRING_CODELIST_SENTINEL
     dataset_validator.validate_dataset(
-        test_data.FIXED_STRING_CODELIST_DS,
+        test_data.FIXED_STRING_CODELIST_DS(),
         "STRING",
         code_list,
         sentinel_list,
@@ -21,7 +21,7 @@ def test_measure_code_list_validation():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_STRING_CODELIST_INVALID_DS,
+            test_data.FIXED_STRING_CODELIST_INVALID_DS(),
             "STRING",
             code_list,
             sentinel_list,
@@ -32,7 +32,7 @@ def test_measure_code_list_validation():
 
 def test_measure_data_type_string_validation():
     dataset_validator.validate_dataset(
-        test_data.FIXED_STRING_DS,
+        test_data.FIXED_STRING_DS(),
         "STRING",
         None,
         None,
@@ -40,7 +40,7 @@ def test_measure_data_type_string_validation():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_STRING_INVALID_DS,
+            test_data.FIXED_STRING_INVALID_DS(),
             "STRING",
             None,
             None,
@@ -54,7 +54,7 @@ def test_measure_data_type_string_validation():
 
 def test_measure_data_type_long_validation():
     dataset_validator.validate_dataset(
-        test_data.FIXED_LONG_DS,
+        test_data.FIXED_LONG_DS(),
         "LONG",
         None,
         None,
@@ -62,7 +62,7 @@ def test_measure_data_type_long_validation():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_LONG_INVALID_DS,
+            test_data.FIXED_LONG_INVALID_DS(),
             "LONG",
             None,
             None,
@@ -75,7 +75,7 @@ def test_measure_data_type_long_validation():
 
 def test_measure_data_type_double_validation():
     dataset_validator.validate_dataset(
-        test_data.FIXED_DOUBLE_DS,
+        test_data.FIXED_DOUBLE_DS(),
         "DOUBLE",
         None,
         None,
@@ -83,7 +83,7 @@ def test_measure_data_type_double_validation():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_DOUBLE_INVALID_DS,
+            test_data.FIXED_DOUBLE_INVALID_DS(),
             "DOUBLE",
             None,
             None,
@@ -96,7 +96,7 @@ def test_measure_data_type_double_validation():
 
 def test_measure_data_type_date_validation():
     dataset_validator.validate_dataset(
-        test_data.FIXED_DATE_DS,
+        test_data.FIXED_DATE_DS(),
         "DATE",
         None,
         None,
@@ -104,7 +104,7 @@ def test_measure_data_type_date_validation():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_DATE_INVALID_DS,
+            test_data.FIXED_DATE_INVALID_DS(),
             "DATE",
             None,
             None,
@@ -117,7 +117,7 @@ def test_measure_data_type_date_validation():
 
 def test_temporality_fixed():
     dataset_validator.validate_dataset(
-        test_data.FIXED_VALID_DS,
+        test_data.FIXED_VALID_DS(),
         "STRING",
         None,
         None,
@@ -125,7 +125,7 @@ def test_temporality_fixed():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_INVALID_START_DS,
+            test_data.FIXED_INVALID_START_DS(),
             "STRING",
             None,
             None,
@@ -137,7 +137,7 @@ def test_temporality_fixed():
     ]
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.FIXED_INVALID_DUPLICATES_DS,
+            test_data.FIXED_INVALID_DUPLICATES_DS(),
             "STRING",
             None,
             None,
@@ -148,7 +148,7 @@ def test_temporality_fixed():
 
 def test_temporality_status():
     dataset_validator.validate_dataset(
-        test_data.STATUS_VALID_DS,
+        test_data.STATUS_VALID_DS(),
         "STRING",
         None,
         None,
@@ -156,7 +156,7 @@ def test_temporality_status():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.STATUS_INVALID_START_STOP_DS,
+            test_data.STATUS_INVALID_START_STOP_DS(),
             "STRING",
             None,
             None,
@@ -168,7 +168,7 @@ def test_temporality_status():
     ]
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.STATUS_INVALID_DUPLICATES_DS,
+            test_data.STATUS_INVALID_DUPLICATES_DS(),
             "STRING",
             None,
             None,
@@ -181,7 +181,7 @@ def test_temporality_status():
 
 def test_temporality_event():
     dataset_validator.validate_dataset(
-        test_data.EVENT_VALID_DS,
+        test_data.EVENT_VALID_DS(),
         "STRING",
         None,
         None,
@@ -189,7 +189,7 @@ def test_temporality_event():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.EVENT_INVALID_START_DS,
+            test_data.EVENT_INVALID_START_DS(),
             "STRING",
             None,
             None,
@@ -200,7 +200,7 @@ def test_temporality_event():
     ]
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.EVENT_INVALID_OVERLAP_DS,
+            test_data.EVENT_INVALID_OVERLAP_DS(),
             "STRING",
             None,
             None,
@@ -216,7 +216,7 @@ def test_temporality_event():
 
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.EVENT_INVALID_TIMESPANS_DS,
+            test_data.EVENT_INVALID_TIMESPANS_DS(),
             "STRING",
             None,
             None,
@@ -231,7 +231,7 @@ def test_temporality_event():
     ]
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.EVENT_TOO_MANY_ERRORS_DS,
+            test_data.EVENT_TOO_MANY_ERRORS_DS(),
             "STRING",
             None,
             None,
@@ -242,7 +242,7 @@ def test_temporality_event():
 
 def test_temporality_accumulated():
     dataset_validator.validate_dataset(
-        test_data.ACCUMULATED_VALID_DS,
+        test_data.ACCUMULATED_VALID_DS(),
         "STRING",
         None,
         None,
@@ -250,7 +250,7 @@ def test_temporality_accumulated():
     )
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.ACCUMULATED_INVALID_START_STOP_DS,
+            test_data.ACCUMULATED_INVALID_START_STOP_DS(),
             "STRING",
             None,
             None,
@@ -263,13 +263,12 @@ def test_temporality_accumulated():
     ]
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.ACCUMULATED_INVALID_TIMESPANS_DS,
+            test_data.ACCUMULATED_INVALID_TIMESPANS_DS(),
             "STRING",
             None,
             None,
             "ACCUMULATED",
         )
-    print(e.value.errors)
     assert e.value.errors == [
         (
             'Invalid overlapping timespans for identifier "1": '
@@ -283,7 +282,7 @@ def test_max_50_errors():
     # codelist error
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.TOO_MANY_ERRORS_DS,
+            test_data.TOO_MANY_ERRORS_DS(),
             "STRING",
             test_data.TOO_MANY_ERRORS_CODELIST,
             None,
@@ -294,7 +293,7 @@ def test_max_50_errors():
     # temporal error
     with pytest.raises(ValidationError) as e:
         dataset_validator.validate_dataset(
-            test_data.TOO_MANY_ERRORS_DS,
+            test_data.TOO_MANY_ERRORS_DS(),
             "STRING",
             None,
             None,

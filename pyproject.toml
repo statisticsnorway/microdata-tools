@@ -7,7 +7,7 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cryptography>=48.0.0",
+    "cryptography>=48.0.1",
     "numpy>=2.2.0",
     "pyarrow==23.0.1",
     "pydantic>=2.11.7",
@@ -23,7 +23,7 @@ dev = [
 
 [tool.uv]
 package = true
-exclude-newer = "3 days"
+exclude-newer = "7 days"
 required-version = ">=0.7.0"
 
 [build-system]

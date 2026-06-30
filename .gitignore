@@ -13,6 +13,8 @@ __pycache__/
 # C extensions
 *.so
 
+tmp/
+
 # Distribution / packaging
 .Python
 build/
@@ -57,6 +59,18 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+
+tests/resources/validation/validate_dataset/big_datasets/ACCUMULATED_DS/ACCUMULATED_DS.csv
+tests/resources/validation/validate_dataset/big_datasets/ACCUMULATED_DS/ACCUMULATED_DS.csv.rowcount
+
+tests/resources/validation/validate_dataset/big_datasets/EVENT_DS/EVENT_DS.csv
+tests/resources/validation/validate_dataset/big_datasets/EVENT_DS/EVENT_DS.csv.rowcount
+
+tests/resources/validation/validate_dataset/big_datasets/FIXED_DS/FIXED_DS.csv
+tests/resources/validation/validate_dataset/big_datasets/FIXED_DS/FIXED_DS.csv.rowcount
+
+tests/resources/validation/validate_dataset/big_datasets/STATUS_DS/STATUS_DS.csv
+tests/resources/validation/validate_dataset/big_datasets/STATUS_DS/STATUS_DS.csv.rowcount
 
 # Translations
 *.mo
