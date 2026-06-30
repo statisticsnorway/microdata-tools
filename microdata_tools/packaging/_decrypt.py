@@ -5,24 +5,34 @@ import tarfile
 from pathlib import Path
 from typing import List, Tuple
 
-from cryptography.fernet import Fernet, InvalidToken
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.exceptions import InvalidTag
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.hpke import (
+    MLKEM768X25519PrivateKey,
+)
 
-from microdata_tools.packaging._utils import check_exists
+from microdata_tools.packaging._crypto_config import (
+    HPKE_INFO,
+    HPKE_SUITE,
+    NONCE_SIZE_BYTES,
+)
+from microdata_tools.packaging._utils import (
+    check_exists,
+)
 from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
 )
+from microdata_tools.packaging.keys import PrivateKey
 
 logger = logging.getLogger()
 
 
-def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
+def decrypt(private_key_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
     """
     Decrypts a dataset as follows:
-        1. Decrypts the symmetric key using the RSA private key.
+        1. Recovers the symmetric key using the hybrid private key
+           (HPKE with ML-KEM-768 + X25519).
         2. Decrypts each chunk using the symmetric key.
         3. Merges the decrypted chunks into a single file.
     """
@@ -39,36 +49,35 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
     decrypted_dir = output_dataset_dir / "decrypted"
     os.makedirs(decrypted_dir, exist_ok=True)
 
-    if not output_dataset_dir.exists():
-        os.makedirs(output_dataset_dir)
-
     if chunk_dir.exists() and first_encrypted_chunk.exists():
         logger.info(f"Encrypted file found in {dataset_dir}")
 
-        with open(
-            Path(rsa_keys_dir / "microdata_private_key.pem"), "rb"
-        ) as key_file:
-            private_key = serialization.load_pem_private_key(
-                key_file.read(), password=None, backend=default_backend()
+        # Read private key from file
+        private_key = PrivateKey.load_from_file(
+            Path(private_key_dir / "microdata_private_key.pem")
+        ).to_hpke_key()
+
+        if not isinstance(private_key, MLKEM768X25519PrivateKey):
+            raise TypeError(
+                "Private key is not a hybrid ML-KEM-768-X25519 private key."
             )
+        # Read the hpke ciphertext from file and recover the symmetric key
+        hpke_ciphertext_path = Path(dataset_dir / f"{dataset_name}.kem.encr")
+        check_exists(hpke_ciphertext_path)
 
-        encrypted_symkey = Path(dataset_dir / f"{dataset_name}.symkey.encr")
-        check_exists(encrypted_symkey)
+        with open(hpke_ciphertext_path, "rb") as f:
+            hpke_ciphertext = f.read()
 
-        if not isinstance(private_key, rsa.RSAPrivateKey):
-            raise TypeError("Privatkey is not RSA. Cannot use .decrypt().")
+        try:
+            decrypted_symkey = HPKE_SUITE.decrypt(
+                hpke_ciphertext, private_key, info=HPKE_INFO
+            )
+        except Exception as e:
+            raise InvalidKeyError(
+                "Unable to recover symmetric key. Is the private key correct?"
+            ) from e
 
-        with open(encrypted_symkey, "rb") as f:
-            symkey = f.read()
-        decrypted_symkey = private_key.decrypt(
-            symkey,
-            padding.OAEP(
-                mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None,
-            ),
-        )
-        fernet = Fernet(decrypted_symkey)
+        aesgcm = AESGCM(decrypted_symkey)
 
         # Decrypt all the encrypted csv files in the directory
         for encrypted_file in chunk_dir.iterdir():
@@ -78,14 +87,18 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
                 # Decrypt csv file
                 with open(encrypted_file, "rb") as file:
                     data = file.read()
+                    nonce, ciphertext = (
+                        data[:NONCE_SIZE_BYTES],
+                        data[NONCE_SIZE_BYTES:],
+                    )
 
                 try:
-                    decrypted_data = fernet.decrypt(data)
+                    decrypted_data = aesgcm.decrypt(nonce, ciphertext, None)
 
                     with open(decrypted_dir / f"{csv_file}", "wb") as file:
                         file.write(decrypted_data)
 
-                except InvalidToken as exc:
+                except InvalidTag as exc:
                     raise InvalidKeyError(
                         f"Not able to decrypt {encrypted_file}, "
                         f"is symkey correct?"
@@ -93,8 +106,8 @@ def decrypt(rsa_keys_dir: Path, dataset_dir: Path, output_dir: Path) -> None:
 
                 logger.debug(f"Decrypted {encrypted_file}")
 
-        del symkey
-        del fernet
+        del decrypted_symkey
+        del aesgcm
 
         # Merges the decrypted csv files into a single file
         _combine_csv_files(decrypted_dir, dataset_dir / f"{dataset_name}.csv")
@@ -140,14 +153,15 @@ def untar_encrypted_dataset(
 
 
 def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
-    if f"{dataset_name}.json" not in files:
+    filenames = {os.path.basename(f) for f in files}
+    if f"{dataset_name}.json" not in filenames:
         raise InvalidTarFileContents(f"{dataset_name}.json not in .tar file")
 
     if len(files) > 1:
-        if f"{dataset_name}.symkey.encr" not in files:
+        if f"{dataset_name}.kem.encr" not in filenames:
             raise InvalidTarFileContents(
                 f"Tar file for {dataset_name} does not contain the required "
-                f"{dataset_name}.symkey.encr file"
+                f"{dataset_name}.kem.encr file"
             )
 
         chunk_files = [str for str in files if str.endswith(".csv.encr")]
@@ -157,7 +171,7 @@ def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
                 f"Tar file for {dataset_name} does not contain any chunks files"
             )
 
-        if f"{dataset_name}.md5" not in files:
+        if f"{dataset_name}.md5" not in filenames:
             raise InvalidTarFileContents(
                 f"Tar file for {dataset_name} does not contain the required "
                 f"{dataset_name}.md5 file"
