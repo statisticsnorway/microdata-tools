@@ -171,10 +171,10 @@ def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
                 f"Tar file for {dataset_name} does not contain any chunks files"
             )
 
-        if f"{dataset_name}.md5" not in filenames:
+        if f"{dataset_name}.sha256" not in filenames:
             raise InvalidTarFileContents(
                 f"Tar file for {dataset_name} does not contain the required "
-                f"{dataset_name}.md5 file"
+                f"{dataset_name}.sha256 file"
             )
 
 
