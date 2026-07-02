@@ -149,16 +149,16 @@ def tar_encrypted_dataset(input_dir: Path, dataset_name: str) -> None:
         if len(chunk_files) == 0:
             raise ValidationException(f"No files found in {chunk_dir}")
 
-        md5_file = dataset_dir / f"{dataset_name}.md5"
-        if not md5_file.exists():
+        sha256_file = dataset_dir / f"{dataset_name}.sha256"
+        if not sha256_file.exists():
             raise ValidationException(
-                f"The required file {md5_file} is missing"
+                f"The required file {sha256_file} is missing"
             )
 
         files_to_tar.extend(
             [
                 dataset_dir / f"{dataset_name}.kem.encr",
-                dataset_dir / f"{dataset_name}.md5",
+                dataset_dir / f"{dataset_name}.sha256",
             ]
         )
 

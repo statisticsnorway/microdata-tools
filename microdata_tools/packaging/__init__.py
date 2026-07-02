@@ -68,10 +68,10 @@ def package_dataset(
             if not dataset_output_dir.exists():
                 os.makedirs(dataset_output_dir)
 
-        if Path(dataset_dir / f"{dataset_name}.md5").exists():
+        if Path(dataset_dir / f"{dataset_name}.sha256").exists():
             shutil.move(
-                dataset_dir / f"{dataset_name}.md5",
-                dataset_output_dir / f"{dataset_name}.md5",
+                dataset_dir / f"{dataset_name}.sha256",
+                dataset_output_dir / f"{dataset_name}.sha256",
             )
 
         shutil.copyfile(
@@ -141,5 +141,5 @@ def _validate_csv_consistency(
             output_dir / dataset_name / f"{dataset_name}.csv"
         )
         compare_checksum_with_file(
-            dataset_dir / f"{dataset_name}.md5", calculated_checksum
+            dataset_dir / f"{dataset_name}.sha256", calculated_checksum
         )
