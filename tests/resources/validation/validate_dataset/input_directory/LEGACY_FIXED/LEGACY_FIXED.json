@@ -1,0 +1,34 @@
+{
+    "temporalityType": "FIXED",
+    "sensitivityLevel": "PERSON_GENERAL",
+    "populationDescription": [{"languageCode": "no", "value": "Alle personer registrert bosatt i Norge"}],
+    "spatialCoverageDescription": [{"languageCode": "no", "value": "Norge"}],
+    "subjectFields": [
+      [{"languageCode": "no", "value": "Befolkning"}]
+    ],
+    "dataRevision": {
+      "description": [{"languageCode": "no","value": "Første publisering."}]
+    },
+    "identifierVariables": [{"unitType": "PERSON"}],
+    "measureVariables": [
+      {
+        "name": [{"languageCode": "no", "value": "Kjønn"}],
+        "description": [{"languageCode": "no", "value": "Kjønn slik det er registrert i folkeregisteret"}],
+        "dataType": "STRING",
+        "valueDomain": {
+          "codeList": [
+            {
+              "code": "1",
+              "categoryTitle": [{"languageCode": "no", "value": "Mann"}],
+              "validFrom": "1900-01-01"
+            },
+            {
+              "code": "2",
+              "categoryTitle": [{"languageCode": "no", "value": "Kvinne"}],
+              "validFrom": "1900-01-01"
+            }
+          ]
+        }
+      }
+    ]
+  }

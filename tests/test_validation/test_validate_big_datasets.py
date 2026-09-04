@@ -63,7 +63,7 @@ def setup_fn(row_count):
             ("2010-01-01", "2010-01-01"),
             ("2007-01-01", "2007-01-01"),
         ],
-        "FIXED_DS": [("", "2020-01-01")],
+        "FIXED_DS": [("", "")],
     }
     for dataset_name in VALID_DATASET_NAMES:
         file_path = f"{RESOURCE_DIR}/{dataset_name}/{dataset_name}.csv"

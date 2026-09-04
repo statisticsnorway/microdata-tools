@@ -57,7 +57,7 @@ def FIXED_STRING_CODELIST_DS():
             "value": ["0", "1", "2", "1"],
             "start_year": [None] * 4,
             "start_epoch_days": [None] * 4,
-            "stop_epoch_days": [18262] * 4,
+            "stop_epoch_days": [None] * 4,
         },
     )
 
@@ -70,7 +70,7 @@ def FIXED_STRING_CODELIST_INVALID_DS():
             "value": ["0", "1", "2", "3"],
             "start_year": [None] * 4,
             "start_epoch_days": [None] * 4,
-            "stop_epoch_days": [18262] * 4,
+            "stop_epoch_days": [None] * 4,
         },
     )
 
@@ -82,7 +82,7 @@ _FIXED_DS_TEMPLATE = {
     "unit_id": ["1", "2", "3", "4"],
     "start_year": [None] * 4,
     "start_epoch_days": [None] * 4,
-    "stop_epoch_days": [18262] * 4,
+    "stop_epoch_days": [None] * 4,
 }
 
 
@@ -174,7 +174,7 @@ _FIXED_VALID_DICT = {
     "value": ["1", "2", "3", "4"],
     "start_year": [None] * 4,
     "start_epoch_days": [None] * 4,
-    "stop_epoch_days": [18262] * 4,
+    "stop_epoch_days": [None] * 4,
 }
 
 
