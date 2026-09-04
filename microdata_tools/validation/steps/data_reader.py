@@ -2,7 +2,7 @@
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict
 
 import pyarrow
 import pyarrow.dataset
@@ -81,6 +81,7 @@ def _csv_stream_to_parquet(
     reader: pyarrow.csv.CSVStreamingReader,
     writer: pyarrow.parquet.ParquetWriter,
 ) -> None:
+    found_deprecated_stop_dates = False
     while True:
         try:
             batch = reader.read_next_batch()
@@ -91,6 +92,10 @@ def _csv_stream_to_parquet(
         value = _sanitize_value(table, measure_data_type)
         epoch_start = _cast_to_epoch_date(table, "start")
         epoch_stop = _cast_to_epoch_date(table, "stop")
+        if temporality_type == "FIXED":
+            if epoch_stop.null_count < len(epoch_stop):
+                found_deprecated_stop_dates = True
+            epoch_stop = _empty_column(epoch_stop)
         columns = [unit_id, value, epoch_start, epoch_stop]
         column_names = [
             "unit_id",
@@ -103,6 +108,13 @@ def _csv_stream_to_parquet(
             column_names.append("start_year")
         table = pyarrow.Table.from_arrays(columns, column_names)
         writer.write_table(table)
+    if found_deprecated_stop_dates:
+        logger.warning(
+            "DEPRECATED: found stop dates in the #4 column of a dataset "
+            "with temporalityType FIXED. These dates are ignored, and "
+            "support for them will be removed in a future version. Leave "
+            "both date columns empty for FIXED datasets."
+        )
 
 
 def _csv_to_parquet(
@@ -181,6 +193,14 @@ def _sanitize_value(
         return table["value"]
 
 
+def _empty_column(column: pyarrow.ChunkedArray) -> pyarrow.Array:
+    """
+    Returns an all null column of the same length and type. Used to
+    ignore the deprecated stop dates of a FIXED dataset.
+    """
+    return pyarrow.nulls(len(column), type=column.type)
+
+
 def _cast_to_epoch_date(
     table: pyarrow.Table, column_name: str
 ) -> pyarrow.Array:
@@ -235,18 +255,6 @@ def _min_max(
     return min_v, max_v
 
 
-def _max(
-    filesystem_dataset: pyarrow.dataset.FileSystemDataset, column: str
-) -> Tuple[int | None, int | None]:
-    return _min_max(filesystem_dataset, column)[1]
-
-
-def _min(
-    filesystem_dataset: pyarrow.dataset.FileSystemDataset, column: str
-) -> Tuple[int | None, int | None]:
-    return _min_max(filesystem_dataset, column)[0]
-
-
 def get_temporal_data(
     dataset: pyarrow.dataset.FileSystemDataset, temporality_type: str
 ) -> Dict[str, int]:
@@ -257,17 +265,9 @@ def get_temporal_data(
     """
     temporal_data = {}
     if temporality_type == "FIXED":
-        stop_max = _max(dataset, "stop_epoch_days")
-        if stop_max is None:
-            error_string = (
-                "Could not read data in fourth column (Stop date)."
-                " Is this column empty?"
-            )
-            raise ValidationError(error_string, errors=[error_string])
-        temporal_data["start"] = "1900-01-01"
-        temporal_data["latest"] = (
-            datetime(1970, 1, 1) + timedelta(days=stop_max)
-        ).strftime("%Y-%m-%d")
+        # A FIXED dataset has no dates in its data file. Its temporal
+        # coverage is derived from the metadata by the metadata_enricher.
+        return temporal_data
     else:
         start_min, start_max = _min_max(dataset, "start_epoch_days")
         stop_min, stop_max = _min_max(dataset, "stop_epoch_days")
