@@ -50,8 +50,8 @@ def test_validate_valid_dataset():
         ) as f:
             expected_metadata = json.load(f)
         if expected_metadata["temporalityType"] == "FIXED":
-            # A FIXED dataset is valid up until the time of validation,
-            # so its temporalCoverageLatest is not a fixed date.
+            # FIXED datasets does not have a fixed temporal coverage
+            # so the temporalCoverageLatest are set to now.
             expected_metadata["dataRevision"]["temporalCoverageLatest"] = (
                 datetime.now().strftime("%Y-%m-%d")
             )
@@ -60,9 +60,9 @@ def test_validate_valid_dataset():
 
 def test_validate_legacy_fixed_dataset(caplog):
     """
-    Before the stop column was deprecated for FIXED datasets, the date
-    the data was valid until was repeated on every row. Such datasets
-    are still valid: the dates are ignored, and the producer is warned.
+    Before the stop colum was deprecated for FIXED datasets, the date
+    was repeated on every row. Such datasetsare still valid:
+    the dates are ignored, and the producer is warned.
     """
     DATASET_NAME = "LEGACY_FIXED"
     with caplog.at_level(logging.WARNING):
