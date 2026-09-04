@@ -72,6 +72,8 @@ tests/resources/validation/validate_dataset/big_datasets/FIXED_DS/FIXED_DS.csv.r
 tests/resources/validation/validate_dataset/big_datasets/STATUS_DS/STATUS_DS.csv
 tests/resources/validation/validate_dataset/big_datasets/STATUS_DS/STATUS_DS.csv.rowcount
 
+*.parquet
+
 # Translations
 *.mo
 *.pot
