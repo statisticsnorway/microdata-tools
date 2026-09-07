@@ -20,10 +20,7 @@ def test_enrich_with_temporal_coverage_fixed():
         metadata = json.load(f)
         metadata_enricher.enrich_with_temporal_coverage(metadata, {})
         data_revision = metadata["dataRevision"]
-        assert (
-            data_revision["temporalCoverageStart"]
-            == "1900-01-01"
-        )
+        assert data_revision["temporalCoverageStart"] == "1900-01-01"
         assert data_revision[
             "temporalCoverageLatest"
         ] == datetime.now().strftime("%Y-%m-%d")
