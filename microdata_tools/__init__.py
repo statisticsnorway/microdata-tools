@@ -1,4 +1,8 @@
-from microdata_tools.packaging import package_dataset, unpackage_dataset
+from microdata_tools.packaging import (
+    package_dataset,
+    unpackage_dataset,
+)
+from microdata_tools.packaging.keys import PrivateKey, PublicKey
 from microdata_tools.validation import (
     get_unit_id_type_for_unit_type,
     validate_dataset,
@@ -11,4 +15,6 @@ __all__ = [
     "validate_dataset",
     "validate_metadata",
     "get_unit_id_type_for_unit_type",
+    "PrivateKey",
+    "PublicKey",
 ]

@@ -14,29 +14,29 @@ def check_exists(path: Path) -> None:
 
 def calculate_checksum(csv_file: Path) -> str:
     """
-    Reads a file in chunks and returns the MD5 hash of the file
+    Reads a file in chunks and returns the SHA-256 hash of the file
     """
     CHUNK_SIZE = 32768
-    hash_md5 = hashlib.md5()
+    hash_sha256 = hashlib.sha256()
     with open(csv_file, "rb") as f:
         for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
-            hash_md5.update(chunk)
+            hash_sha256.update(chunk)
 
-    return hash_md5.hexdigest()
+    return hash_sha256.hexdigest()
 
 
 def write_checksum_to_file(csv_file: Path) -> None:
-    hash_file = str(csv_file).replace(".csv", ".md5")
+    hash_file = str(csv_file).replace(".csv", ".sha256")
     with open(hash_file, "w") as file:
         file.write(calculate_checksum(csv_file))
 
 
 def compare_checksum_with_file(
-    md5_file: Path, calculated_checksum: str
+    sha256_file: Path, calculated_checksum: str
 ) -> None:
-    with open(md5_file, "r") as file:
+    with open(sha256_file, "r") as file:
         checksum_from_file = file.readlines()[0]
         if calculated_checksum != checksum_from_file.strip():
             raise CsvConsistencyException(
-                "MD5 checksums do not match. The csv file may be corrupted!"
+                "SHA-256 checksums do not match. The csv file may be corrupted!"
             )
