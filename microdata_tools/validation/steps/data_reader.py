@@ -135,6 +135,7 @@ def _csv_stream_to_sqlite_and_parquet(
                 "both date columns empty for FIXED datasets."
             )
 
+
 def _csv_to_sqlite_and_parquet(
     input_csv_path: Path,
     output_parquet_path: Path,
