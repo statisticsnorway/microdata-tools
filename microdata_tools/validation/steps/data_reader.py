@@ -101,7 +101,7 @@ def _csv_stream_to_sqlite_and_parquet(
             if temporality_type == "FIXED":
                 if epoch_stop.null_count < len(epoch_stop):
                     found_deprecated_stop_dates = True
-            epoch_stop = _empty_column(epoch_stop)
+                epoch_stop = _empty_column(epoch_stop)
             columns = [unit_id, value, epoch_start, epoch_stop]
             column_names = [
                 "unit_id",
