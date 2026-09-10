@@ -362,7 +362,8 @@ def validate_dataset(
     temporality_type: str,
 ) -> None:
     assert os.path.exists(sqlite_path)
-    with sqlite3.connect(sqlite_path) as conn:
+    conn = sqlite3.connect(sqlite_path)
+    try:
         _valid_unit_id_check(data)
         _valid_value_column_check(
             data, measure_data_type, code_list, sentinel_list
@@ -381,3 +382,5 @@ def validate_dataset(
             _no_overlapping_timespans_check(conn)
         else:
             raise RuntimeError(f"Unknown temporality type '{temporality_type}'")
+    finally:
+        conn.close()
