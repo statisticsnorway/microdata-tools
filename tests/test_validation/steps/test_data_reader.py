@@ -22,13 +22,16 @@ def _csv_to_table(
 ):
     os.makedirs("tmp", exist_ok=True)
     output_parquet_path = "tmp/tmp.parquet"
-    return data_reader.read_and_sanitize_csv_write_parquet(
+    output_sqlite_path = "tmp/tmp.sqlite3.db"
+    ds = data_reader.read_and_sanitize_csv_write_sqlite_and_parquet(
         csv_data_path,
         Path(output_parquet_path),
+        Path(output_sqlite_path),
         identifier_data_type,
         measure_data_type,
         temporality_type,
-    ).to_table()
+    )
+    return ds.to_table()
 
 
 def _get_temporal_data(table: pyarrow.Table, temporality_type: str):
