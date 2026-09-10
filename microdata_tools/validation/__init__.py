@@ -88,12 +88,16 @@ def validate_dataset(
 
         # Read data
         parquet_path = working_directory_path / f"{dataset_name}.parquet"
-        filesystem_dataset = data_reader.read_and_sanitize_csv_write_parquet(
-            input_data_path,
-            parquet_path,
-            identifier_data_type,
-            measure_data_type,
-            temporality_type,
+        sqlite_path = working_directory_path / f"{dataset_name}.sqlite3.db"
+        filesystem_dataset = (
+            data_reader.read_and_sanitize_csv_write_sqlite_and_parquet(
+                input_data_path,
+                parquet_path,
+                sqlite_path,
+                identifier_data_type,
+                measure_data_type,
+                temporality_type,
+            )
         )
 
         # Enrich metadata with temporal data
@@ -112,6 +116,7 @@ def validate_dataset(
         # Validate data
         dataset_validator.validate_dataset(
             pyarrow.dataset.dataset(parquet_path),
+            sqlite_path,
             measure_data_type,
             code_list,
             sentinel_list,
