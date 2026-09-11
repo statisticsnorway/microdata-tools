@@ -104,6 +104,15 @@ The data file is a csv file seperated by semicolons. A valid example would be:
 000000000000003;123;2020-01-01;2020-12-31;
 000000000000004;123;2020-01-01;2020-12-31;
 ```
+
+For datasets with temporalityType FIXED the value does not change over time, so there is no time period to describe — both the start and stop columns should be left empty. On microdata.no such variables are shown with an infinite validity period ("∞"), see [BEFOLKNING_KJOENN](https://microdata.no/discovery/variable/no.ssb.fdb/56/BEFOLKNING_KJOENN) for an example.
+```csv
+000000000000001;123;;;
+000000000000002;123;;;
+000000000000003;123;;;
+000000000000004;123;;;
+```
+
 Read more about the data format and columns in [the documentation](https://statisticsnorway.github.io/microdata-tools/).
 
 The metadata files should be in json format. The requirements for the metadata is best described through the [Pydantic model](/microdata_tools/validation/model/metadata.py), [the examples](/docs/examples), and [the metadata model](https://statisticsnorway.github.io/microdata-tools/metadata-model/).
@@ -156,4 +165,3 @@ if you dont have it installed on your system you can use:
 uv run pre-commit
 ```
 Read more about [pre-commit](https://pre-commit.com/#intro)
-

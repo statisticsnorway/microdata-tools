@@ -246,7 +246,7 @@ def test_temporality_fixed():
             "FIXED",
         )
     assert e.value.errors == [
-        f"Invalid #3 and/or #4 columns for row with identifier: {id}"
+        f"Expected empty #3 column for row with identifier: {id}"
         for id in range(1, 5)
     ]
     with pytest.raises(ValidationError) as e:

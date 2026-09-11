@@ -66,6 +66,8 @@ tests/resources/validation/validate_dataset/big_datasets/*/*.csv.rowcount
 tests/resources/validation/steps/dataset_validator/parquet/*.parquet
 
 
+*.parquet
+
 # Translations
 *.mo
 *.pot

@@ -1,5 +1,9 @@
 import json
+import logging
 import os
+from datetime import datetime
+
+from pyarrow import dataset
 
 from microdata_tools import validate_dataset
 
@@ -13,6 +17,9 @@ VALID_DATASET_NAMES = [
     "SYNT_PERSON_INNTEKT",
     "SYNT_PERSON_MOR",
     "SYNT_UTDANNING",
+    # A FIXED dataset in the depercated format, with a stop date on
+    # every row. Still valid, see test_validate_legacy_fixed_dataset.
+    "LEGACY_FIXED",
 ]
 NO_SUCH_DATASET_NAME = "NO_SUCH_DATASET"
 WRONG_DELIMITER_DATASET_NAME = "WRONG_DELIMITER_DATASET"
@@ -42,7 +49,46 @@ def test_validate_valid_dataset():
             f"{EXPECTED_DIR}/{dataset_name}.json", "r", encoding="utf-8"
         ) as f:
             expected_metadata = json.load(f)
+        if expected_metadata["temporalityType"] == "FIXED":
+            # FIXED datasets does not have a fixed temporal coverage
+            # so the temporalCoverageLatest are set to now.
+            expected_metadata["dataRevision"]["temporalCoverageLatest"] = (
+                datetime.now().strftime("%Y-%m-%d")
+            )
         assert actual_metadata == expected_metadata
+
+
+def test_validate_legacy_fixed_dataset(caplog):
+    """
+    Before the stop colum was deprecated for FIXED datasets, the date
+    was repeated on every row. Such datasetsare still valid:
+    the dates are ignored, and the producer is warned.
+    """
+    DATASET_NAME = "LEGACY_FIXED"
+    with caplog.at_level(logging.WARNING):
+        data_errors = validate_dataset(
+            DATASET_NAME,
+            working_directory=WORKING_DIR,
+            keep_temporary_files=True,
+            input_directory=INPUT_DIR,
+        )
+    assert not data_errors
+    assert "DEPRECATED" in caplog.text
+    assert "#4 column" in caplog.text
+
+    with open(f"{WORKING_DIR}/{DATASET_NAME}.json", "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+    data_revision = metadata["dataRevision"]
+    # The stop dates in the data file are not used as temporal coverage
+    assert data_revision["temporalCoverageStart"] == "1900-01-01"
+    assert data_revision["temporalCoverageLatest"] == datetime.now().strftime(
+        "%Y-%m-%d"
+    )
+
+    # The deprecated stop dates are dropped from the validated data
+    table = dataset.dataset(f"{WORKING_DIR}/{DATASET_NAME}.parquet").to_table()
+    assert table.column("stop_epoch_days").null_count == table.num_rows
+    assert table.column("start_epoch_days").null_count == table.num_rows
 
 
 def test_invalid_dataset_name():

@@ -108,20 +108,20 @@ def _fixed_temporal_variables_check(data: FileSystemDataset) -> None:
     """
     Any given row in a table with temporalityType=FIXED is valid only if:
     * The start_epoch_days column contains null (empty)
-    * The stop_epoch_days column contains a non-null value (int32)
+
+    The stop_epoch_days column is always empty for a FIXED dataset. The
+    value of a FIXED variable does not change over time, so there is no
+    time period to describe. Any stop dates in the data file are ignored
+    by the data_reader.
     """
-    start_is_valid_filter = dataset.field("start_epoch_days").is_valid()
-    stop_is_null_filter = dataset.field("stop_epoch_days").is_null()
     invalid_rows = data.to_table(
-        filter=start_is_valid_filter | stop_is_null_filter,
+        filter=dataset.field("start_epoch_days").is_valid(),
         columns=["unit_id"],
     )
     if len(invalid_rows) > 0:
         raise ValidationError(
-            "#3 and #4 columns",
-            errors=_get_error_list(
-                invalid_rows, "Invalid #3 and/or #4 columns"
-            ),
+            "#3 column",
+            errors=_get_error_list(invalid_rows, "Expected empty #3 column"),
         )
 
 

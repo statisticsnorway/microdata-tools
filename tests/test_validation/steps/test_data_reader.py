@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -10,6 +11,12 @@ from microdata_tools.validation.steps import data_reader
 
 INPUT_DIR = Path("tests/resources/validation/steps/data_reader")
 
+# We use the csvs below to test csv parsing and value sanitizing only.
+# Their rows are not valid under any temporality type, so the temporality
+# is picked for its read path alone: EVENT is the one that writes both
+# date columns exactly as they appear in the file. STATUS and ACCUMULATED
+# add a start_year column, and FIXED empties the stop column, see
+# test_fixed_ignores_stop_dates.
 EXPECTED_COLUMNS = {
     "unit_id": ["000001", "000002", "000002"],
     "start_epoch_days": [None, 18262, 18262],
@@ -57,7 +64,7 @@ def test_get_temporal_data():
     )
     fixed_dict = {
         "start_epoch_days": [None, None, None, None, None],
-        "stop_epoch_days": [1, 2, 3, 4, 5],
+        "stop_epoch_days": [None, None, None, None, None],
     }
     event_dict = {
         "start_epoch_days": [1, 2, 3, 1, 5],
@@ -77,10 +84,7 @@ def test_get_temporal_data():
     }
 
     fixed_table = pyarrow.Table.from_pydict(fixed_dict, schema=table_schema)
-    assert _get_temporal_data(fixed_table, "FIXED") == {
-        "start": "1900-01-01",
-        "latest": "1970-01-06",
-    }
+    assert _get_temporal_data(fixed_table, "FIXED") == {}
     event_table = pyarrow.Table.from_pydict(event_dict, schema=table_schema)
     assert _get_temporal_data(event_table, "EVENT") == {
         "start": "1970-01-02",
@@ -116,17 +120,48 @@ def test_get_temporal_data():
     ]
 
 
+def test_fixed_ignores_stop_dates(caplog):
+    """
+    Stop dates are deperecated for FIXED datasets. A data file that still
+    has them is read as if the column were empty, and the producer is
+    warned.
+    """
+    legacy_data_path = INPUT_DIR / "FIXED_DEPRECATED_STOP.csv"
+    with caplog.at_level(logging.WARNING):
+        table = _csv_to_table(legacy_data_path, "STRING", "STRING", "FIXED")
+    assert table.to_pydict() == {
+        "unit_id": ["000001", "000002", "000003"],
+        "value": ["abc123", "abc123", "abc123"],
+        "start_epoch_days": [None, None, None],
+        "stop_epoch_days": [None, None, None],
+    }
+    assert "DEPRECATED" in caplog.text
+    assert "#4 column" in caplog.text
+
+    caplog.clear()
+    empty_data_path = INPUT_DIR / "FIXED.csv"
+    with caplog.at_level(logging.WARNING):
+        table = _csv_to_table(empty_data_path, "STRING", "STRING", "FIXED")
+    assert table.to_pydict() == {
+        "unit_id": ["000001", "000002", "000003"],
+        "value": ["abc123", "abc123", "abc123"],
+        "start_epoch_days": [None, None, None],
+        "stop_epoch_days": [None, None, None],
+    }
+    assert not caplog.text
+
+
 def test_sanitize_long():
     long_data_path = INPUT_DIR / "LONG.csv"
     assert _csv_to_table(
-        long_data_path, "STRING", "LONG", "FIXED"
+        long_data_path, "STRING", "LONG", "EVENT"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
         "value": [12345, 12345, 12345],
     }
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "LONG_INVALID_VALUE.csv"
-        _csv_to_table(invalid_data_path, "STRING", "LONG", "FIXED")
+        _csv_to_table(invalid_data_path, "STRING", "LONG", "EVENT")
     assert e.value.errors == [
         "In CSV column #1: CSV conversion error to int64: invalid value "
         "'abc123'"
@@ -136,14 +171,14 @@ def test_sanitize_long():
 def test_sanitize_double():
     double_data_path = INPUT_DIR / "DOUBLE.csv"
     assert _csv_to_table(
-        double_data_path, "STRING", "DOUBLE", "FIXED"
+        double_data_path, "STRING", "DOUBLE", "EVENT"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
         "value": [12345.12345, 12345.12345, 12345.12345],
     }
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "DOUBLE_INVALID_FORMAT.csv"
-        _csv_to_table(invalid_data_path, "STRING", "DOUBLE", "FIXED")
+        _csv_to_table(invalid_data_path, "STRING", "DOUBLE", "EVENT")
     assert e.value.errors == [
         "In CSV column #1: CSV conversion error to double: invalid value "
         "'12345,12345'"
@@ -153,14 +188,14 @@ def test_sanitize_double():
 def test_sanitize_date():
     date_data_path = INPUT_DIR / "DATE.csv"
     assert _csv_to_table(
-        date_data_path, "STRING", "DATE", "FIXED"
+        date_data_path, "STRING", "DATE", "EVENT"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
         "value": [18262, 18262, 18262],
     }
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "DATE_INVALID_VALUE.csv"
-        _csv_to_table(invalid_data_path, "STRING", "DATE", "FIXED")
+        _csv_to_table(invalid_data_path, "STRING", "DATE", "EVENT")
     assert e.value.errors == [
         "In CSV column #1: CSV conversion error to date32[day]: invalid value "
         "'2020-13-01'"
@@ -170,7 +205,7 @@ def test_sanitize_date():
 def test_sanitize_string():
     string_data_path = INPUT_DIR / "STRING.csv"
     assert _csv_to_table(
-        string_data_path, "STRING", "STRING", "FIXED"
+        string_data_path, "STRING", "STRING", "EVENT"
     ).to_pydict() == {
         **EXPECTED_COLUMNS,
         "value": ["abc123", "abc123", "abc123"],
@@ -180,7 +215,7 @@ def test_sanitize_string():
 def test_sanitize_data_invalid_start_stop():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_INVALID_START_STOP.csv"
-        _csv_to_table(invalid_data_path, "STRING", "STRING", "FIXED")
+        _csv_to_table(invalid_data_path, "STRING", "STRING", "EVENT")
     assert e.value.errors == [
         "In CSV column #3: CSV conversion error to date32[day]: invalid value "
         "'2020-13-01'"
@@ -190,7 +225,7 @@ def test_sanitize_data_invalid_start_stop():
 def test_sanitize_data_wrong_delimiter():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_INVALID_DELIMITER.csv"
-        _csv_to_table(invalid_data_path, "STRING", "STRING", "FIXED")
+        _csv_to_table(invalid_data_path, "STRING", "STRING", "EVENT")
     assert e.value.errors == [
         "CSV parse error: Expected 5 columns, got 1: 000001,abc123,2020-01-01,"
     ]
@@ -199,7 +234,7 @@ def test_sanitize_data_wrong_delimiter():
 def test_sanitize_data_empty_file():
     with pytest.raises(ValidationError) as e:
         invalid_data_path = INPUT_DIR / "STRING_EMPTY_FILE.csv"
-        _csv_to_table(invalid_data_path, "STRING", "STRING", "FIXED")
+        _csv_to_table(invalid_data_path, "STRING", "STRING", "EVENT")
     assert e.value.errors == ["Empty CSV file"]
 
 
