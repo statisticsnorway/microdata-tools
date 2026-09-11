@@ -79,8 +79,7 @@ Import microdata-tools in your script and validate your files:
 from microdata_tools import validate_dataset
 
 validation_errors = validate_dataset(
-    "MY_DATASET_NAME",
-    input_directory="path/to/my-input-directory"
+    "MY_DATASET_NAME", input_directory="path/to/my-input-directory"
 )
 
 if not validation_errors:
