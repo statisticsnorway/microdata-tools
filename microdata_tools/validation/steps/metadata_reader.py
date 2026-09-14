@@ -34,10 +34,11 @@ def _validate_datatype_in_codelist_and_sentinels(
     ]
     if invalid_codes:
         error_message = (
-            f"Specified data type for measure ({data_type}) does not match the "
-            f"data type within the "
-            f"{list_name} ({_determine_datatype(invalid_codes[0])}). "
-            f"Codes with mismatching data type are: "
+            f"Specified data type for measure ({data_type}) "
+            f"does not match the data type within the {list_name} "
+            "in the metadata json. The codes appear to be of type "
+            f"{_determine_datatype(invalid_codes[0])}. "
+            "Codes with mismatching data type are: "
             f"{invalid_codes[:5] + ['...'] if len(invalid_codes) > 5 else invalid_codes}"  # noqa
         )
         return error_message
