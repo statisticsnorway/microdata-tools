@@ -187,7 +187,8 @@ def test_mismatch_between_specified_datatype_and_datatype_within_codelist():
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert e.value.errors == [
         "Specified data type for measure (LONG) does not match the data type "
-        "within the codelist (STRING). Codes with mismatching data type are: "
+        "within the codelist in the metadata json. The codes appear to be of "
+        "type STRING. Codes with mismatching data type are: "
         "['1', '2', '3', '4', '5', '...']"
     ]
 
@@ -199,6 +200,7 @@ def test_mismatch_between_specified_datatype_and_datatype_within_sentinel_list()
         metadata_reader.run_reader(DATASET_NAME, METADATA_PATH)
     assert e.value.errors == [
         "Specified data type for measure (STRING) does not match the data type "
-        "within the sentinel- and missing values list (LONG). Codes with "
-        "mismatching data type are: [0]"
+        "within the sentinel- and missing values list in the metadata json. "
+        "The codes appear to be of type LONG. "
+        "Codes with mismatching data type are: [0]"
     ]
