@@ -52,7 +52,6 @@ The input directory is set to the directory of the script by default.
 If you wish to use a different directory, you can use the ```input_directory```-parameter:
 
 ```py
-
 from microdata_tools import validate_dataset
 
 validation_errors = validate_dataset(
@@ -70,13 +69,12 @@ The validate function will temporarily generate some files in order to validate 
 
 
 ```py
-
 from microdata_tools import validate_dataset
 
 validation_errors = validate_dataset(
     "my-dataset-name",
     input_directory="/my/input/directory",
-    working_directory="/my/working/directory"
+    working_directory="/my/working/directory",
 )
 
 if not validation_errors:
@@ -94,7 +92,7 @@ validation_errors = validate_dataset(
     "MY_DATASET_NAME",
     input_directory="/my/input/directory",
     working_directory="/my/working/directory",
-    keep_temporary_files=True
+    keep_temporary_files=True,
 )
 
 if not validation_errors:
@@ -110,8 +108,7 @@ You can validate the metadata by itself with the validate_metadata function:
 from microdata_tools import validate_metadata
 
 validation_errors = validate_metadata(
-    "MY_DATASET_NAME",
-    input_directory="my/input/directory"
+    "MY_DATASET_NAME", input_directory="my/input/directory"
 )
 
 if not validation_errors:
