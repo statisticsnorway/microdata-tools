@@ -21,6 +21,7 @@ If you're a data owner preparing a dataset, the full guide lives on the document
 
 - **[Getting started](https://statisticsnorway.github.io/microdata-tools/)** — install, prepare, validate and package your dataset, step by step.
 - **[The metadata model](https://statisticsnorway.github.io/microdata-tools/metadata-model/)** — a field-by-field reference for the metadata JSON file.
+- **[The data file format](https://statisticsnorway.github.io/microdata-tools/data-file-format/)** — a reference for the CSV data file, including validation rules.
 - **[The packaging format](https://statisticsnorway.github.io/microdata-tools/packaging-format/)** — how your data is encrypted and packaged.
 
 The sections below are aimed at developers integrating `microdata-tools` into another service (such as job-executor), and at contributors to this repository.
