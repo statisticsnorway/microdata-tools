@@ -11,6 +11,10 @@ This page describes what happens to the files when running `package_dataset()`.
 
 The combination of AES-256-GCM for the bulk data and HPKE/ML-KEM-768/X25519 (a post-quantum-safe key encapsulation scheme combined with X25519) for the key means that only the holder of the corresponding private key — microdata.no — can ever recover the symmetric key needed to decrypt the data.
 
+!!! note "Getting your public key"
+    Your public key is supplied through datastore-admin once you're logged in (look for a "copy public key" button). Contact the microdata.no team if you can't find it.
+
+
 ## Archive contents
 
 A packaged `<DATASET_NAME>.tar` archive contains:

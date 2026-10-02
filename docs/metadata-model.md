@@ -2,6 +2,20 @@
 _______
 This document is a field-by-field reference for the metadata JSON file that accompanies each dataset. It describes what each field means and how to fill it in, so you can write a valid metadata file for your dataset. For a step-by-step walkthrough of preparing, validating and packaging a full dataset, see [Getting started](index.md). For the CSV data file format and its validation rules, see [the data file format](data-file-format.md). For complete, valid metadata files, see [the example datasets](https://github.com/statisticsnorway/microdata-tools/tree/main/docs/examples).
 
+Here is the overall shape of a metadata file. The sections below describe each of these fields in detail, in the same order as they appear here:
+
+```json
+{
+    "temporalityType": "...",
+    "sensitivityLevel": "...",
+    "populationDescription": [...],
+    "spatialCoverageDescription": [...],
+    "subjectFields": [...],
+    "dataRevision": {...},
+    "identifierVariables": [...],
+    "measureVariables": [...]
+}
+```
 
 ## Root level fields
 These fields describe the dataset as a whole.
@@ -13,7 +27,7 @@ These fields describe the dataset as a whole.
 ```
 
 - `FIXED`: A value that does not change over time for a given unit, e.g. place of birth.
-- `STATUS`: A value observed at specific points in time, e.g. employment status at a given date.
+- `STATUS`: A value observed at specific points in time. The value is only true at one specific point in time, so start and stop are always the same date, e.g. employment status at a given date.
 - `ACCUMULATED`: A value accumulated over a period, e.g. yearly income.
 - `EVENT`: A state that is valid over a period of time. A unit can have only one state at a given point in time, but the state may change over time, e.g. marital status or place of residence.
 
@@ -223,14 +237,19 @@ You might find that some of your datasets contain a unitType in the measure colu
 ```
 
 ## Unit types
-* **PERSON**: Representation of a person in the microdata.no platform. Columns with this unit type should contain FNR.
-* **FAMILIE**: Representation of a family in the microdata.no platform. Columns with this unit type should contain FNR.
-* **FORETAK**: Representation of a foretak in the microdata.no platform. Columns with this unit type should contain ORGNR.
-* **BEDRIFT**: Representation of a bedrift in the microdata.no platform. Columns with this unit type should contain ORGNR.
-* **HUSHOLDNING**: Representation of a husholdning in the microdata.no platform. Columns with this unit type should contain FNR.
-* **JOBB**: Representation of a job in the microdata.no platform. Columns with this unit type should contain FNR_ORGNR. FNR belongs to the employee and ORGNR belongs to the employer.
-* **KOMMUNE**: Representation of a kommune in the microdata.no platform. Columns with this unit type should contain a valid kommune number.
-* **KURS**: Representation of a course in the microdata.no platform. Columns with this unit type should contain FNR_KURSID. Where FNR belongs to the participant and KURSID is the NUDB course id.
-* **KJORETOY**: Representation of a vehicle in the microdata.no platform. Columns with this unit type should contain FNR_REGNR. Where FNR is the owner of the vehicle, and REGNR is the registration number for the vehicle.
+These are only some of the used unit types. [See the complete list of predefined unit types here](https://github.com/statisticsnorway/microdata-tools/tree/main/microdata_tools/validation/components/unit_type_variables).
 
-[See complete list of predefined unit types here](https://github.com/statisticsnorway/microdata-tools/tree/main/microdata_tools/validation/components/unit_type_variables).
+| Unit type | Column should contain | Represents |
+|---|---|---|
+| `PERSON` | FNR | A person |
+| `FAMILIE` | FNR | A family |
+| `FORETAK` | ORGNR | A foretak |
+| `BEDRIFT` | ORGNR | A bedrift |
+| `HUSHOLDNING` | FNR | A husholdning |
+| `JOBB` | FNR_ORGNR | A job. FNR belongs to the employee, ORGNR to the employer. |
+| `KOMMUNE` | Kommune number | A kommune |
+| `KURS` | FNR_KURSID | A course. FNR belongs to the participant, KURSID is the NUDB course id. |
+| `KJORETOY` | FNR_REGNR | A vehicle. FNR is the owner, REGNR is the vehicle's registration number. |
+
+!!! note "Need a unit type that isn't listed?"
+    Unit types are centrally defined and maintained by the microdata.no developers. If your dataset's identifier or measure doesn't fit any of the existing types, [open an issue](https://github.com/statisticsnorway/microdata-tools/issues) to request a new one.

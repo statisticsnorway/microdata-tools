@@ -5,10 +5,11 @@ This document is a reference for the CSV data file that accompanies each dataset
 
 ## File format
 A data file must be supplied as a csv file with semicolon as the column seperator, with no header row. There must always be 5 columns present in this order:
+
 1. identifier
 2. measure
-3. start
-4. stop
+3. start date
+4. stop date
 5. empty column (This column is reserved for an extra attribute variable if that is considered necessary. Example: Datasource)
 
 For a dataset with temporalityType FIXED, the value does not change over time, so there is no time period to describe — both the start and stop columns should be left empty. On microdata.no, this is reflected by showing the variable's validity period as infinite ("∞"). See [Validation rules by temporality type](#validation-rules-by-temporality-type) below for details on stop-column backwards compatibility.
@@ -43,10 +44,11 @@ This dataset describes a group of persons gross income accumulated yearly. The c
 
 ## General validation rules
 * There can be no empty rows in the dataset
-* There can be no more than 5 elements in a row
+* Every row must have exactly 5 fields (4 semicolons), even if the last one or more are left empty
 * Every row must have a non-empty identifier
 * Every row must have a non-empty measure
 * Values in the stop- and start-columns must be formatted correctly: "YYYY-MM-DD". Example "2020-12-31".
+* `DOUBLE` values must use `.` (period) as the decimal separator — not `,` (comma)
 * The data file must be utf-8 encoded
 
 ## Validation rules by temporality type

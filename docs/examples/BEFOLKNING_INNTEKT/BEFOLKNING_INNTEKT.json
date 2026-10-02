@@ -15,7 +15,7 @@
 		{
 			"name": [{"languageCode": "no", "value": "Personens inntekt"}],
 			"description": [{"languageCode": "no", "value": "Personens rapporterte inntekt"}],
-			"dataType": "STRING",
+			"dataType": "LONG",
 			"valueDomain": {
 				"description": [{"languageCode": "no", "value":"Årlig personinntekt"}],
 				"measurementType": "CURRENCY",
