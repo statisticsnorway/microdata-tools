@@ -30,10 +30,11 @@ extra_css:
   - stylesheets/extra.css
 
 nav:
-  - Getting Started: index.md
-  - The Metadata model: metadata-model.md
-  - Usage: USAGE.md
-  - Report an Issue:
+  - Getting started: index.md
+  - The metadata model: metadata-model.md
+  - The data file format: data-file-format.md
+  - The packaging format: packaging-format.md
+  - Report an issue:
       - Issue template EN: issue_templates/issue_template_en.md
       - Issue template NO: issue_templates/issue_template_no.md
   - Releases: https://github.com/statisticsnorway/microdata-tools/releases
@@ -44,6 +45,8 @@ plugins:
   - search
 
 markdown_extensions:
+  - admonition
+  - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
