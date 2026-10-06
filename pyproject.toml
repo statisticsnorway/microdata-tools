@@ -7,12 +7,12 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "cryptography>=50.0.0",
+    "cryptography>=50.0.1",
     "numpy>=2.2.0",
     "pyarrow==25.0.1",
-    "pydantic>=2.11.7",
-    "adbc-driver-manager==1.10.0",
-    "adbc-driver-sqlite==1.10.0",
+    "pydantic>=2.13.5",
+    "adbc-driver-manager==1.12.0",
+    "adbc-driver-sqlite==1.12.0",
 ]
 
 [dependency-groups]
@@ -20,7 +20,7 @@ dev = [
     "pre-commit>=4.3.0",
     "pytest-cov>=6.2.1",
     "pytest>=8.4.1",
-    "ruff>=0.12.0",
+    "ruff>=0.16.8",
 ]
 
 [tool.uv]
