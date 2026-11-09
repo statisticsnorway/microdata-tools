@@ -96,6 +96,20 @@ def test_check_no_path_traversal_rejects_escaping_member(name):
     )
 
 
+def test_check_no_path_traversal_rejects_symlink_member():
+    symlink = tarfile.TarInfo("dataset-dir")
+    symlink.type = tarfile.SYMTYPE
+    symlink.linkname = "/outside/dir"
+    members = [symlink, tarfile.TarInfo("dataset-dir/DATASET.json")]
+
+    with raises(InvalidTarFileContents) as e:
+        _check_no_path_traversal(members)
+    assert (
+        str(e.value)
+        == "Tar member 'dataset-dir' is not a regular file or directory"
+    )
+
+
 def test_unpackage_dataset(keys_dir, tmp_path):
     dataset_name = "VALID"
     dataset_dir = Path(f"{INPUT_PACKAGE_DIR}/{dataset_name}")

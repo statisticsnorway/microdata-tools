@@ -160,6 +160,10 @@ def _check_no_path_traversal(members: List[tarfile.TarInfo]) -> None:
             raise InvalidTarFileContents(
                 f"Tar member '{member.name}' contains a path traversal sequence"
             )
+        if not (member.isfile() or member.isdir()):
+            raise InvalidTarFileContents(
+                f"Tar member '{member.name}' is not a regular file or directory"
+            )
 
 
 def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
