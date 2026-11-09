@@ -1,0 +1,8 @@
+[project]
+name = "microdata-tools-docs"
+version = "0.0.0"
+requires-python = ">=3.14,<3.15"
+dependencies = ["mkdocs-material"]
+
+[tool.uv]
+package = false
