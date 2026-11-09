@@ -7,6 +7,8 @@ version: 2
 updates:
   - package-ecosystem: "uv"
     directory: "/"
+    exclude-paths:
+      - "docs/**"
     schedule:
       interval: "monthly"
       day: "monday"
@@ -24,6 +26,20 @@ updates:
       semver-major-days: 30
       semver-minor-days: 14
       semver-patch-days: 7
+
+  - package-ecosystem: "uv"
+    directory: "/docs"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Oslo"
+    groups:
+      docs:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 7
 
   - package-ecosystem: 'github-actions'
     directory: '/'
