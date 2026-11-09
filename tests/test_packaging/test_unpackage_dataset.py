@@ -2,10 +2,13 @@ import filecmp
 import tarfile
 from pathlib import Path
 
-from pytest import MonkeyPatch, fail, raises
+from pytest import MonkeyPatch, fail, mark, raises
 
 from microdata_tools import package_dataset, unpackage_dataset
-from microdata_tools.packaging._decrypt import _validate_tar_contents
+from microdata_tools.packaging._decrypt import (
+    _check_no_path_traversal,
+    _validate_tar_contents,
+)
 from microdata_tools.packaging.exceptions import (
     InvalidKeyError,
     InvalidTarFileContents,
@@ -66,6 +69,30 @@ def test_validate_tar_contents_missing_chunk():
     assert (
         str(e.value)
         == f"Tar file for {dataset_name} does not contain any chunks files"
+    )
+
+
+def test_check_no_path_traversal():
+    members = [
+        tarfile.TarInfo("DATASET.json"),
+        tarfile.TarInfo("DATASET.kem.encr"),
+    ]
+
+    try:
+        _check_no_path_traversal(members)
+    except InvalidTarFileContents:
+        fail("InvalidTarFileContents raised unexpectedly")
+
+
+@mark.parametrize("name", ["../evil.py", "/etc/passwd", "sub/../../evil.py"])
+def test_check_no_path_traversal_rejects_escaping_member(name):
+    members = [tarfile.TarInfo("DATASET.json"), tarfile.TarInfo(name)]
+
+    with raises(InvalidTarFileContents) as e:
+        _check_no_path_traversal(members)
+    assert (
+        str(e.value)
+        == f"Tar member '{name}' contains a path traversal sequence"
     )
 
 

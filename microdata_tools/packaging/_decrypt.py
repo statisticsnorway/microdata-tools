@@ -149,7 +149,17 @@ def untar_encrypted_dataset(
 ) -> None:
     with tarfile.open(input_file) as tar:
         _validate_tar_contents(tar.getnames(), dataset_name)
+        _check_no_path_traversal(tar.getmembers())
         tar.extractall(path=untar_dir)
+
+
+def _check_no_path_traversal(members: List[tarfile.TarInfo]) -> None:
+    for member in members:
+        member_path = Path(member.name)
+        if member_path.is_absolute() or ".." in member_path.parts:
+            raise InvalidTarFileContents(
+                f"Tar member '{member.name}' contains a path traversal sequence"
+            )
 
 
 def _validate_tar_contents(files: List[str], dataset_name: str) -> None:
