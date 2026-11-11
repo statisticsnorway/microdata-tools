@@ -24,8 +24,13 @@ jobs:
         with:
           python-version: '3.14'
 
+      - name: Install a specific version of uv
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.13.4"
+
       - name: Install Dependencies
-        run: pip install mkdocs-material
+        run: uv sync --project docs --locked
 
       - name: Deploy to GitHub Pages
-        run: mkdocs gh-deploy --force --verbose
+        run: uv run --project docs --locked mkdocs gh-deploy --force --verbose

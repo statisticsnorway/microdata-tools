@@ -41,6 +41,12 @@ nav:
 
 docs_dir: docs
 
+# The docs environment is a standalone uv project living inside docs_dir,
+# so its project files must not be published to the site.
+exclude_docs: |
+  pyproject.toml
+  uv.lock
+
 plugins:
   - search
 
