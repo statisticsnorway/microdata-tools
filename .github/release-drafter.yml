@@ -1,26 +1,35 @@
-# re: https://github.com/release-drafter/release-drafter/tree/v6.0.0/?tab=readme-ov-file#configuration-options
+# re: https://github.com/release-drafter/release-drafter/tree/v7.10.0/?tab=readme-ov-file#configuration-options
 categories:
   - title: ":boom: Breaking Changes"
-    label: "breaking"
+    when:
+      label: "breaking"
   - title: ":rocket: Features"
-    label: "enhancement"
+    when:
+      label: "enhancement"
   - title: ":fire: Removals and Deprecations"
-    label: "removal"
+    when:
+      label: "removal"
   - title: ":beetle: Fixes"
-    label: "bug"
+    when:
+      label: "bug"
   - title: ":racehorse: Performance"
-    label: "performance"
+    when:
+      label: "performance"
   - title: ":rotating_light: Testing"
-    label: "testing"
+    when:
+      label: "testing"
   - title: ":construction_worker: Continuous Integration"
-    label: "ci"
+    when:
+      label: "ci"
   - title: ":books: Documentation"
-    label: "documentation"
+    when:
+      label: "documentation"
   - title: ":hammer: Refactoring"
-    label: "refactoring"
+    when:
+      label: "refactoring"
   - title: ":package: Dependencies"
-    labels:
-      - "dependencies"
+    when:
+      label: "dependencies"
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&' 
 template: |
